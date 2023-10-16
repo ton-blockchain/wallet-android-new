@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="300dp">
+
+    <ImageView
+        android:id="@+id/tonConnectApproveCloseButton"
+        android:background="@drawable/ripple_oval_dark"
+        android:contentDescription="@string/accessibility_close"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="4dp"
+        android:src="@drawable/ic_close_24"
+        android:scaleType="center" />
+
+    <View
+        android:id="@+id/tonConnectApproveLoadingView"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center" />
+
+    <LinearLayout
+        android:id="@+id/tonConnectApproveContentLayout"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/tonConnectApproveImageView"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="44dp"
+            android:scaleType="center"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            android:id="@+id/tonConnectApproveTitleTextView"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="40dp"
+            tools:text="Connect to Fragment"
+            style="@style/Text.Header.Black" />
+
+        <TextView
+            android:id="@+id/tonConnectApproveSubTitleTextView"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="24dp"
+            tools:text="fragment.io is requesting access to your wallet address UQBF…AoKP v4R2."/>
+
+        <TextView
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            android:layout_marginHorizontal="24dp"
+            android:text="@string/ton_connect_connect_description"
+            android:textColor="@color/text_secondary" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tonConnectApproveConnectButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="16dp"
+                android:text="@string/ton_connect_connect_wallet"
+                style="@style/Button.Big.Primary" />
+
+            <ImageView
+                android:id="@+id/tonConnectApproveDoneImage"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center_horizontal|bottom"
+                android:layout_marginBottom="20dp"
+                android:src="@drawable/ic_done"
+                android:visibility="invisible" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+</FrameLayout>

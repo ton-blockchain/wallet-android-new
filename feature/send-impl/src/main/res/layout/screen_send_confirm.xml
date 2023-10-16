@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/sendConfirmScrollView"
+        android:fillViewport="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:layout_marginBottom="68dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="20dp">
+
+            <TextView
+                android:id="@+id/sendConfirmCommentTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginHorizontal="20dp"
+                android:text="@string/comment_optional"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                style="@style/Text.Title" />
+
+            <org.ton.wallet.uicomponents.view.AppEditText
+                android:id="@+id/sendConfirmDescriptionEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:hint="@string/description_of_payment"
+                app:layout_constraintTop_toBottomOf="@id/sendConfirmCommentTitle" />
+
+            <TextView
+                android:id="@+id/sendConfirmDescriptionCommentText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginHorizontal="20dp"
+                android:text="@string/comment_visible_to_everyone"
+                android:textColor="@color/text_secondary"
+                app:layout_constraintTop_toBottomOf="@id/sendConfirmDescriptionEditText" />
+
+            <TextView
+                android:id="@+id/sendConfirmMessageCharactersText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                app:layout_constraintTop_toBottomOf="@id/sendConfirmDescriptionCommentText" />
+
+            <TextView
+                android:id="@+id/sendConfirmDetailsTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:layout_marginHorizontal="20dp"
+                android:text="@string/details"
+                app:layout_constraintTop_toBottomOf="@id/sendConfirmMessageCharactersText"
+                style="@style/Text.Title" />
+
+
+            <TextView
+                android:id="@+id/sendConfirmRecipientTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:layout_marginStart="20dp"
+                android:lineSpacingExtra="10sp"
+                android:text="@string/recipient"
+                app:layout_constraintTop_toBottomOf="@id/sendConfirmDetailsTitle"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/sendConfirmRecipientValue"
+                android:fontFamily="@font/robotomono_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                app:layout_constraintTop_toTopOf="@id/sendConfirmRecipientTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/sendConfirmRecipientTitle" />
+
+            <View
+                android:id="@+id/sendConfirmRecipientLine"
+                android:background="@color/input_disabled"
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginTop="14dp"
+                app:layout_constraintTop_toBottomOf="@id/sendConfirmRecipientTitle" />
+
+
+            <TextView
+                android:id="@+id/sendConfirmAmountTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:layout_marginStart="20dp"
+                android:text="@string/amount"
+                app:layout_constraintTop_toBottomOf="@id/sendConfirmRecipientLine"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/sendConfirmAmountValue"
+                android:drawablePadding="4dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                app:drawableStartCompat="@drawable/ic_gem_18"
+                app:layout_constraintTop_toTopOf="@id/sendConfirmAmountTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/sendConfirmAmountTitle" />
+
+            <View
+                android:id="@+id/sendConfirmAmountLine"
+                android:background="@color/input_disabled"
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginTop="14dp"
+                app:layout_constraintTop_toBottomOf="@id/sendConfirmAmountTitle" />
+
+
+            <TextView
+                android:id="@+id/sendConfirmFeeTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:layout_marginStart="20dp"
+                android:text="@string/fee"
+                app:layout_constraintTop_toBottomOf="@id/sendConfirmAmountLine"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/sendConfirmFeeValue"
+                android:drawablePadding="4dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                app:drawableStartCompat="@drawable/ic_gem_18"
+                app:layout_constraintTop_toTopOf="@id/sendConfirmFeeTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/sendConfirmFeeTitle" />
+
+            <View
+                android:id="@+id/sendConfirmFeeLoadingView"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginEnd="20dp"
+                app:layout_constraintTop_toTopOf="@id/sendConfirmFeeTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/sendConfirmFeeTitle" />
+
+            <View
+                android:id="@+id/sendConfirmFeeLine"
+                android:background="@color/input_disabled"
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginTop="14dp"
+                app:layout_constraintTop_toBottomOf="@id/sendConfirmFeeTitle" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <org.ton.wallet.uicomponents.view.AppToolbar
+        android:id="@+id/sendConfirmToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:title="@string/send_ton"
+        app:shadowAlpha="0" />
+
+    <TextView
+        android:id="@+id/sendConfirmContinueButton"
+        android:layout_gravity="bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="@string/confirm_and_send"
+        style="@style/Button.Big.Primary" />
+
+</FrameLayout>

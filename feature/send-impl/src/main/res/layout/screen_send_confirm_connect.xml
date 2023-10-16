@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/sendConfirmConnectScrollView"
+        android:fillViewport="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:layout_marginBottom="68dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="76dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/sendConfirmConnectAmountText"
+                android:drawablePadding="4dp"
+                android:fontFamily="@font/productsans_medium"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:textSize="44sp" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="14dp">
+
+                <TextView
+                    android:id="@+id/sendConfirmConnectReceiverTitleText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|center_vertical"
+                    android:text="@string/recipient" />
+
+                <TextView
+                    android:id="@+id/sendConfirmConnectReceiverText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|center_vertical" />
+
+            </FrameLayout>
+
+            <View
+                android:background="@color/input_disabled"
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="14dp">
+
+                <TextView
+                    android:id="@+id/sendConfirmConnectFeeTitleText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|center_vertical"
+                    android:text="@string/fee" />
+
+                <TextView
+                    android:id="@+id/sendConfirmConnectFeeText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|center_vertical" />
+
+                <View
+                    android:id="@+id/sendConfirmConnectFeeLoaderView"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="end|center_vertical" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <org.ton.wallet.uicomponents.view.AppToolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:title="@string/ton_transfer"
+        app:imageVisible="false"
+        app:shadowAlpha="0" />
+
+    <LinearLayout
+        android:id="@+id/sendConfirmConnectButtonsLayout"
+        android:layout_gravity="bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/sendConfirmConnectCancelButton"
+            android:layout_gravity="bottom"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/cancel"
+            style="@style/Button.Big.Secondary" />
+
+        <TextView
+            android:id="@+id/sendConfirmConnectConfirmButton"
+            android:layout_gravity="bottom"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="@string/confirm"
+            style="@style/Button.Big.Primary" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/sendConfirmConnectDoneImage"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/ic_done"
+        android:visibility="invisible" />
+
+</FrameLayout>

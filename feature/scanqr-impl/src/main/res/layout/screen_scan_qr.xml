@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/common_black"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.camera.view.PreviewView
+        android:id="@+id/scanQrPreviewView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <View
+        android:id="@+id/scanQrForegroundView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/scanQrTitle"
+        android:gravity="center"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="36dp"
+        android:text="@string/scan_qr_code"
+        android:textColor="@color/common_white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        style="@style/Text.Header.White" />
+
+    <ImageView
+        android:id="@+id/scanQrImageButton"
+        android:background="@drawable/bkg_button_camera"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginBottom="88dp"
+        android:scaleType="center"
+        android:src="@drawable/ic_image_select_28"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/scanQrFlashlightButton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:tint="@color/common_white"
+        tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:id="@+id/scanQrFlashlightButton"
+        android:background="@drawable/bkg_button_camera"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="72dp"
+        android:layout_marginBottom="88dp"
+        android:scaleType="center"
+        android:src="@drawable/ic_flashlight_28"
+        app:layout_constraintStart_toEndOf="@id/scanQrImageButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:tint="@color/common_white"
+        tools:ignore="ContentDescription" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/scanQrCameraGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="scanQrImageButton,scanQrFlashlightButton,scanQrPreviewView" />
+
+
+    <ImageView
+        android:id="@+id/scanQrBackButton"
+        android:background="@drawable/ripple_oval_light"
+        android:contentDescription="@string/accessibility_back"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="4dp"
+        android:scaleType="center"
+        android:src="@drawable/ic_back_24"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:tint="@color/common_white" />
+
+
+    <TextView
+        android:id="@+id/scanQrNoPermissionTitle"
+        android:gravity="center"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="40dp"
+        android:text="@string/no_camera_access"
+        android:textColor="@color/common_white"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintTop_toBottomOf="@id/scanQrBackButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/scanQrNoPermissionSubtitle"
+        style="@style/Text.Header.Black" />
+
+    <TextView
+        android:id="@+id/scanQrNoPermissionSubtitle"
+        android:gravity="center"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginHorizontal="40dp"
+        android:text="@string/no_camera_access_description"
+        android:textColor="@color/common_white"
+        app:layout_constraintTop_toBottomOf="@id/scanQrNoPermissionTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/scanQrOpenSettingsButton" />
+
+    <TextView
+        android:id="@+id/scanQrOpenSettingsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="100dp"
+        android:text="@string/open_settings"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        style="@style/Button.Big.Primary" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/scanQrNoPermissionGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:constraint_referenced_ids="scanQrNoPermissionTitle,scanQrNoPermissionSubtitle,scanQrOpenSettingsButton" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

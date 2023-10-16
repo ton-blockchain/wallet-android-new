@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/receiveScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginHorizontal="40dp"
+                android:text="@string/share_this_address"
+                android:textColor="@color/text_secondary" />
+
+            <ImageView
+                android:id="@+id/receiveQrImage"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="@dimen/qr_image_size"
+                android:layout_height="@dimen/qr_image_size"
+                android:layout_marginTop="26dp"
+                android:scaleType="center"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:id="@+id/receiveAddressText"
+                android:fontFamily="@font/robotomono_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="28dp"
+                android:layout_marginHorizontal="20dp"
+                tools:text="lhGE49PbJckcU1y70jEQwf\n6InI414L1PLMIs3rrFx50F" />
+
+            <TextView
+                android:id="@+id/receiveShareButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="16dp"
+                android:text="@string/share_wallet_address"
+                style="@style/Button.Big.Primary" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <org.ton.wallet.uicomponents.view.AppToolbar
+        android:id="@+id/receiveToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:title="@string/receive_ton"
+        app:imageVisible="false" />
+
+</FrameLayout>

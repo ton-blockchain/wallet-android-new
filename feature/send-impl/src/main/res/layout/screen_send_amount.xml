@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/sendAmountScrollView"
+        android:fillViewport="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <View
+                android:id="@+id/sendAmountToBackground"
+                android:background="@drawable/ripple_rect"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintTop_toTopOf="@id/sendAmountToText"
+                app:layout_constraintBottom_toBottomOf="@id/sendAmountToText" />
+
+            <TextView
+                android:id="@+id/sendAmountToText"
+                android:gravity="start"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="8dp"
+                android:paddingVertical="14dp"
+                android:textColor="@color/text_secondary"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/sendAmountToEdit"
+                tools:text="Send to: EQCc…9ZLD grshn.ton" />
+
+            <TextView
+                android:id="@+id/sendAmountToEdit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:text="@string/edit"
+                android:textColor="@color/blue"
+                app:layout_constraintTop_toTopOf="@id/sendAmountToText"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/sendAmountToText" />
+
+            <org.ton.wallet.uicomponents.view.amount.AmountEditText
+                android:id="@+id/sendAmountEditText"
+                android:background="@color/transparent"
+                android:fontFamily="@font/productsans_medium"
+                android:hint="0"
+                android:importantForAutofill="no"
+                android:includeFontPadding="false"
+                android:inputType="text"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginHorizontal="20dp"
+                android:maxLength="19"
+                android:textColorHint="@color/input_hint"
+                android:textIsSelectable="true"
+                android:textSize="@dimen/amount_big_text_size"
+                app:layout_constraintTop_toBottomOf="@id/sendAmountToBackground"
+                app:layout_constraintBottom_toTopOf="@id/sendAmountSendAllBackground"
+                app:layout_constraintHeight_default="wrap" />
+
+            <TextView
+                android:id="@+id/sendAmountInsufficientFundsText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/insufficient_funds"
+                android:textColor="@color/text_error"
+                app:layout_constraintStart_toStartOf="@id/sendAmountEditText"
+                app:layout_constraintEnd_toEndOf="@id/sendAmountEditText"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/sendAmountSendAllBackground"
+                android:background="@drawable/ripple_rect"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintTop_toTopOf="@id/sendAmountSendAllTitle"
+                app:layout_constraintBottom_toBottomOf="@id/sendAmountSendAllTitle" />
+
+            <TextView
+                android:id="@+id/sendAmountSendAllTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginBottom="8dp"
+                android:paddingVertical="14dp"
+                android:text="@string/send_all"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/sendAmountContinueButton" />
+
+            <TextView
+                android:id="@+id/sendAmountSendAllValue"
+                android:drawablePadding="4dp"
+                android:gravity="start"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="8dp"
+                app:drawableStartCompat="@drawable/ic_gem_18"
+                app:layout_constraintTop_toTopOf="@id/sendAmountSendAllTitle"
+                app:layout_constraintStart_toEndOf="@id/sendAmountSendAllTitle"
+                app:layout_constraintEnd_toStartOf="@id/sendAmountSendAllSwitch"
+                app:layout_constraintBottom_toBottomOf="@id/sendAmountSendAllTitle" />
+
+            <org.ton.wallet.uicomponents.view.SwitchView
+                android:id="@+id/sendAmountSendAllSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="18dp"
+                app:layout_constraintTop_toTopOf="@id/sendAmountSendAllTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/sendAmountSendAllTitle" />
+
+            <TextView
+                android:id="@+id/sendAmountContinueButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="16dp"
+                android:text="@string/continue_text"
+                app:layout_constraintBottom_toTopOf="@id/sendAmountNumPadView"
+                style="@style/Button.Big.Primary" />
+
+            <org.ton.wallet.uicomponents.view.NumPadView
+                android:id="@+id/sendAmountNumPadView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginBottom="15dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:numpad_dot="true" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <org.ton.wallet.uicomponents.view.AppToolbar
+        android:id="@+id/sendAmountToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:title="@string/send_ton"
+        app:shadowAlpha="0" />
+
+</FrameLayout>

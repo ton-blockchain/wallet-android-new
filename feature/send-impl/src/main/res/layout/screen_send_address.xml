@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/sendAddressScrollView"
+        android:fillViewport="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize">
+
+        <LinearLayout
+            android:id="@+id/sendAddressContentLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="80dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginHorizontal="20dp"
+                android:text="@string/wallet_address_or_domain"
+                style="@style/Text.Title" />
+
+            <org.ton.wallet.uicomponents.view.AppEditText
+                android:id="@+id/sendAddressEditText"
+                android:hint="@string/enter_wallet_address"
+                android:layout_marginTop="12dp"
+                android:layout_marginHorizontal="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="2" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginHorizontal="20dp"
+                android:text="@string/paste_address_or_dns"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginHorizontal="12dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/sendAddressPasteButton"
+                    android:background="@drawable/ripple_rect_6dp_dark"
+                    android:drawablePadding="8dp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:gravity="center_vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:text="@string/paste"
+                    android:textColor="@color/blue"
+                    android:textSize="14sp"
+                    app:drawableStartCompat="@drawable/ic_paste_20"
+                    app:drawableTint="@color/blue" />
+
+                <TextView
+                    android:id="@+id/sendAddressScanButton"
+                    android:background="@drawable/ripple_rect_6dp_dark"
+                    android:drawablePadding="8dp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:gravity="center_vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:padding="8dp"
+                    android:text="@string/scan"
+                    android:textColor="@color/blue"
+                    android:textSize="14sp"
+                    app:drawableStartCompat="@drawable/ic_scan_20"
+                    app:drawableTint="@color/blue" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/sendAddressRecentTitleText"
+                android:fontFamily="@font/inter_semi_bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginHorizontal="20dp"
+                android:text="@string/recent"
+                android:textColor="@color/blue"
+                android:textSize="13sp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/sendAddressHistoryRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <FrameLayout
+        android:background="@color/common_white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginTop="16dp"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="16dp">
+
+        <TextView
+            android:id="@+id/sendAddressButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/continue_text"
+            style="@style/Button.Big.Primary" />
+
+    </FrameLayout>
+
+    <org.ton.wallet.uicomponents.view.AppToolbar
+        android:id="@+id/sendAddressToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:title="@string/send_ton"
+        app:imageVisible="false"
+        app:shadowAlpha="0.0" />
+
+</FrameLayout>

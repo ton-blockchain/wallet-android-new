@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/splash_bottom_sheet_top">
+
+    <TextView
+        android:id="@+id/itemHeaderAddressText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/common_white"
+        android:textSize="15sp"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/itemHeaderBalanceText"
+        tools:text="UQBF…AoKP" />
+
+<!--    <androidx.appcompat.widget.AppCompatTextView-->
+<!--        android:id="@+id/itemHeaderBalanceText"-->
+<!--        android:drawablePadding="4dp"-->
+<!--        android:fontFamily="@font/productsans_medium"-->
+<!--        android:gravity="center"-->
+<!--        android:includeFontPadding="false"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="2dp"-->
+<!--        android:layout_marginHorizontal="20dp"-->
+<!--        android:lineSpacingExtra="4sp"-->
+<!--        android:maxLines="1"-->
+<!--        android:textColor="@color/common_white"-->
+<!--        android:textSize="@dimen/amount_big_text_size"-->
+<!--        app:layout_constrainedWidth="true"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/itemHeaderAddressText"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintBottom_toBottomOf="@id/itemHeaderButtonsGuideline"-->
+<!--        tools:text="987654321.123456789" />-->
+
+    <org.ton.wallet.uicomponents.view.amount.AmountView
+        android:id="@+id/itemHeaderBalanceText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:paddingHorizontal="20dp"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintTop_toBottomOf="@id/itemHeaderAddressText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/itemHeaderButtonsGuideline" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/itemHeaderButtonsGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="top"
+        app:constraint_referenced_ids="mainReceiveButtonBackground,mainSendButtonBackground" />
+
+    <View
+        android:id="@+id/mainReceiveButtonBackground"
+        android:background="@drawable/bkg_button_primary"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="6dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/mainSendButtonBackground"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/mainReceiveButtonText"
+        android:drawablePadding="6dp"
+        android:fontFamily="@font/roboto_medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/receive"
+        android:textColor="@color/common_white"
+        app:drawableStartCompat="@drawable/ic_receive_18"
+        app:drawableTint="@color/common_white"
+        app:layout_constraintTop_toTopOf="@id/mainReceiveButtonBackground"
+        app:layout_constraintStart_toStartOf="@id/mainReceiveButtonBackground"
+        app:layout_constraintEnd_toEndOf="@id/mainReceiveButtonBackground"
+        app:layout_constraintBottom_toBottomOf="@id/mainReceiveButtonBackground" />
+
+    <View
+        android:id="@+id/mainSendButtonBackground"
+        android:background="@drawable/bkg_button_primary"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintStart_toEndOf="@id/mainReceiveButtonBackground"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/mainSendButtonText"
+        android:drawablePadding="6dp"
+        android:fontFamily="@font/roboto_medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/send"
+        android:textColor="@color/common_white"
+        app:drawableStartCompat="@drawable/ic_send_18"
+        app:drawableTint="@color/common_white"
+        app:layout_constraintTop_toTopOf="@id/mainSendButtonBackground"
+        app:layout_constraintStart_toStartOf="@id/mainSendButtonBackground"
+        app:layout_constraintEnd_toEndOf="@id/mainSendButtonBackground"
+        app:layout_constraintBottom_toBottomOf="@id/mainSendButtonBackground" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

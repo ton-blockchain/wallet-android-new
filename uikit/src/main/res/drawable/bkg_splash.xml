@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:drawable="@color/common_black" />
+
+    <item android:top="@dimen/splash_bottom_sheet_top">
+        <shape android:shape="rectangle">
+            <corners
+                android:topLeftRadius="@dimen/bottom_sheet_radius"
+                android:topRightRadius="@dimen/bottom_sheet_radius" />
+            <solid
+                android:color="@color/common_white" />
+        </shape>
+    </item>
+
+</layer-list>

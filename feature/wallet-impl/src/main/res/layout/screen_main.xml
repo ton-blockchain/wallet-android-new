@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/common_black"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/toolbarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="56dp">
+
+        <org.ton.wallet.rlottie.RLottieImageView
+            android:id="@+id/mainToolbarAnimationView"
+            android:alpha="0"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_gravity="bottom"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="29dp"
+            app:rlottie_autoRepeat="true"
+            app:rlottie_rawRes="@raw/lottie_main"
+            tools:alpha="1"
+            tools:background="@color/blue" />
+
+        <TextView
+            android:id="@+id/mainToolbarBalanceText"
+            android:alpha="0"
+            android:fontFamily="@font/roboto_medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="38dp"
+            android:layout_marginBottom="28dp"
+            android:lineSpacingExtra="3sp"
+            android:textColor="@color/common_white"
+            android:textSize="18sp"
+            tools:alpha="1"
+            tools:text="56.2322" />
+
+        <TextView
+            android:id="@+id/mainToolbarFiatBalanceText"
+            android:alpha="0"
+            android:fontFamily="@font/roboto_regular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="30dp"
+            android:textColor="@color/text_balance_fiat"
+            android:textSize="14sp"
+            tools:alpha="1"
+            tools:text="≈ $89.6" />
+
+        <TextView
+            android:id="@+id/mainToolbarStatusText"
+            android:ellipsize="end"
+            android:fontFamily="@font/roboto_medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="100dp"
+            android:maxLines="1"
+            android:textColor="@color/common_white"
+            android:textSize="20sp" />
+
+        <ImageView
+            android:id="@+id/mainScanButton"
+            android:background="@drawable/ripple_oval_light"
+            android:contentDescription="@string/accessibility_settings"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="end"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="52dp"
+            android:scaleType="center"
+            android:src="@drawable/ic_scan_24"
+            app:tint="@color/common_white" />
+
+        <ImageView
+            android:id="@+id/mainSettingsButton"
+            android:background="@drawable/ripple_oval_light"
+            android:contentDescription="@string/accessibility_settings"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_gravity="end"
+            android:scaleType="center"
+            android:src="@drawable/ic_settings_24"
+            app:tint="@color/common_white" />
+
+    </FrameLayout>
+
+    <org.ton.wallet.uicomponents.view.PullToRefreshLayout
+        android:id="@+id/mainPullToRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="56dp">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/mainRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never" />
+
+        <TextView
+            android:id="@+id/mainStickyHeaderView"
+            android:background="@color/common_white"
+            android:fontFamily="@font/roboto_medium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="20dp"
+            android:layout_marginHorizontal="16dp"
+            android:text="Header"
+            android:textColor="@color/common_black"
+            android:textSize="15sp"
+            android:visibility="gone" />
+
+    </org.ton.wallet.uicomponents.view.PullToRefreshLayout>
+
+</FrameLayout>

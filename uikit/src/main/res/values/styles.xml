@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Text -->
+    <style name="Text" parent="Widget.AppCompat.TextView">
+        <item name="android:fontFamily">@font/roboto_regular</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="Text.Header">
+        <item name="android:fontFamily">@font/roboto_medium</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="Text.Header.Black">
+        <item name="android:textColor">@color/header_black</item>
+    </style>
+
+    <style name="Text.Header.White">
+        <item name="android:textColor">@color/common_white</item>
+    </style>
+
+    <style name="Text.Title">
+        <item name="android:fontFamily">@font/roboto_medium</item>
+        <item name="android:textColor">@color/blue</item>
+    </style>
+
+    <style name="Text.Toolbar">
+        <item name="android:fontFamily">@font/roboto_medium</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+
+    <!-- Button -->
+    <style name="Button" parent="Text">
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="Button.Big">
+        <item name="android:drawablePadding">4dp</item>
+        <item name="android:minWidth">200dp</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
+    </style>
+
+    <style name="Button.Big.Primary">
+        <item name="android:background">@drawable/bkg_button_primary</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
+        <item name="android:textColor">@color/common_white</item>
+    </style>
+
+    <style name="Button.Big.Secondary">
+        <item name="android:background">@drawable/bkg_button_secondary</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
+        <item name="android:textColor">@color/blue</item>
+    </style>
+
+    <style name="Button.Big.Transparent">
+        <item name="android:background">@drawable/bkg_button_transparent</item>
+        <item name="android:textColor">@color/blue</item>
+    </style>
+
+</resources>

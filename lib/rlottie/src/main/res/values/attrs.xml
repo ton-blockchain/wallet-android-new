@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="RLottieImageView">
+        <attr name="rlottie_autoPlay" format="boolean" />
+        <attr name="rlottie_autoRepeat" format="boolean" />
+        <attr name="rlottie_rawRes" format="reference" />
+        <attr name="rlottie_width" format="dimension" />
+        <attr name="rlottie_height" format="dimension" />
+    </declare-styleable>
+
+</resources>

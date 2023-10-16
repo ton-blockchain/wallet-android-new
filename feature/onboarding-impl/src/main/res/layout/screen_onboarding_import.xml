@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/common_white"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/importScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:id="@+id/importContentLayout"
+            android:gravity="center_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="56dp">
+
+            <TextView
+                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginHorizontal="40dp"
+                android:text="@string/secret_words_subtitle"
+                style="@style/Text" />
+
+            <TextView
+                android:id="@+id/importDontHaveButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginHorizontal="40dp"
+                android:text="@string/dont_have_phrase"
+                android:textColor="@color/text_blue" />
+
+            <TextView
+                android:id="@+id/importDoneButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:text="@string/continue_text"
+                style="@style/Button.Big.Primary" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <org.ton.wallet.uicomponents.view.AppToolbar
+        android:id="@+id/importToolbar"
+        android:background="@color/common_white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:title="@string/secret_words" />
+
+    <org.ton.wallet.rlottie.RLottieImageView
+        android:id="@+id/importAnimationView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center_horizontal"
+        app:rlottie_rawRes="@raw/lottie_recovery_phrase" />
+
+    <TextView
+        android:id="@+id/importTitleText"
+        android:includeFontPadding="false"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginHorizontal="24dp"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/secret_words"
+        style="@style/Text.Header.Black" />
+
+</FrameLayout>

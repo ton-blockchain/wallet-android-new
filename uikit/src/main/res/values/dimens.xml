@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="amount_big_text_size">44sp</dimen>
+    <dimen name="bottom_sheet_radius">12dp</dimen>
+    <dimen name="button_radius">8dp</dimen>
+    <dimen name="phrase_word_width">220dp</dimen>
+    <dimen name="qr_image_size">160dp</dimen>
+    <dimen name="splash_bottom_sheet_top">300dp</dimen>
+
+</resources>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="AppEditText">
+        <attr name="android:background" format="reference" />
+        <attr name="android:textColorHint" format="color|reference" />
+        <attr name="android:textSize" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="AppToolbar">
+        <attr name="android:title" format="string" />
+        <attr name="imageVisible" format="boolean" />
+        <attr name="shadowAlpha" format="float" />
+        <attr name="tintColor" format="color|reference" />
+        <attr name="titleColor" format="color|reference" />
+    </declare-styleable>
+
+    <declare-styleable name="NumPadView">
+        <attr name="numpad_dark" format="boolean" />
+        <attr name="numpad_dot" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="PassCodeView">
+        <attr name="passcode_dark" format="boolean" />
+    </declare-styleable>
+
+</resources>

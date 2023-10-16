@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageView
+        android:id="@+id/sendProcessingCloseButton"
+        android:background="@drawable/ripple_oval_dark"
+        android:contentDescription="@string/accessibility_back"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="4dp"
+        android:scaleType="center"
+        android:src="@drawable/ic_close_24" />
+
+    <LinearLayout
+        android:id="@+id/sendProcessingCompletedLayout"
+        android:gravity="center_horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:visibility="invisible"
+        tools:visibility="visible">
+
+        <org.ton.wallet.rlottie.RLottieImageView
+            android:id="@+id/sendProcessingCompletedAnimationView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            app:rlottie_autoRepeat="true"
+            app:rlottie_rawRes="@raw/lottie_success" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/done_exclamation"
+            style="@style/Text.Header.Black" />
+
+        <TextView
+            android:id="@+id/sendProcessingSentText"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginHorizontal="40dp"
+            tools:text="2.2 Toncoin have been sent to"/>
+
+        <TextView
+            android:id="@+id/sendProcessingAddressText"
+            android:gravity="center"
+            android:fontFamily="@font/robotomono_regular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="24dp"
+            tools:text="UQBFz01R2CU7YA8pevUaNIYE\nzi1mRo4cX-r3W2Dwx-WEAoKP"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/sendProcessingProgressLayout"
+        android:gravity="center_horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+        <org.ton.wallet.rlottie.RLottieImageView
+            android:id="@+id/sendProcessingProgressAnimationView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            app:rlottie_autoPlay="true"
+            app:rlottie_autoRepeat="true"
+            app:rlottie_rawRes="@raw/lottie_waiting_ton" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/sending_ton"
+            style="@style/Text.Header.Black" />
+
+        <TextView
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginHorizontal="40dp"
+            android:text="@string/please_wait_few_seconds" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/sendProcessingWalletButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_margin="16dp"
+        android:text="@string/view_my_wallet"
+        style="@style/Button.Big.Primary" />
+
+</FrameLayout>

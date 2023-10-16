@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/common_black"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <View
+        android:id="@+id/settingsBackgroundView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/settingsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"/>
+
+    <org.ton.wallet.uicomponents.view.AppToolbar
+        android:id="@+id/settingsToolbar"
+        android:background="@color/common_black"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:title="@string/wallet_settings"
+        app:tintColor="@color/common_white"
+        app:titleColor="@color/common_white" />
+
+</FrameLayout>

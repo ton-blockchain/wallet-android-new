@@ -18,7 +18,10 @@ class GetCurrentAccountBalanceUseCaseImpl(
 
     override fun getTonBalanceFlow(): Flow<Long?> {
         return getCurrentAccountDataUseCase.getAccountStateFlow()
-            .map { it.balance }
+            .map { account ->
+                return@map if (account.balance == -1L && account.lastTransactionId != null) 0L
+                else account.balance
+            }
     }
 
     override fun getFiatBalanceStringFlow(): Flow<String> {

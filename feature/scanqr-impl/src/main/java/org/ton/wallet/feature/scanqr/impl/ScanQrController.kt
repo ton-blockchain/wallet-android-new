@@ -163,6 +163,7 @@ class ScanQrController(args: Bundle?) : BaseViewModelController<ScanQrViewModel>
     private fun onPermissionChanged(hasCameraPermission: Boolean) {
         noPermissionsGroup.isVisible = !hasCameraPermission
         cameraGroup.isVisible = hasCameraPermission
+        titleText.isVisible = hasCameraPermission
         previewForegroundView.foreground =
             if (hasCameraPermission) qrForeground
             else null

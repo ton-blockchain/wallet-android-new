@@ -12,6 +12,7 @@ import androidx.core.widget.NestedScrollView
 import com.bluelinelabs.conductor.ControllerChangeHandler
 import com.bluelinelabs.conductor.ControllerChangeType
 import org.ton.wallet.core.Res
+import org.ton.wallet.coreui.KeyboardUtils
 import org.ton.wallet.coreui.ext.*
 import org.ton.wallet.feature.onboarding.impl.R
 import org.ton.wallet.feature.onboarding.impl.base.BaseInputListController
@@ -40,7 +41,9 @@ class ImportController(args: Bundle?) : BaseInputListController<ImportViewModel>
 
     private lateinit var animationView: RLottieImageView
     private lateinit var contentLayout: LinearLayout
+    private lateinit var doneButton: View
     private lateinit var editTextLayouts: Array<NumericEditTextLayout?>
+    private lateinit var scrollView: NestedScrollView
 
     private var slidingHeaderController: ToolbarSlidingHeaderController? = null
     private var progressDialog: IndeterminateProgressDialog? = null
@@ -48,15 +51,15 @@ class ImportController(args: Bundle?) : BaseInputListController<ImportViewModel>
     override fun createView(inflater: LayoutInflater, container: ViewGroup, savedViewState: Bundle?): View {
         val view = inflater.inflate(R.layout.screen_onboarding_import, container, false)
 
-        val scrollView = view.findViewById<NestedScrollView>(R.id.importScrollView)
-        scrollView.setOnScrollChangeListener(scrollChangeListener)
         view.findViewById<View>(R.id.importDontHaveButton).setOnClickListenerWithLock(viewModel::onNoPhraseClicked)
-
-        val doneButton = view.findViewById<View>(R.id.importDoneButton)
+        doneButton = view.findViewById(R.id.importDoneButton)
         doneButton.setOnClickListenerWithLock(::onDoneClicked)
 
         contentLayout = view.findViewById(R.id.importContentLayout)
         contentLayout.setOnClickListener(::dismissSuggestPopupWindow)
+
+        scrollView = view.findViewById(R.id.importScrollView)
+        scrollView.setOnScrollChangeListener(scrollChangeListener)
 
         // setup inputs
         val childPosition = contentLayout.indexOfChild(doneButton)
@@ -171,6 +174,9 @@ class ImportController(args: Bundle?) : BaseInputListController<ImportViewModel>
                 for (i in 0 until maxIndex) {
                     editTextLayouts[i]?.editText?.setTextWithSelection(words[i])
                     viewModel.setEnteredWord(i, words[i])
+                }
+                KeyboardUtils.hideKeyboard(activity!!.window) {
+                    scrollView.smoothScrollTo(0, doneButton.top)
                 }
             }
         }

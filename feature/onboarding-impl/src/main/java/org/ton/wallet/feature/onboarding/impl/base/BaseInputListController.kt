@@ -64,7 +64,7 @@ abstract class BaseInputListController<VM : BaseInputListViewModel>(args: Bundle
         }
     }
 
-    private fun onWordSelected(word: String) {
+    protected open fun onWordSelected(word: String) {
         currentFocusedEditText?.let { et ->
             et.setTextWithSelection(word)
             val editTextPosition = inputLayouts.indexOfFirst { it.editText == et }

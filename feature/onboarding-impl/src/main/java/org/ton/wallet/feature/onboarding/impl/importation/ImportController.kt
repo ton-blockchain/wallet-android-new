@@ -3,8 +3,10 @@ package org.ton.wallet.feature.onboarding.impl.importation
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.*
+import android.view.inputmethod.EditorInfo
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.TextView.OnEditorActionListener
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.NestedScrollView
 import com.bluelinelabs.conductor.ControllerChangeHandler
@@ -77,6 +79,7 @@ class ImportController(args: Bundle?) : BaseInputListController<ImportViewModel>
             if (i == 0) {
                 editTextLayout.editText.addTextChangedListener(firstInputTextWatcher)
             }
+            editTextLayout.editText.setOnEditorActionListener(editorActionListener)
         }
         for (i in editTextLayouts.indices) {
             editTextLayouts[i]?.setMaxTextWidth(maxNumberWidth)
@@ -122,6 +125,17 @@ class ImportController(args: Bundle?) : BaseInputListController<ImportViewModel>
         slidingHeaderController?.onScrollChange(v, scrollX, scrollY, oldScrollX, oldScrollY)
     }
 
+    override fun onWordSelected(word: String) {
+        super.onWordSelected(word)
+        currentFocusedEditText?.let { et ->
+            et.setTextWithSelection(word)
+            val editTextPosition = inputLayouts.indexOfFirst { it.editText == et }
+            if (editTextPosition == inputLayouts.size - 1) {
+                et.clearFocus()
+            }
+        }
+    }
+
     private fun onDoneClicked() {
         if (checkInputs()) {
             viewModel.onDoneClicked()
@@ -160,6 +174,17 @@ class ImportController(args: Bundle?) : BaseInputListController<ImportViewModel>
                 }
             }
         }
+    }
+
+    private val editorActionListener = OnEditorActionListener { v, actionId, event ->
+        val suggestedWords = viewModel.suggestWordsFlow.value
+        if ((actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_DONE) && suggestedWords.size == 1) {
+            v.text = suggestedWords[0]
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                v.clearFocus()
+            }
+        }
+        false
     }
 
     companion object {

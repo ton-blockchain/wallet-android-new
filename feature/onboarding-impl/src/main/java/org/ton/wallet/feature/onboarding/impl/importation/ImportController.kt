@@ -19,10 +19,12 @@ import org.ton.wallet.screen.viewmodel.viewModels
 import org.ton.wallet.strings.RString
 import org.ton.wallet.uicomponents.dialog.AlertDialog
 import org.ton.wallet.uicomponents.dialog.IndeterminateProgressDialog
+import org.ton.wallet.uicomponents.util.TextWatcherAdapter
 import org.ton.wallet.uicomponents.view.AppToolbar
 import org.ton.wallet.uicomponents.view.NumericEditTextLayout
 import org.ton.wallet.uikit.RUiKitDimen
 import kotlin.math.max
+import kotlin.math.min
 
 class ImportController(args: Bundle?) : BaseInputListController<ImportViewModel>(args) {
 
@@ -71,6 +73,10 @@ class ImportController(args: Bundle?) : BaseInputListController<ImportViewModel>
 
             maxNumberWidth = max(maxNumberWidth, editTextLayout.numberTextWidth)
             editTextLayouts[i] = editTextLayout
+
+            if (i == 0) {
+                editTextLayout.editText.addTextChangedListener(firstInputTextWatcher)
+            }
         }
         for (i in editTextLayouts.indices) {
             editTextLayouts[i]?.setMaxTextWidth(maxNumberWidth)
@@ -105,6 +111,7 @@ class ImportController(args: Bundle?) : BaseInputListController<ImportViewModel>
     }
 
     override fun onDestroyView(view: View) {
+        editTextLayouts.getOrNull(0)?.editText?.removeTextChangedListener(firstInputTextWatcher)
         PreCreatedEditTextLayouts?.forEach { (it.parent as? ViewGroup)?.removeView(it) }
         slidingHeaderController = null
         super.onDestroyView(view)
@@ -137,6 +144,22 @@ class ImportController(args: Bundle?) : BaseInputListController<ImportViewModel>
             positiveButton = Res.str(RString.ok) to DialogInterface.OnClickListener { dialog, _ -> dialog.dismiss() },
         ).build(context)
         showDialog(alertDialog)
+    }
+
+    private val firstInputTextWatcher = object : TextWatcherAdapter {
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            super.onTextChanged(s, start, before, count)
+            val string = s?.toString() ?: ""
+            if (string.contains(" ") && count > 1) {
+                val words = string.split(" ")
+                val maxIndex = min(words.size, editTextLayouts.size)
+                for (i in 0 until maxIndex) {
+                    editTextLayouts[i]?.editText?.setTextWithSelection(words[i])
+                    viewModel.setEnteredWord(i, words[i])
+                }
+            }
+        }
     }
 
     companion object {

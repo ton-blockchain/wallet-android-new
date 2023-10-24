@@ -5,10 +5,12 @@ import drinkless.org.ton.TonApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import org.ton.block.AddrStd
+import org.ton.boc.BagOfCells
 import org.ton.contract.wallet.WalletV4R2Contract
 import org.ton.lite.api.liteserver.LiteServerAccountId
 import org.ton.wallet.data.core.BuildConfig
 import org.ton.wallet.data.core.model.TonAccount
+import org.ton.wallet.data.core.ton.MessageText
 import org.ton.wallet.data.core.ton.TonWalletHelper
 import org.ton.wallet.data.core.util.LoadType
 import org.ton.wallet.data.tonclient.api.TonClient
@@ -248,8 +250,22 @@ class TransactionsRepositoryImpl(
 
     private fun getMessage(msgData: TonApi.MsgData): String? {
         return when (msgData) {
-            is TonApi.MsgDataText -> String(msgData.text)
-            is TonApi.MsgDataDecryptedText -> String(msgData.text)
+            is TonApi.MsgDataText -> {
+                String(msgData.text)
+            }
+            is TonApi.MsgDataDecryptedText -> {
+                String(msgData.text)
+            }
+            is TonApi.MsgDataRaw -> {
+                try {
+                    BagOfCells(msgData.body).roots.firstOrNull()?.let { cell ->
+                        (MessageText.loadTlb(cell) as? MessageText.Raw)?.text
+                    }
+                } catch (e: Exception) {
+                    L.e(e)
+                    null
+                }
+            }
             else -> null
         }
     }

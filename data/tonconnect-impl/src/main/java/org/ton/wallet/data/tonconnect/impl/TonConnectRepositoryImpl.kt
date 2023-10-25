@@ -88,6 +88,7 @@ class TonConnectRepositoryImpl(
         val connection = dao.getConnection(accountId, clientId) ?: return
         val clientIdBytes = connection.clientId.toHexByteArray()
         val secretKeyBytes = connection.secretKey.toHexByteArray()
+        L.d("Send message: ${String(body)}")
         val encryptedBody = SecurityUtils.nativeCryptoBox(body, clientIdBytes, secretKeyBytes) ?: return
         val encryptedBodyBase64 = Base64.encodeToString(encryptedBody, Base64.NO_WRAP)
         val httpUrl = bridgeHttpUrl.newBuilder()
@@ -139,6 +140,7 @@ class TonConnectRepositoryImpl(
         val decodedData = SecurityUtils.nativeCryptoBoxOpen(encodedData, clientIdBytes, secretKeyBytes) ?: return
         val decodedString = String(decodedData)
         L.d("onSseConnectionEvent: $decodedString")
+
         val appRawRequest = json.decodeFromString<TonConnect.AppRawRequest>(decodedString)
         if (appRawRequest.id <= connection.requestId) {
             return

@@ -262,7 +262,6 @@ class TransactionsRepositoryImpl(
                         (MessageText.loadTlb(cell) as? MessageText.Raw)?.text
                     }
                 } catch (e: Exception) {
-                    L.e(e)
                     null
                 }
             }

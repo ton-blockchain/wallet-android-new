@@ -4,6 +4,7 @@ import drinkless.org.ton.TonApi
 import org.ton.wallet.core.ext.toHexByteArray
 import org.ton.wallet.core.ext.toHexString
 import org.ton.wallet.data.tonclient.api.*
+import org.ton.wallet.domain.blockhain.api.UnpackedAddress
 
 class GetAddressUseCaseImpl(
     private val tonClient: TonClient
@@ -39,6 +40,15 @@ class GetAddressUseCaseImpl(
         return try {
             val unpackedAddress = tonClient.sendRequestTyped<TonApi.UnpackedAccountAddress>(TonApi.UnpackAccountAddress(ufAddress))
             return "${unpackedAddress.workchainId}:${unpackedAddress.addr.toHexString()}"
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    override suspend fun getUnpackedAddress(ufAddress: String): UnpackedAddress? {
+        return try {
+            val unpackedAddress = tonClient.sendRequestTyped<TonApi.UnpackedAccountAddress>(TonApi.UnpackAccountAddress(ufAddress))
+            unpackedAddress.workchainId to unpackedAddress.addr
         } catch (e: Exception) {
             null
         }

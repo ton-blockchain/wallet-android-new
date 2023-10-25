@@ -64,7 +64,7 @@ class TonConnectApproveViewModel(args: TonConnectApproveScreenArguments) : BaseV
         _stateFlow.value = _stateFlow.value.copy(connectionState = TonConnectApproveState.ConnectionInProgress)
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                tonConnectOpenConnectionUseCase.invoke(action)
+                tonConnectOpenConnectionUseCase.invoke(action, manifest!!)
                 _stateFlow.value = _stateFlow.value.copy(connectionState = TonConnectApproveState.ConnectionConnected)
                 withContext(Dispatchers.Main) {
                     delay(1000L)

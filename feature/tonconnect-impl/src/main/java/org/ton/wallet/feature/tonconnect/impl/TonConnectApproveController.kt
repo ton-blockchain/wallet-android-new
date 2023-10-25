@@ -16,8 +16,7 @@ import coil.transform.RoundedCornersTransformation
 import org.ton.wallet.core.Res
 import org.ton.wallet.coreui.Formatter
 import org.ton.wallet.coreui.ext.setOnClickListenerWithLock
-import org.ton.wallet.coreui.util.CubicBezierInterpolator
-import org.ton.wallet.coreui.util.FontSpan
+import org.ton.wallet.coreui.util.*
 import org.ton.wallet.screen.controller.BaseViewModelBottomSheetController
 import org.ton.wallet.screen.getScreenArguments
 import org.ton.wallet.screen.viewmodel.viewModels
@@ -57,7 +56,11 @@ class TonConnectApproveController(args: Bundle?) : BaseViewModelBottomSheetContr
         loadingView.background = progressDrawable
 
         contentLayout = view.findViewById(R.id.tonConnectApproveContentLayout)
+
         imageView = view.findViewById(R.id.tonConnectApproveImageView)
+        imageView.clipToOutline = true
+        imageView.outlineProvider = RoundRectOutlineProvider(Res.dp(24f))
+
         titleText = view.findViewById(R.id.tonConnectApproveTitleTextView)
         subTitleText = view.findViewById(R.id.tonConnectApproveSubTitleTextView)
 

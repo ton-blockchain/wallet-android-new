@@ -10,9 +10,12 @@ class TonConnectRequest(
 ) : Parcelable {
 
     @Parcelize
-    sealed class ConnectItem(val name: String) : Parcelable {
+    sealed interface ConnectItem : Parcelable {
 
         @Parcelize
-        data object TonAddressItem : ConnectItem(TonConnect.ConnectItemNameTonAddress)
+        data object Address : ConnectItem
+
+        @Parcelize
+        data class Proof(val payload: String?) : ConnectItem
     }
 }

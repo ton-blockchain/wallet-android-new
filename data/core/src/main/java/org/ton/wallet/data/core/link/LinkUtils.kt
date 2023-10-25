@@ -67,8 +67,11 @@ object LinkUtils {
         for (i in 0 until jsonArray.length()) {
             val item = jsonArray.getJSONObject(i)
             val name = item.getStringOrNull("name") ?: continue
-            if (name == TonConnectRequest.ConnectItem.TonAddressItem.name) {
-                tonConnectItems.add(TonConnectRequest.ConnectItem.TonAddressItem)
+            if (name == TonConnect.ConnectItemNameTonAddress) {
+                tonConnectItems.add(TonConnectRequest.ConnectItem.Address)
+            } else if (name == TonConnect.ConnectItemNameTonProof) {
+                val payload = item.getStringOrNull("payload")
+                tonConnectItems.add(TonConnectRequest.ConnectItem.Proof(payload))
             }
         }
         val request = TonConnectRequest(manifestUrl, tonConnectItems)

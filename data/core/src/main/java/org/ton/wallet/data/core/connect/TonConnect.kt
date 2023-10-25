@@ -19,28 +19,25 @@ class TonConnect {
         val privacyPolicyUrl: String? = null,
     )
 
-    sealed class ConnectEvent {
+    @Serializable
+    class ConnectEventSuccess<T>(
+        val id: Int,
+        val payload: ConnectEventSuccess.Payload<T>,
+        val event: String = "connect"
+    ) {
 
         @Serializable
-        class Success(
-            val id: Int,
-            val payload: Payload,
-            val event: String = "connect"
-        ) : ConnectEvent() {
-
-            @Serializable
-            class Payload(
-                val items: List<TonAddress>,
-                val device: DeviceInfo
-            )
-        }
-
-        @Serializable
-        class Error(
-            val id: Int,
-            val name: String = "error"
-        ) : ConnectEvent()
+        class Payload<T>(
+            val items: List<T>,
+            val device: DeviceInfo
+        )
     }
+
+    @Serializable
+    class ConnectEventError(
+        val id: Int,
+        val name: String = "error"
+    )
 
 
     @Serializable
@@ -53,15 +50,53 @@ class TonConnect {
     )
 
     @Serializable
-    class TonAddress(
-        // raw address
-        val address: String,
-        @NetworkType
-        val network: String,
-        val publicKey: String,
-        val walletStateInit: String,
-        val name: String = "ton_addr"
-    )
+    sealed interface ConnectItemReply {
+
+        @Serializable
+        class ItemAddress(
+            // raw address
+            val address: String,
+            @NetworkType
+            val network: String,
+            val publicKey: String,
+            val walletStateInit: String,
+            val name: String = ConnectItemNameTonAddress
+        ) : ConnectItemReply
+
+        @Serializable
+        class ItemProof private constructor(
+            val proof: Proof? = null,
+            val error: Error? = null,
+            val name: String = ConnectItemNameTonProof
+        ) : ConnectItemReply {
+
+            companion object {
+
+                fun success(proof: Proof): ItemProof {
+                    return ItemProof(proof = proof)
+                }
+
+                fun error(error: Error): ItemProof {
+                    return ItemProof(error = error)
+                }
+            }
+
+            @Serializable
+            class Proof(
+                val timestamp: Double,
+                val domain: Domain,
+                val signature: String,
+                val payload: String?
+            ) {
+
+                @Serializable
+                class Domain(
+                    val lengthBytes: Int,
+                    val value: String
+                )
+            }
+        }
+    }
 
     @Serializable
     class BridgeMessage(
@@ -126,6 +161,7 @@ class TonConnect {
     companion object {
 
         const val ConnectItemNameTonAddress = "ton_addr"
+        const val ConnectItemNameTonProof = "ton_proof"
 
         @StringDef(NetworkMainNet, NetworkTestNet)
         @Retention(AnnotationRetention.SOURCE)

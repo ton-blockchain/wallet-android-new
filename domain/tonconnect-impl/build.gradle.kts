@@ -15,6 +15,7 @@ android {
 dependencies {
     implementation(Config.Lib.coroutines)
     implementation(Config.Lib.json)
+    implementation(Config.Lib.tonKotlin)
     implementation(project(Config.Module.dataCore))
     implementation(project(Config.Module.dataTonConnectApi))
     implementation(project(Config.Module.dataWalletApi))
@@ -22,4 +23,5 @@ dependencies {
     implementation(project(Config.Module.domainTonConnectApi))
     implementation(project(Config.Module.domainWalletApi))
     implementation(project(Config.Module.libCore))
+    implementation(project(Config.Module.libSecurity))
 }

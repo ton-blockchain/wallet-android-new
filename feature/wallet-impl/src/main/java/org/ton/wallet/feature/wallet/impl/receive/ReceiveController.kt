@@ -1,4 +1,4 @@
-package org.ton.wallet.feature.impl.receive
+package org.ton.wallet.feature.wallet.impl.receive
 
 import android.os.Bundle
 import android.view.*

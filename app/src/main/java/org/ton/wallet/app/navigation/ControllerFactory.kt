@@ -11,7 +11,6 @@ import org.ton.wallet.app.navigation.changehandler.SlideChangeHandler
 import org.ton.wallet.app.util.AppErrorHandler
 import org.ton.wallet.core.Res
 import org.ton.wallet.core.ext.weak
-import org.ton.wallet.feature.impl.receive.ReceiveController
 import org.ton.wallet.feature.onboarding.impl.congratulations.CongratulationsController
 import org.ton.wallet.feature.onboarding.impl.finished.OnboardingFinishedController
 import org.ton.wallet.feature.onboarding.impl.importation.ImportController
@@ -32,6 +31,7 @@ import org.ton.wallet.feature.settings.impl.SettingsController
 import org.ton.wallet.feature.tonconnect.impl.TonConnectApproveController
 import org.ton.wallet.feature.transactions.impl.TransactionDetailsController
 import org.ton.wallet.feature.wallet.impl.main.MainScreenController
+import org.ton.wallet.feature.wallet.impl.receive.ReceiveController
 import org.ton.wallet.lib.log.L
 import org.ton.wallet.screen.AppScreen
 import org.ton.wallet.screen.controller.BaseBottomSheetController

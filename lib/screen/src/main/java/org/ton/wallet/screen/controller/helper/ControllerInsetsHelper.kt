@@ -36,6 +36,7 @@ internal class ControllerInsetsHelper(
 
         val filteredInsets = WindowInsetsCompat.Builder(insets)
             .setInsets(WindowInsetsCompat.Type.systemBars(), insets.getInsetsIgnoringVisibility(WindowInsetsCompat.Type.systemBars()))
+            .setInsets(WindowInsetsCompat.Type.ime(), insets.getInsets(WindowInsetsCompat.Type.ime()))
             .build()
 
         var insetsTypeMask = WindowInsetsCompat.Type.systemBars()

@@ -12,6 +12,7 @@ import org.ton.wallet.feature.onboarding.impl.recovery.show.RecoveryShowScreenAr
 import org.ton.wallet.feature.passcode.impl.enter.PassCodeEnterScreenArguments
 import org.ton.wallet.feature.passcode.impl.setup.PassCodeSetupScreenArguments
 import org.ton.wallet.feature.settings.api.SettingsScreenApi
+import org.ton.wallet.lib.log.L
 import org.ton.wallet.screen.AppScreen
 import org.ton.wallet.strings.RString
 
@@ -73,5 +74,15 @@ internal class SettingsScreenApiImpl(
 
     override fun onPermissionRequested() {
         AppIntentUtils.isAppIntentStarted = true
+    }
+
+    override fun shareLogs(activity: Activity) {
+        val file = L.getArchive()
+        AppIntentUtils.shareFile(
+            context = activity,
+            file = file,
+            chooserTitle = "Share logs",
+            contentType = "application/zip"
+        )
     }
 }

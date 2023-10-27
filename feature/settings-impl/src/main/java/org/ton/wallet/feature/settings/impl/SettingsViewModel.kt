@@ -15,6 +15,7 @@ import org.ton.wallet.core.Res
 import org.ton.wallet.core.ext.weak
 import org.ton.wallet.coreui.Formatter
 import org.ton.wallet.data.auth.api.AuthRepository
+import org.ton.wallet.data.core.BuildConfig
 import org.ton.wallet.data.core.model.FiatCurrency
 import org.ton.wallet.data.core.model.TonAccountType
 import org.ton.wallet.data.notifications.api.NotificationsRepository
@@ -81,6 +82,12 @@ class SettingsViewModel : BaseViewModel() {
             items.add(SettingsSwitchItem(ItemBiometricAuth, Res.str(RString.biometric_auth), isBiometricOn))
         }
         items.add(SettingsTextUiItem(ItemDeleteWallet, Res.str(RString.delete_wallet), titleColor = Res.color(RUiKitColor.text_error)))
+
+        if (BuildConfig.DEBUG) {
+            items.add(SettingsHeaderItem("Debug"))
+            items.add(SettingsTextUiItem(ItemExportLogs, "Export logs"))
+        }
+
         items
     }
 
@@ -150,13 +157,14 @@ class SettingsViewModel : BaseViewModel() {
         activityRef = weak(activity)
     }
 
-    fun onTextItemClicked(item: SettingsTextUiItem) {
+    fun onTextItemClicked(activity: Activity, item: SettingsTextUiItem) {
         when (item.id) {
             ItemAddress -> onAddressClicked(item)
             ItemCurrency -> onFiatCurrencyClicked()
             ItemRecoveryPhrase -> onShowRecoveryClicked()
             ItemChangePasscode -> onChangePasscodeClicked()
             ItemDeleteWallet -> _showDeleteWalletDialogFlow.trySend(Unit)
+            ItemExportLogs -> screenApi.shareLogs(activity)
         }
     }
 
@@ -259,6 +267,7 @@ class SettingsViewModel : BaseViewModel() {
         const val ItemChangePasscode = 4
         const val ItemBiometricAuth = 5
         const val ItemDeleteWallet = 6
+        const val ItemExportLogs = 100
 
         private const val PurposeRecovery = "recovery"
         private const val PurposeChangePasscode = "changePasscode"

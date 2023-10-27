@@ -31,7 +31,7 @@ class SettingsController(args: Bundle?) : BaseViewModelController<SettingsViewMo
 
         override fun onTextItemClicked(item: SettingsTextUiItem) {
             super.onTextItemClicked(item)
-            viewModel.onTextItemClicked(item)
+            viewModel.onTextItemClicked(activity!!, item)
         }
 
         override fun onSwitchItemClicked(item: SettingsSwitchItem) {

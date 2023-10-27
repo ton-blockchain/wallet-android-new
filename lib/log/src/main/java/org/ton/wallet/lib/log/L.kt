@@ -1,10 +1,9 @@
 package org.ton.wallet.lib.log
 
+import android.content.Context
 import android.util.Log
-import org.ton.wallet.lib.log.target.LogTarget
-import org.ton.wallet.lib.log.target.LogcatTarget
-import java.io.PrintWriter
-import java.io.StringWriter
+import org.ton.wallet.lib.log.target.*
+import java.io.*
 
 object L {
 
@@ -16,10 +15,22 @@ object L {
     private val targets = arrayListOf<LogTarget>()
 
     private val logcatTarget = LogcatTarget()
+    private lateinit var fileTarget: FileLogTarget
 
-    init {
+    fun init(context: Context, withFileLog: Boolean, versionName: String, versionCode: Int) {
         logcatTarget.isEnabled = true
         targets.add(logcatTarget)
+
+        val fileLogDir = getLogsDir(context)
+        fileTarget = FileLogTarget(fileLogDir, versionName, versionCode)
+        if (withFileLog) {
+            fileTarget.isEnabled = true
+            targets.add(fileTarget)
+        }
+    }
+
+    fun getArchive(): File {
+        return fileTarget.getArchive()
     }
 
     fun v(vararg args: Any) {
@@ -148,5 +159,13 @@ object L {
             }
         }
         return null
+    }
+
+    private fun getLogsDir(context: Context): File {
+        val dir = File(context.filesDir, "l")
+        if (!dir.exists()) {
+            dir.mkdirs()
+        }
+        return dir
     }
 }

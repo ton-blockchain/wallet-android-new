@@ -24,4 +24,6 @@ interface SettingsScreenApi {
     fun showBiometricPrompt(activity: Activity, onSuccess: () -> Unit)
 
     fun onPermissionRequested()
+
+    fun shareLogs(activity: Activity)
 }

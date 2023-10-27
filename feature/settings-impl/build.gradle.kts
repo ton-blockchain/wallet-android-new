@@ -9,6 +9,9 @@ android {
     defaultConfig {
         minSdk = Config.Build.minSdk
     }
+    buildFeatures {
+        buildConfig = true
+    }
     kotlinOptions.jvmTarget = Config.Version.jvmTarget
 }
 

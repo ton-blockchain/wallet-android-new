@@ -7,6 +7,7 @@ import org.ton.wallet.coreui.ext.vibrate
 import org.ton.wallet.data.core.link.LinkAction
 import org.ton.wallet.data.core.link.LinkUtils
 import org.ton.wallet.feature.scanqr.api.ScanQrScreenApi
+import org.ton.wallet.lib.log.L
 import org.ton.wallet.screen.viewmodel.BaseViewModel
 
 class ScanQrViewModel(private val args: ScanQrScreenArguments) : BaseViewModel() {
@@ -27,6 +28,7 @@ class ScanQrViewModel(private val args: ScanQrScreenArguments) : BaseViewModel()
     }
 
     fun onQrDetected(value: String): Boolean {
+        L.d("QR string: $value")
         val linkAction = LinkUtils.parseLink(value) ?: return false
         val linkActionType = getLinkActionType(linkAction)
         return if (args.linkActionTypes.contains(linkActionType)) {

@@ -7,9 +7,15 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import androidx.core.content.FileProvider
+import org.ton.wallet.app.BuildConfig
 import org.ton.wallet.lib.log.L
+import java.io.File
 
 object AppIntentUtils {
+
+    private val fileProviderAuthority: String
+        get() = BuildConfig.APPLICATION_ID + ".fileProvider"
 
     var isAppIntentStarted = false
 
@@ -40,6 +46,15 @@ object AppIntentUtils {
         }
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context.startActivity(intent)
+    }
+
+    fun shareFile(context: Context, file: File, chooserTitle: String = "", contentType: String = "*/*", extraText: String? = null) {
+        val fileUri = FileProvider.getUriForFile(context, fileProviderAuthority, file)
+        val sendIntent = Intent(Intent.ACTION_SEND)
+            .setType(contentType)
+            .putExtra(Intent.EXTRA_STREAM, fileUri)
+        extraText?.let { sendIntent.putExtra(Intent.EXTRA_TEXT, it) }
+        startChooserIntent(context, sendIntent, chooserTitle)
     }
 
     fun shareText(context: Context, text: String, chooserTitle: String = "", ) {

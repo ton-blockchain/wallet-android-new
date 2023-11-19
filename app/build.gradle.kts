@@ -80,6 +80,7 @@ dependencies {
     implementation(project(Config.Module.libScreen))
     implementation(project(Config.Module.libSecurity))
     implementation(project(Config.Module.libSqlite))
+    implementation(project(Config.Module.libTonConnect))
 
     implementation(project(Config.Module.dataAuthApi))
     implementation(project(Config.Module.dataAuthImpl))
@@ -94,8 +95,6 @@ dependencies {
     implementation(project(Config.Module.dataTransactionsImpl))
     implementation(project(Config.Module.dataTonClientApi))
     implementation(project(Config.Module.dataTonClientImpl))
-    implementation(project(Config.Module.dataTonConnectApi))
-    implementation(project(Config.Module.dataTonConnectImpl))
     implementation(project(Config.Module.dataWalletApi))
     implementation(project(Config.Module.dataWalletImpl))
 

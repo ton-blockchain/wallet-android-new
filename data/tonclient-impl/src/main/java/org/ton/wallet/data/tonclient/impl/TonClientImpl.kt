@@ -3,15 +3,12 @@ package org.ton.wallet.data.tonclient.impl
 import android.content.SharedPreferences
 import drinkless.org.ton.Client
 import drinkless.org.ton.TonApi
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.ton.lite.client.LiteClient
 import org.ton.wallet.data.core.DefaultPrefsKeys
 import org.ton.wallet.data.core.await
 import org.ton.wallet.data.tonclient.api.TonApiException
@@ -25,18 +22,13 @@ import kotlin.math.roundToInt
 class TonClientImpl(
     private val sharedPreferences: SharedPreferences,
     private val okHttpClient: OkHttpClient,
-    private val keysDirectory: File,
-    private val json: Json
+    private val keysDirectory: File
 ) : TonClient {
 
     private val tonClientInitMutex = Mutex()
-    private val liteClientInitMutex = Mutex()
     private val isTonApiInitialized = AtomicBoolean(false)
+    private val syncProgressFlow: StateFlow<Int> = MutableStateFlow(100)
     private val ton = Client.create(null, null, null)
-
-    private var liteClient: LiteClient? = null
-
-    val syncProgressFlow: StateFlow<Int> = MutableStateFlow(100)
 
     init {
         ton.setUpdatesHandler(::handleUpdate)
@@ -45,14 +37,6 @@ class TonClientImpl(
     override suspend fun sendRequest(request: TonApi.Function): TonApi.Object {
         initClient()
         return sendRequestInternal(request)
-    }
-
-    override suspend fun getLiteClient(): LiteClient? {
-        if (liteClient == null) {
-            val configJson = getConfigJson() ?: throw IllegalStateException("Config json is null")
-            initLiteClient(configJson)
-        }
-        return liteClient
     }
 
     @Throws(Exception::class)
@@ -66,12 +50,6 @@ class TonClientImpl(
             }
 
             val configJson = getConfigJson() ?: throw IllegalStateException("Config json is null")
-            try {
-                liteClient = initLiteClient(configJson)
-            } catch (e: Exception) {
-                L.e(e)
-            }
-
             val tonApiConfig = TonApi.Config(configJson, BlockChainName, false, false)
             keysDirectory.mkdirs()
             val keyStoreType = TonApi.KeyStoreTypeDirectory(keysDirectory.absolutePath)
@@ -81,17 +59,6 @@ class TonClientImpl(
                 isTonApiInitialized.set(true)
             }
         }
-    }
-
-    private suspend fun initLiteClient(configJson: String): LiteClient? {
-        if (liteClient == null) {
-            liteClientInitMutex.withLock {
-                if (liteClient == null) {
-                    liteClient = LiteClient(Dispatchers.Default, liteClientConfigGlobal = json.decodeFromString(configJson))
-                }
-            }
-        }
-        return liteClient
     }
 
     private suspend fun getConfigJson(): String? {

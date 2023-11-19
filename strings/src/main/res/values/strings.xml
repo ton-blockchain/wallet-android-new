@@ -71,6 +71,7 @@
     <string name="invalid_address">Invalid Address</string>
     <string name="invalid_address_description">Address entered does not belong to TON</string>
     <string name="lets_check_recovery_phrase">Let\'s check that you wrote them\u00A0down correctly. Please enter the\u00A0words %1$d, %2$d and %3$d.</string>
+    <string name="message">Message</string>
     <string name="network_error">Network error occurred. Check your connection and retry.</string>
     <string name="no_camera_access">No Camera Access</string>
     <string name="no_camera_access_description">TON Wallet doesn\'t have access to the\u00A0camera. Please enable camera access to\u00A0scan QR codes.</string>
@@ -115,6 +116,7 @@
     <string name="send_ton">Send TON</string>
     <string name="send_ton_to_address">Send TON to this address</string>
     <string name="send_ton_to_address_retry">Retry to send TON to this address</string>
+    <string name="sender">Sender</string>
     <string name="sender_address">Sender address</string>
     <string name="sending_ton">Sending TON</string>
     <string name="set_a_passcode">Set a Passcode</string>
@@ -125,6 +127,7 @@
     <string name="show_recovery_phrase">Show recovery phrase</string>
     <string name="skip">Skip</string>
     <string name="start_description">TON Wallet allows you to\u00A0make fast and\u00A0secure blockchain-based payments without\u00A0intermediaries.</string>
+    <string name="state_init_incorrect">State init is incorrect</string>
     <string name="status_connecting">Connecting…</string>
     <string name="status_updating">Updating…</string>
     <string name="status_waiting_network">Waiting for network…</string>
@@ -140,6 +143,7 @@
     <string name="ton_transfer">TON Transfer</string>
     <string name="toncoin_have_been_sent">%1$s Toncoin have been sent to</string>
     <string name="too_bad">Too Bad!</string>
+    <string name="transaction_expired">Transaction expired</string>
     <string name="transaction_title">Transaction</string>
     <string name="transaction_hash_copied_to_clipboard">Transaction hash copied to clipboard</string>
     <string name="try_again">Try again</string>

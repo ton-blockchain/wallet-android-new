@@ -4,7 +4,6 @@ import android.net.Uri
 import org.json.JSONObject
 import org.ton.wallet.core.ext.getStringOrNull
 import org.ton.wallet.core.ext.toUriSafe
-import org.ton.wallet.data.core.connect.TonConnect
 import org.ton.wallet.data.core.connect.TonConnectRequest
 
 object LinkUtils {
@@ -67,22 +66,20 @@ object LinkUtils {
         for (i in 0 until jsonArray.length()) {
             val item = jsonArray.getJSONObject(i)
             val name = item.getStringOrNull("name") ?: continue
-            if (name == TonConnect.ConnectItemNameTonAddress) {
-                tonConnectItems.add(TonConnectRequest.ConnectItem.Address)
-            } else if (name == TonConnect.ConnectItemNameTonProof) {
-                val payload = item.getStringOrNull("payload")
-                tonConnectItems.add(TonConnectRequest.ConnectItem.Proof(payload))
+            when (name) {
+                "ton_addr" -> {
+                    tonConnectItems.add(TonConnectRequest.ConnectItem.Address)
+                }
+                "ton_proof" -> {
+                    val payload = item.getStringOrNull("payload")
+                    tonConnectItems.add(TonConnectRequest.ConnectItem.Proof(payload))
+                }
+                else -> {
+                    tonConnectItems.add(TonConnectRequest.ConnectItem.UnknownMethod(name))
+                }
             }
         }
         val request = TonConnectRequest(manifestUrl, tonConnectItems)
-
-        // ret
-        val retObject = when {
-            ret == "none" -> TonConnect.Ret.None
-            ret?.toUriSafe() != null -> TonConnect.Ret.Url(ret)
-            else -> TonConnect.Ret.Back
-        }
-
         return LinkAction.TonConnectAction(uri.toString(), version, clientId, request)
     }
 }

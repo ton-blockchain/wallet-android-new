@@ -4,10 +4,10 @@ import android.util.Base64
 import drinkless.org.ton.TonApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import org.ton.block.AddrStd
+import org.ton.block.StateInit
 import org.ton.boc.BagOfCells
-import org.ton.contract.wallet.WalletV4R2Contract
-import org.ton.lite.api.liteserver.LiteServerAccountId
+import org.ton.crypto.base64
+import org.ton.wallet.core.ext.toIntOrNull
 import org.ton.wallet.data.core.BuildConfig
 import org.ton.wallet.data.core.model.TonAccount
 import org.ton.wallet.data.core.ton.MessageText
@@ -131,15 +131,14 @@ class TransactionsRepositoryImpl(
         return transactionsDao.getAllSendUnique(accountId)
     }
 
-    override suspend fun getSendFee(account: AccountDto, publicKey: String, sendParams: SendParams): Long {
-        val inputKey = TonApi.InputKeyFake()
+    override suspend fun getSendFee(sendParams: SendParams): Long {
         return try {
-            val queryInfo = getSendQueryInfo(account, inputKey, null, publicKey, sendParams)
+            val queryInfo = getSendQueryInfo(sendParams)
             val feeRequest = TonApi.QueryEstimateFees(queryInfo.id, true)
             val feeResponse = tonClient.sendRequestTyped<TonApi.QueryFees>(feeRequest)
             feeResponse.sourceFees.gasFee + feeResponse.sourceFees.storageFee + feeResponse.sourceFees.fwdFee + feeResponse.sourceFees.inFwdFee
         } catch (e: Exception) {
-            if (account.version == 4) {
+            if (sendParams.account.version == 4) {
                 0L
             } else {
                 throw e
@@ -147,25 +146,27 @@ class TransactionsRepositoryImpl(
         }
     }
 
-    override suspend fun performSend(account: AccountDto, publicKey: String, secret: ByteArray, password: ByteArray, seed: ByteArray, sendParams: SendParams): Long {
-        val inputKey = TonApi.InputKeyRegular(TonApi.Key(publicKey, secret), password)
-        val queryInfo = getSendQueryInfo(account, inputKey, seed, publicKey, sendParams)
+    override suspend fun performSend(sendParams: SendParams): Long {
+        if (sendParams.secret == null) throw IllegalArgumentException("Secret is null")
+        if (sendParams.password == null) throw IllegalArgumentException("Password is null")
+        if (sendParams.seed == null) throw IllegalArgumentException("Seed is null")
+
+        val queryInfo = getSendQueryInfo(sendParams)
         val sendQuery = TonApi.QuerySend(queryInfo.id)
         tonClient.sendRequestTyped<TonApi.Ok>(sendQuery)
         val bodyHash = queryInfo.bodyHash
         val validUntil = queryInfo.validUntil
-
         val transaction = TransactionDto(
             hash = Base64.encodeToString(bodyHash, Base64.NO_WRAP),
-            accountId = account.id,
+            accountId = sendParams.account.id,
             status = TransactionStatus.Pending,
             timestampSec = System.currentTimeMillis() / 1000,
             amount = -sendParams.amount,
             peerAddress = sendParams.toAddress,
-            message = sendParams.message,
+            message = sendParams.message?.let { msg -> TonWalletHelper.getMessageText(msg, sendParams.seed) },
             validUntilSec = validUntil,
         )
-        val internalId = transactionsDao.add(account.id, transaction)
+        val internalId = transactionsDao.add(sendParams.account.id, transaction)
         if (internalId != null) {
             transaction.internalId = internalId
             (transactionsAddedFlow as MutableSharedFlow).emit(transaction)
@@ -178,33 +179,44 @@ class TransactionsRepositoryImpl(
         transactionsDao.deleteAll()
     }
 
-    private suspend fun getSendQueryInfo(accountDto: AccountDto, inputKey: TonApi.InputKey, seed: ByteArray?, publicKey: String, sendParams: SendParams): TonApi.QueryInfo {
-        val request: TonApi.Function
-        if (accountDto.version == 4) {
-            val liteClient = tonClient.getLiteClient() ?: throw Exception("Lite client is not initialized")
-
-            val unpackedFromAddress = tonClient.sendRequestTyped<TonApi.UnpackedAccountAddress>(TonApi.UnpackAccountAddress(sendParams.fromAddress))
-            val fromAddrStd = AddrStd(unpackedFromAddress.workchainId, unpackedFromAddress.addr)
-            val blockId = liteClient.getLastBlockId()
-            val accountInfo = liteClient.getAccount(LiteServerAccountId(fromAddrStd.workchainId, fromAddrStd.address), blockId)!!
-            val walletContract = WalletV4R2Contract(accountInfo)
-
-            val account = TonAccount(publicKey, accountDto.version, accountDto.revision, walletContract.getSubWalletId(), walletContract.getSeqno())
-            val unpackedToAddress = tonClient.sendRequestTyped<TonApi.UnpackedAccountAddress>(TonApi.UnpackAccountAddress(sendParams.toAddress))
-            val requestBody = TonWalletHelper.getTransferMessageBody(account, unpackedToAddress.workchainId, unpackedToAddress.addr, sendParams.amount, sendParams.message, seed)
-            val code = TonWalletHelper.getContractCode(account.type)
-            val data = TonWalletHelper.getAccountData(account)
-            request = TonApi.RawCreateQuery(TonApi.AccountAddress(sendParams.fromAddress), code, data, requestBody)
+    private suspend fun getSendQueryInfo(sendParams: SendParams): TonApi.QueryInfo {
+        val account = if (sendParams.account.version == 4) {
+            val accountState = tonClient.sendRequestTyped<TonApi.RawFullAccountState>(TonApi.RawGetAccountState(TonApi.AccountAddress(sendParams.account.address)))
+            val seqNo = accountState.data.copyOfRange(13, 17).toIntOrNull() ?: 0
+            val subWalletId = accountState.data.copyOfRange(17, 21).toIntOrNull() ?: TonAccount.DefaultWalletId
+            TonAccount(sendParams.publicKey, sendParams.account.version, sendParams.account.revision, subWalletId, seqNo)
         } else {
-            val account = TonAccount(publicKey, accountDto.version, accountDto.revision)
-            val accountCode = TonWalletHelper.getContractCode(account.type)
-            val accountData = TonWalletHelper.getAccountData(account)
-            val initialAccountState = TonApi.RawInitialAccountState(accountCode, accountData)
+            TonAccount(sendParams.publicKey, sendParams.account.version, sendParams.account.revision)
+        }
+
+        val codeByteArray: ByteArray
+        val dataByteArray: ByteArray
+        if (sendParams.stateInitBase64 == null) {
+            codeByteArray = account.getCode()
+            dataByteArray = account.getInitialData()
+        } else {
+            val stateInit = try {
+                StateInit.loadTlb(BagOfCells(base64(sendParams.stateInitBase64!!)).roots.first())
+            } catch (e: Exception) {
+                throw IllegalArgumentException("StateInit is incorrect")
+            }
+            codeByteArray = stateInit.code.value?.value?.let { BagOfCells(it).toByteArray() } ?: byteArrayOf()
+            dataByteArray = stateInit.data.value?.value?.let { BagOfCells(it).toByteArray() } ?: byteArrayOf()
+        }
+
+        val request = if (sendParams.account.version == 4) {
+            val unpackedToAddress = tonClient.sendRequestTyped<TonApi.UnpackedAccountAddress>(TonApi.UnpackAccountAddress(sendParams.toAddress))
+            val requestBody = TonWalletHelper.getTransferMessageBody(account, unpackedToAddress.workchainId, unpackedToAddress.addr, sendParams.amount, sendParams.message, sendParams.seed)
+            TonApi.RawCreateQuery(TonApi.AccountAddress(sendParams.toAddress), codeByteArray, dataByteArray, requestBody)
+        } else {
+            val initialAccountState = TonApi.RawInitialAccountState(codeByteArray, dataByteArray)
+            val messageString = sendParams.message?.let { TonWalletHelper.getMessageText(it, sendParams.seed) }
             val messageData =
-                if (sendParams.message.isNullOrEmpty()) TonApi.MsgDataText(null)
-                else TonApi.MsgDataText(sendParams.message!!.toByteArray(Charset.defaultCharset()))
-            val actionMessage = TonApi.ActionMsg(arrayOf(TonApi.MsgMessage(TonApi.AccountAddress(sendParams.toAddress), publicKey, sendParams.amount, messageData, 3)), true)
-            request = TonApi.CreateQuery(inputKey, TonApi.AccountAddress(sendParams.fromAddress), 0, actionMessage, initialAccountState)
+                if (messageString.isNullOrEmpty()) TonApi.MsgDataText(null)
+                else TonApi.MsgDataText(messageString.toByteArray(Charset.defaultCharset()))
+            val actionMessage = TonApi.ActionMsg(arrayOf(TonApi.MsgMessage(TonApi.AccountAddress(sendParams.toAddress), sendParams.publicKey, sendParams.amount, messageData, 3)), true)
+            val inputKey = TonApi.InputKeyRegular(TonApi.Key(sendParams.publicKey, sendParams.secret), sendParams.password)
+            TonApi.CreateQuery(inputKey, TonApi.AccountAddress(sendParams.account.address), 0, actionMessage, initialAccountState)
         }
         return tonClient.sendRequestTyped(request)
     }

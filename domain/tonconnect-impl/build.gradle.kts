@@ -17,11 +17,11 @@ dependencies {
     implementation(Config.Lib.json)
     implementation(Config.Lib.tonKotlin)
     implementation(project(Config.Module.dataCore))
-    implementation(project(Config.Module.dataTonConnectApi))
     implementation(project(Config.Module.dataWalletApi))
     implementation(project(Config.Module.domainBlockchainApi))
     implementation(project(Config.Module.domainTonConnectApi))
     implementation(project(Config.Module.domainWalletApi))
     implementation(project(Config.Module.libCore))
     implementation(project(Config.Module.libSecurity))
+    implementation(project(Config.Module.libTonConnect))
 }

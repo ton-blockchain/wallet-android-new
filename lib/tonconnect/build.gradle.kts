@@ -1,29 +1,36 @@
 plugins {
     id("com.android.library")
     kotlin("android")
+    id("kotlinx-serialization")
+    id("kotlin-parcelize")
 }
 
 android {
-    namespace = "org.ton.wallet.data.tonconnect.impl"
+    namespace = "org.ton.wallet.lib.tonconnect"
     compileSdk = Config.Build.compileSdk
+    ndkVersion = Config.Build.ndkVersion
     defaultConfig {
         minSdk = Config.Build.minSdk
     }
     kotlinOptions.jvmTarget = Config.Version.jvmTarget
+
+    externalNativeBuild {
+        cmake {
+            path(file("src/main/cpp/CMakeLists.txt"))
+        }
+    }
 }
 
 dependencies {
+    implementation(Config.Lib.annotation)
     implementation(Config.Lib.coroutines)
     implementation(Config.Lib.json)
     implementation(platform(Config.Lib.okHttpBom))
     implementation(Config.Lib.okHttpCore)
+    implementation(Config.Lib.okHttpLogging)
     implementation(Config.Lib.okHttpSse)
 
     implementation(project(Config.Module.dataCore))
-    implementation(project(Config.Module.dataTonConnectApi))
-    implementation(project(Config.Module.dataWalletApi))
     implementation(project(Config.Module.libCore))
     implementation(project(Config.Module.libLog))
-    implementation(project(Config.Module.libSecurity))
-    implementation(project(Config.Module.libSqlite))
 }

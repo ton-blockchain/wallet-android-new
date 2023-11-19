@@ -44,12 +44,14 @@ class ImportController(args: Bundle?) : BaseInputListController<ImportViewModel>
     private lateinit var doneButton: View
     private lateinit var editTextLayouts: Array<NumericEditTextLayout?>
     private lateinit var scrollView: NestedScrollView
+    private lateinit var rootView: View
 
     private var slidingHeaderController: ToolbarSlidingHeaderController? = null
     private var progressDialog: IndeterminateProgressDialog? = null
 
     override fun createView(inflater: LayoutInflater, container: ViewGroup, savedViewState: Bundle?): View {
         val view = inflater.inflate(R.layout.screen_onboarding_import, container, false)
+        rootView = view
 
         view.findViewById<View>(R.id.importDontHaveButton).setOnClickListenerWithLock(viewModel::onNoPhraseClicked)
         doneButton = view.findViewById(R.id.importDoneButton)
@@ -71,6 +73,9 @@ class ImportController(args: Bundle?) : BaseInputListController<ImportViewModel>
             editTextLayout.editText.setTextWithSelection(viewModel.enteredWords[i])
             editTextLayout.setNumber(i + 1)
             editTextLayout.setTextFocusChangedListener(editTextFocusChangedListener)
+            editTextLayout.editText.imeOptions =
+                if (i < recoveryWordsCount - 1) EditorInfo.IME_ACTION_NEXT
+                else EditorInfo.IME_ACTION_DONE
 
             val layoutParams = LinearLayout.LayoutParams(editTextWidth, ViewGroup.LayoutParams.WRAP_CONTENT)
             layoutParams.topMargin = if (i == 0) Res.dp(20) else Res.dp(8)
@@ -182,12 +187,18 @@ class ImportController(args: Bundle?) : BaseInputListController<ImportViewModel>
         }
     }
 
-    private val editorActionListener = OnEditorActionListener { v, actionId, event ->
+    private val editorActionListener = OnEditorActionListener { v, actionId, _ ->
         val suggestedWords = viewModel.suggestWordsFlow.value
-        if ((actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_DONE) && suggestedWords.size == 1) {
-            v.text = suggestedWords[0]
+        if (actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_DONE) {
+            if (suggestedWords.size == 1) {
+                v.text = suggestedWords[0]
+            }
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 v.clearFocus()
+                rootView.requestFocus()
+                KeyboardUtils.hideKeyboard(activity!!.window) {
+                    viewModel.onDoneClicked()
+                }
             }
         }
         false

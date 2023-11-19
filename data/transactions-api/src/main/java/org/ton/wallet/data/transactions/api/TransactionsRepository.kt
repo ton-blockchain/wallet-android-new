@@ -17,8 +17,8 @@ interface TransactionsRepository : BaseRepository {
     suspend fun getLocalRecentSendTransactions(accountId: Int): List<RecentTransactionDto>
 
     @Throws(Exception::class)
-    suspend fun getSendFee(account: AccountDto, publicKey: String, sendParams: SendParams): Long
+    suspend fun getSendFee(sendParams: SendParams): Long
 
     @Throws(Exception::class)
-    suspend fun performSend(account: AccountDto, publicKey: String, secret: ByteArray, password: ByteArray, seed: ByteArray, sendParams: SendParams): Long
+    suspend fun performSend(sendParams: SendParams): Long
 }

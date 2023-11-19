@@ -68,6 +68,7 @@ object Config {
         const val libSecurity = ":lib:security"
         const val libSqlite = ":lib:sqlite"
         const val libSqliteLib = ":lib:sqlite-lib"
+        const val libTonConnect = ":lib:tonconnect"
 
         const val dataAuthApi = ":data:auth-api"
         const val dataAuthImpl = ":data:auth-impl"
@@ -81,8 +82,6 @@ object Config {
         const val dataTonApi = ":data:tonapi"
         const val dataTonClientApi = ":data:tonclient-api"
         const val dataTonClientImpl = ":data:tonclient-impl"
-        const val dataTonConnectApi = ":data:tonconnect-api"
-        const val dataTonConnectImpl = ":data:tonconnect-impl"
         const val dataTransactionsApi = ":data:transactions-api"
         const val dataTransactionsImpl = ":data:transactions-impl"
         const val dataWalletApi = ":data:wallet-api"

@@ -28,14 +28,5 @@ object SecurityUtils {
     }
 
     @Keep
-    external fun nativeCryptoBoxInitKeys(): ByteArray?
-
-    @Keep
-    external fun nativeCryptoBox(message: ByteArray?, publicKey: ByteArray?, secretKey: ByteArray?): ByteArray?
-
-    @Keep
-    external fun nativeCryptoBoxOpen(cipher: ByteArray?, publicKey: ByteArray?, secretKey: ByteArray?): ByteArray?
-
-    @Keep
     private external fun nativeGetArgonHash(password: ByteArray?, salt: ByteArray?, tCost: Int, mCost: Int, parallelism: Int, hashLen: Int): ByteArray?
 }

@@ -21,7 +21,6 @@ dependencies {
     implementation(project(Config.Module.dataCore))
     implementation(project(Config.Module.dataNotificationsApi))
     implementation(project(Config.Module.dataSettingsApi))
-    implementation(project(Config.Module.dataTonConnectApi))
     implementation(project(Config.Module.dataTransactionsApi))
     implementation(project(Config.Module.dataWalletApi))
     implementation(project(Config.Module.domainTransactionsApi))

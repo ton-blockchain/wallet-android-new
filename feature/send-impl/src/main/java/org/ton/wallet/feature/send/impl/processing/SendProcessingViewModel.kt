@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.ton.wallet.core.Res
 import org.ton.wallet.coreui.Formatter
+import org.ton.wallet.data.core.ton.MessageData
 import org.ton.wallet.domain.transactions.api.GetSendFeeUseCase
 import org.ton.wallet.domain.transactions.api.SendUseCase
 import org.ton.wallet.feature.send.api.SendProcessingScreenApi
@@ -41,7 +42,8 @@ class SendProcessingViewModel(private val args: SendProcessingScreenArguments) :
     init {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val actualFee = getSendFeeUseCase.invoke(args.address, _amountFlow.value, args.message)
+                val message = args.message?.let(MessageData::text)
+                val actualFee = getSendFeeUseCase.invoke(args.address, _amountFlow.value, message)
                 val feeDiff = abs(actualFee - presetFee)
                 if (feeDiff.toDouble() / presetFee > 0.01) {
                     snackBarController.showMessage(SnackBarMessage(
@@ -54,7 +56,7 @@ class SendProcessingViewModel(private val args: SendProcessingScreenArguments) :
                     return@launch
                 }
 
-                val resultAmount = sendUseCase.invoke(args.address, _amountFlow.value, args.message)
+                val resultAmount = sendUseCase.invoke(args.address, _amountFlow.value, message, null)
                 _amountFlow.value = resultAmount
                 onSendCompleted()
             } catch (e: Exception) {

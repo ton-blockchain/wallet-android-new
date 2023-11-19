@@ -8,20 +8,16 @@ import org.ton.wallet.app.Injector
 import org.ton.wallet.app.action.TonConnectEventHandler
 import org.ton.wallet.data.core.DefaultPrefsKeys
 import org.ton.wallet.data.prices.api.PricesRepository
-import org.ton.wallet.data.tonconnect.api.TonConnectRepository
-import org.ton.wallet.domain.tonconnect.api.TonConnectGetEventsUseCase
-import org.ton.wallet.domain.wallet.api.GetCurrentAccountDataUseCase
 import org.ton.wallet.domain.wallet.api.RefreshCurrentAccountStateUseCase
 import org.ton.wallet.lib.log.L
+import org.ton.wallet.lib.tonconnect.TonConnectClient
 import org.ton.wallet.screen.viewmodel.BaseViewModel
 
 class PollingViewModel : BaseViewModel() {
 
-    private val getCurrentAccountDataUseCase: GetCurrentAccountDataUseCase by inject()
     private val refreshCurrentAccountStateUseCase: RefreshCurrentAccountStateUseCase by inject()
-    private val tonConnectRepository: TonConnectRepository by inject()
     private val tonConnectEventHandler: TonConnectEventHandler by inject()
-    private val tonConnectGetEventsUseCase: TonConnectGetEventsUseCase by inject()
+    private val tonConnectClient: TonConnectClient by inject()
 
     private val jobsMap = mutableMapOf<String, Job>()
     private val pricesRepository: PricesRepository by inject()
@@ -31,7 +27,7 @@ class PollingViewModel : BaseViewModel() {
         initPolling("fiatPrices", 60_000) {
             pricesRepository.fetchPrices()
         }
-        initPolling("accountState", 60_000) {
+        initPolling("accountState", 30_000) {
             try {
                 refreshCurrentAccountStateUseCase.invoke()
             } catch (e: Exception) {
@@ -39,11 +35,7 @@ class PollingViewModel : BaseViewModel() {
             }
         }
 
-        getCurrentAccountDataUseCase.getIdFlow()
-            .onEach(tonConnectRepository::checkExistingConnections)
-            .launchIn(viewModelScope + Dispatchers.IO)
-
-        tonConnectGetEventsUseCase.invoke()
+        tonConnectClient.eventsFlow
             .onEach(tonConnectEventHandler::onTonConnectEvent)
             .launchIn(viewModelScope + Dispatchers.IO)
     }

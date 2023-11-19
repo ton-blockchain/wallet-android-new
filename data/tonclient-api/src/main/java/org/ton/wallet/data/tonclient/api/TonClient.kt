@@ -1,15 +1,11 @@
 package org.ton.wallet.data.tonclient.api
 
 import drinkless.org.ton.TonApi
-import org.ton.lite.client.LiteClient
 
 interface TonClient {
 
     @Throws(Exception::class)
     suspend fun sendRequest(request: TonApi.Function): TonApi.Object
-
-    @Throws(Exception::class)
-    suspend fun getLiteClient(): LiteClient?
 }
 
 @Throws(Exception::class)

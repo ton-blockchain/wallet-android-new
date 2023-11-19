@@ -15,5 +15,5 @@ android {
 dependencies {
     implementation(Config.Lib.coroutines)
     implementation(project(Config.Module.dataCore))
-    implementation(project(Config.Module.dataTonConnectApi))
+    implementation(project(Config.Module.libTonConnect))
 }

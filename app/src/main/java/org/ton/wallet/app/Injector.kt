@@ -29,8 +29,6 @@ import org.ton.wallet.data.settings.impl.NetworkStateRepositoryImpl
 import org.ton.wallet.data.settings.impl.SettingsRepositoryImpl
 import org.ton.wallet.data.tonclient.api.TonClient
 import org.ton.wallet.data.tonclient.impl.TonClientImpl
-import org.ton.wallet.data.tonconnect.api.TonConnectRepository
-import org.ton.wallet.data.tonconnect.impl.*
 import org.ton.wallet.data.transactions.api.TransactionsRepository
 import org.ton.wallet.data.transactions.impl.*
 import org.ton.wallet.data.wallet.api.*
@@ -42,8 +40,10 @@ import org.ton.wallet.domain.blockhain.api.*
 import org.ton.wallet.domain.blockhain.impl.*
 import org.ton.wallet.domain.settings.api.DeleteWalletUseCase
 import org.ton.wallet.domain.settings.impl.DeleteWalletUseCaseImpl
-import org.ton.wallet.domain.tonconnect.api.*
-import org.ton.wallet.domain.tonconnect.impl.*
+import org.ton.wallet.domain.tonconnect.api.TonConnectOpenConnectionUseCase
+import org.ton.wallet.domain.tonconnect.api.TonConnectSendResponseUseCase
+import org.ton.wallet.domain.tonconnect.impl.TonConnectOpenConnectionUseCaseImpl
+import org.ton.wallet.domain.tonconnect.impl.TonConnectSendResponseUseCaseImpl
 import org.ton.wallet.domain.transactions.api.*
 import org.ton.wallet.domain.transactions.impl.*
 import org.ton.wallet.domain.wallet.api.*
@@ -59,21 +59,18 @@ import org.ton.wallet.feature.transactions.api.TransactionDetailsScreenApi
 import org.ton.wallet.feature.wallet.api.MainScreenApi
 import org.ton.wallet.feature.wallet.api.ReceiveScreenApi
 import org.ton.wallet.lib.sqlite.SqliteDatabase
+import org.ton.wallet.lib.tonconnect.TonConnectClient
 import org.ton.wallet.screen.viewmodel.ViewModelDiScopeProvider
 import org.ton.wallet.uicomponents.snackbar.SnackBarController
 import org.ton.wallet.uicomponents.snackbar.SnackBarControllerImpl
 import org.ton.wallet.uicomponents.util.ClipboardController
 import org.ton.wallet.uicomponents.util.ClipboardControllerImpl
 import java.io.File
-import java.util.concurrent.TimeUnit
 
 object Injector {
 
     const val DefaultSharedPreferences = "defaultPrefs"
     const val SecuredSharedPreferences = "securedPrefs"
-
-    private const val DefaultOkHttpClient = "httpClient"
-    private const val SseOkHttpClient = "sseClient"
 
     private lateinit var application: Application
 
@@ -112,39 +109,39 @@ object Injector {
                     EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
                 )
             }
-            singleton<OkHttpClient>(DefaultOkHttpClient) {
+            singleton<OkHttpClient>() {
                 val loggingInterceptor = HttpLoggingInterceptor(HttpLoggingInterceptor.Logger.DEFAULT)
                 loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
                 OkHttpClient.Builder()
                     .addInterceptor(loggingInterceptor)
                     .build()
             }
-            singleton<OkHttpClient>(SseOkHttpClient) {
-                OkHttpClient.Builder()
-                    .connectTimeout(5, TimeUnit.SECONDS)
-                    .readTimeout(10, TimeUnit.MINUTES)
-                    .writeTimeout(10, TimeUnit.MINUTES)
-                    .build()
-            }
             singleton<TonClient> {
                 TonClientImpl(
                     sharedPreferences = getInstance(DefaultSharedPreferences),
-                    okHttpClient = getInstance(DefaultOkHttpClient),
-                    keysDirectory = File(AppFiles.getFilesDir(), "ton0"),
-                    json = getInstance()
+                    okHttpClient = getInstance(),
+                    keysDirectory = File(AppFiles.getFilesDir(), "ton0")
                 )
             }
 
             singleton<SqliteDatabase> { AppDataBase(getInstance()) }
 
             // api
-            singleton<PricesApi> { PricesApiImpl(okHttpClient = getInstance(DefaultOkHttpClient)) }
+            singleton<PricesApi> {
+                PricesApiImpl(okHttpClient = getInstance())
+            }
+            singleton<TonConnectClient> {
+                TonConnectClient.createInstance(
+                    json = getInstance(),
+                    sharedPreferences = getInstance(DefaultSharedPreferences),
+                    securedPreferences = getInstance(SecuredSharedPreferences)
+                )
+            }
 
             // dao
             singleton<AccountsDao> { AccountsDaoImpl(db = getInstance()) }
             singleton<FiatPricesDao> { FiatPricesDaoImpl(db = getInstance()) }
             singleton<TransactionsDao> { TransactionsDaoImpl(db = getInstance()) }
-            singleton<TonConnectDao> { TonConnectDaoImpl(db = getInstance()) }
 
             // repositories
             singleton<AccountsRepository> {
@@ -171,14 +168,6 @@ object Injector {
             }
             singleton<SettingsRepository> {
                 SettingsRepositoryImpl(preferences = getInstance(DefaultSharedPreferences))
-            }
-            singleton<TonConnectRepository> {
-                TonConnectRepositoryImpl(
-                    okHttpClient = getInstance(DefaultOkHttpClient),
-                    sseHttpClient = getInstance(SseOkHttpClient),
-                    json = getInstance(),
-                    dao = getInstance()
-                )
             }
             singleton<TransactionsRepository> {
                 TransactionsRepositoryImpl(
@@ -210,12 +199,10 @@ object Injector {
                     getInstance<NotificationsRepository>(),
                     getInstance<PricesRepository>(),
                     getInstance<SettingsRepository>(),
-                    getInstance<TonConnectRepository>(),
                     getInstance<TransactionsRepository>(),
                     getInstance<WalletRepository>()
                 )
                 DeleteWalletUseCaseImpl(
-                    db = getInstance(),
                     defaultPreferences = getInstance(DefaultSharedPreferences),
                     securedPreferences = getInstance(SecuredSharedPreferences),
                     repositories = repositories
@@ -286,27 +273,20 @@ object Injector {
                     walletRepository = getInstance()
                 )
             }
-            factory<TonConnectGetEventsUseCase> {
-                TonConnectGetEventsUseCaseImpl(
-                    tonConnectRepository = getInstance(),
-                    getCurrentAccountDataUseCase = getInstance()
-                )
-            }
             factory<TonConnectOpenConnectionUseCase> {
                 TonConnectOpenConnectionUseCaseImpl(
                     appVersion = BuildConfig.VERSION_NAME,
                     json = getInstance(),
-                    tonConnectRepository = getInstance(),
+                    tonConnectClient = getInstance(),
                     walletRepository = getInstance(),
                     getAddressUseCase = getInstance(),
                     getCurrentAccountDataUseCase = getInstance()
                 )
             }
-            factory<TonConnectSendUseCase> {
-                TonConnectSendUseCaseImpl(
+            factory<TonConnectSendResponseUseCase> {
+                TonConnectSendResponseUseCaseImpl(
                     json = getInstance(),
-                    getCurrentAccountDataUseCase = getInstance(),
-                    tonConnectRepository = getInstance()
+                    tonConnectClient = getInstance()
                 )
             }
 
@@ -322,7 +302,8 @@ object Injector {
                 TonConnectEventHandlerImpl(
                     navigator = getInstance(),
                     notificationsRepository = getInstance(),
-                    settingsRepository = getInstance()
+                    settingsRepository = getInstance(),
+                    tonConnectClient = getInstance()
                 )
             }
         }

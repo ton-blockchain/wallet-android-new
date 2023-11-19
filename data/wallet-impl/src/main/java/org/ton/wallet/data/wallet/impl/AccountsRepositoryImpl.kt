@@ -9,7 +9,6 @@ import kotlinx.coroutines.launch
 import org.ton.wallet.data.core.SecuredPrefsKeys
 import org.ton.wallet.data.core.model.TonAccount
 import org.ton.wallet.data.core.model.TonAccountType
-import org.ton.wallet.data.core.ton.TonWalletHelper
 import org.ton.wallet.data.core.util.CoroutineScopes
 import org.ton.wallet.data.tonclient.api.TonClient
 import org.ton.wallet.data.tonclient.api.sendRequestTyped
@@ -87,9 +86,7 @@ class AccountsRepositoryImpl(
         var dto = accountsDao.get(type)
         if (dto == null) {
             val account = TonAccount(publicKey, type.version, type.revision)
-            val code = TonWalletHelper.getContractCode(type)
-            val data = TonWalletHelper.getAccountData(account)
-            val initialState = TonApi.RawInitialAccountState(code, data)
+            val initialState = TonApi.RawInitialAccountState(account.getCode(), account.getInitialData())
             val addressRequest = TonApi.GetAccountAddress(initialState, account.revision, 0)
             val addressResponse = tonClient.sendRequestTyped<TonApi.AccountAddress>(addressRequest)
             val address = addressResponse.accountAddress!!

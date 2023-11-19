@@ -13,5 +13,6 @@ android {
 }
 
 dependencies {
+    implementation(project(Config.Module.dataCore))
     implementation(project(Config.Module.dataTransactionsApi))
 }

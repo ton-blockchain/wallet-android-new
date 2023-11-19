@@ -1,5 +1,6 @@
 package org.ton.wallet.domain.transactions.impl
 
+import org.ton.wallet.data.core.ton.MessageData
 import org.ton.wallet.data.tonclient.api.TonApiException
 import org.ton.wallet.data.transactions.api.TransactionsRepository
 import org.ton.wallet.data.transactions.api.model.SendParams
@@ -13,11 +14,11 @@ class GetSendFeeUseCaseImpl(
     private val walletRepository: WalletRepository
 ) : GetSendFeeUseCase {
 
-    override suspend fun invoke(toAddress: String, amount: Long, message: String?): Long {
+    override suspend fun invoke(toAddress: String, amount: Long, message: MessageData?, stateInitBase64: String?): Long {
         val account = getCurrentAccountDataUseCase.getAccountState() ?: throw IllegalArgumentException("Account is null")
-        val sendParams = SendParams(account.address, toAddress, amount, message)
+        val sendParams = SendParams(account, walletRepository.publicKey, toAddress, amount, message, stateInitBase64)
         return try {
-            transactionsRepository.getSendFee(account, walletRepository.publicKey, sendParams)
+            transactionsRepository.getSendFee(sendParams)
         } catch (e: TonApiException) {
             if (e.message == "NOT_ENOUGH_FUNDS") {
                 0

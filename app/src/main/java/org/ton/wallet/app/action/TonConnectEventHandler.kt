@@ -10,28 +10,30 @@ import org.ton.wallet.app.util.AppLifecycleDetector
 import org.ton.wallet.core.Res
 import org.ton.wallet.data.notifications.api.NotificationsRepository
 import org.ton.wallet.data.settings.api.SettingsRepository
-import org.ton.wallet.data.tonconnect.api.model.TonConnectEvent
 import org.ton.wallet.feature.send.impl.connect.SendConnectConfirmScreenArguments
+import org.ton.wallet.lib.tonconnect.*
 import org.ton.wallet.screen.AppScreen
 import org.ton.wallet.strings.RString
 import org.ton.wallet.uikit.RUiKitDrawable
 
 interface TonConnectEventHandler {
 
-    fun onTonConnectEvent(event: TonConnectEvent)
+    suspend fun onTonConnectEvent(event: TonConnectEvent)
 }
 
 internal class TonConnectEventHandlerImpl(
     private val navigator: Navigator,
     private val notificationsRepository: NotificationsRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val tonConnectClient: TonConnectClient
 ) : TonConnectEventHandler {
 
-    override fun onTonConnectEvent(event: TonConnectEvent) {
+    override suspend fun onTonConnectEvent(event: TonConnectEvent) {
         val isAppForeground = AppLifecycleDetector.isAppForegroundFlow.value
-        if (event is TonConnectEvent.Transfer) {
+        if (event.request is TonConnectApi.SendTransactionRequest) {
             val isPasscodeAtTop = navigator.topScreenTag == AppScreen.PassCodeEnter.name
             if (isAppForeground && !isPasscodeAtTop) {
+                tonConnectClient.setEventShowed(event.clientId, event.eventId)
                 navigator.push(SendConnectConfirmScreenArguments(event))
             } else if (settingsRepository.isNotificationsOn.value) {
                 val intent = Intent(Res.context, MainActivity::class.java)
@@ -52,6 +54,8 @@ internal class TonConnectEventHandlerImpl(
                     .setSmallIcon(RUiKitDrawable.ic_gem_18)
                 notificationsRepository.showNotification(Res.context, notificationsRepository.idTonConnectAction, builder)
             }
+        } else if (event.request is TonConnectApi.DisconnectRequest) {
+            tonConnectClient.disconnect(event.clientId)
         }
     }
 }

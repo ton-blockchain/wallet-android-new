@@ -3,7 +3,6 @@ package org.ton.wallet.app.data
 import android.content.Context
 import org.ton.wallet.app.BuildConfig
 import org.ton.wallet.data.prices.impl.dao.SqlTableFiatPrices
-import org.ton.wallet.data.tonconnect.impl.SqlTableTonConnect
 import org.ton.wallet.data.transactions.impl.SqlTableTransactions
 import org.ton.wallet.data.wallet.api.SqlTableAccounts
 import org.ton.wallet.lib.sqlite.SQLiteDatabaseWrapper
@@ -17,7 +16,6 @@ internal class AppDataBase(context: Context) : SqliteDatabaseImpl(context, "db",
         db.executeSql(SqlTableFiatPrices.getCreateSqlQuery())
         db.executeSql(SqlTableFiatPrices.getInitSqlQuery())
         db.executeSql(SqlTableTransactions.getCreateSqlQuery())
-        db.executeSql(SqlTableTonConnect.getCreateSqlQuery())
     }
 
     override fun onOpen(db: SQLiteDatabaseWrapper) {

@@ -17,5 +17,8 @@ class TonConnectRequest(
 
         @Parcelize
         data class Proof(val payload: String?) : ConnectItem
+
+        @Parcelize
+        data class UnknownMethod(val method: String) : ConnectItem
     }
 }

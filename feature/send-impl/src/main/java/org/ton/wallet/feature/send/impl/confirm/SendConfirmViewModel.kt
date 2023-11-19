@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.*
 import org.ton.wallet.core.Res
 import org.ton.wallet.coreui.Formatter
 import org.ton.wallet.coreui.KeyboardUtils
+import org.ton.wallet.data.core.ton.MessageData
 import org.ton.wallet.data.tonclient.api.TonApiException
 import org.ton.wallet.domain.transactions.api.GetSendFeeUseCase
 import org.ton.wallet.feature.passcode.api.PassCodeEnterScreenApi
@@ -103,13 +104,13 @@ class SendConfirmViewModel(private val args: SendConfirmScreenArguments) : BaseV
         calculateFeeJob = viewModelScope.launch(Dispatchers.IO) {
             val amount = _amountFlow.value
             try {
-                val fee = getSendFeeUseCase.invoke(recipientAddress, amount, message)
+                val fee = getSendFeeUseCase.invoke(recipientAddress, amount, MessageData.text(message))
                 _feeFlow.emit(fee)
             } catch (e: TonApiException) {
                 if (e.message == "NOT_ENOUGH_FUNDS") {
                     var zeroAmountFee: Long? = null
                     try {
-                        zeroAmountFee = getSendFeeUseCase.invoke(recipientAddress, 0, message)
+                        zeroAmountFee = getSendFeeUseCase.invoke(recipientAddress, 0, MessageData.text(message))
                     } catch (e: TonApiException) {
                         if (e.message == "NOT_ENOUGH_FUNDS") {
                             showNotEnoughFundsError()
@@ -122,7 +123,7 @@ class SendConfirmViewModel(private val args: SendConfirmScreenArguments) : BaseV
                     if (zeroAmountFee != null) {
                         val decreasedAmount = amount - zeroAmountFee
                         try {
-                            val decreasedAmountFee = getSendFeeUseCase.invoke(recipientAddress, decreasedAmount, message)
+                            val decreasedAmountFee = getSendFeeUseCase.invoke(recipientAddress, decreasedAmount, MessageData.text(message))
                             _feeFlow.emit(decreasedAmountFee)
                             _amountFlow.emit(decreasedAmount)
                             snackBarController.showMessage(SnackBarMessage(

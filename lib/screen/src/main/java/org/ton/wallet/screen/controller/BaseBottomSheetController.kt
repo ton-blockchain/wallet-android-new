@@ -112,6 +112,8 @@ abstract class BaseBottomSheetController @JvmOverloads constructor(
         return superInsets
     }
 
+    protected open fun onAnimationStarted() = Unit
+
     protected open fun onAnimationFinished() = Unit
 
     private fun show() {
@@ -123,6 +125,7 @@ abstract class BaseBottomSheetController @JvmOverloads constructor(
             bottomSheetLayout.measure(widthSpec, heightSpec)
             bottomSheetLayout.translationY = bottomSheetLayout.measuredHeight.toFloat()
             bottomSheetLayout.isInvisible = false
+            onAnimationStarted()
             startBottomSheetAnimation(0f, AnimationSpeedPxPerMillis, ::onAnimationFinished)
         }
     }

@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import org.ton.wallet.app.action.TonConnectEventHandler
 import org.ton.wallet.app.navigation.BackStackItem
 import org.ton.wallet.app.navigation.Navigator
 import org.ton.wallet.app.util.*
@@ -18,14 +19,15 @@ import org.ton.wallet.core.ThreadUtils
 import org.ton.wallet.data.auth.api.AuthRepository
 import org.ton.wallet.data.core.link.LinkActionHandler
 import org.ton.wallet.data.core.link.LinkUtils
+import org.ton.wallet.data.core.util.CoroutineScopes
 import org.ton.wallet.data.settings.api.SettingsRepository
-import org.ton.wallet.data.tonconnect.api.model.TonConnectEvent
 import org.ton.wallet.data.wallet.api.WalletRepository
 import org.ton.wallet.feature.onboarding.impl.recovery.finished.RecoveryFinishedScreenArguments
 import org.ton.wallet.feature.passcode.api.PassCodeEnterScreenApi
 import org.ton.wallet.feature.passcode.impl.enter.PassCodeEnterScreenArguments
-import org.ton.wallet.feature.send.impl.connect.SendConnectConfirmScreenArguments
 import org.ton.wallet.lib.security.BiometricUtils
+import org.ton.wallet.lib.tonconnect.TonConnectClient
+import org.ton.wallet.lib.tonconnect.TonConnectEvent
 import org.ton.wallet.screen.AppScreen
 import org.ton.wallet.screen.viewmodel.ActivityViewModel
 
@@ -36,6 +38,8 @@ class MainActivityViewModel : ActivityViewModel() {
     private val linkActionHandler: LinkActionHandler by inject()
     private val navigator: Navigator by inject()
     private val settingsRepository: SettingsRepository by inject()
+    private val tonConnectClient: TonConnectClient by inject()
+    private val tonConnectEventHandler: TonConnectEventHandler by inject()
     private val walletRepository: WalletRepository by inject()
 
     private var savedBackStack: List<BackStackItem>? = null
@@ -76,7 +80,7 @@ class MainActivityViewModel : ActivityViewModel() {
                 } else {
                     navigator.setBackStack(backStack)
                 }
-                ThreadUtils.postOnMain(::handleIntent)
+                ThreadUtils.postOnMain(::handleIntent, 500L)
             }
         }
     }
@@ -109,10 +113,10 @@ class MainActivityViewModel : ActivityViewModel() {
             return
         }
         viewModelScope.launch(Dispatchers.Default) {
-            val transferAction = intent?.getParcelableExtra<TonConnectEvent.Transfer>(MainActivity.ArgumentKeyTonConnectAction)
+            val tonConnectEvent = intent?.getParcelableExtra<TonConnectEvent>(MainActivity.ArgumentKeyTonConnectAction)
             val action = LinkUtils.parseLink(intent?.data?.toString() ?: "")
-            if (transferAction != null) {
-                navigator.push(SendConnectConfirmScreenArguments(transferAction))
+            if (tonConnectEvent != null) {
+                tonConnectEventHandler.onTonConnectEvent(tonConnectEvent)
             } else if (action != null) {
                 linkActionHandler.processLinkAction(action)
             }
@@ -135,6 +139,9 @@ class MainActivityViewModel : ActivityViewModel() {
 
     private fun navigateToWallet() {
         navigator.push(screen = AppScreen.Main.name, isRoot = true, isReplace = true)
+        CoroutineScopes.appScope.launch(Dispatchers.IO) {
+            tonConnectClient.restoreConnections()
+        }
     }
 
     private fun isNotificationsAllowed(): Boolean {

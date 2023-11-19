@@ -32,7 +32,7 @@ internal class FileLogTarget(
         calendar.timeInMillis = System.currentTimeMillis()
         val dateString = getCurrentDateString(calendar, FILE_DATE_FORMAT_PATTERN)
 
-        val file = File(logsDirectory, "l-${dateString}.txt")
+        val file = File(logsDirectory, "l-${dateString}.log")
         val fileExists = file.exists()
         if (!fileExists) {
             file.createNewFile()

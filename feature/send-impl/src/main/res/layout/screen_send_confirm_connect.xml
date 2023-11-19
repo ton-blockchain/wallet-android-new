@@ -27,12 +27,37 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="20dp"
+                android:layout_marginBottom="28dp"
                 android:textSize="44sp" />
 
             <FrameLayout
+                android:id="@+id/sendConfirmConnectSenderLayout"
+                android:background="@drawable/bkg_list_item"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="28dp"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="14dp">
+
+                <TextView
+                    android:id="@+id/sendConfirmConnectSenderTitleText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|center_vertical"
+                    android:text="@string/sender" />
+
+                <TextView
+                    android:id="@+id/sendConfirmConnectSenderText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|center_vertical" />
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:background="@drawable/bkg_list_item"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:paddingHorizontal="20dp"
                 android:paddingVertical="14dp">
 
@@ -51,10 +76,28 @@
 
             </FrameLayout>
 
-            <View
-                android:background="@color/input_disabled"
+            <FrameLayout
+                android:id="@+id/sendConfirmConnectMessageLayout"
+                android:background="@drawable/bkg_list_item"
                 android:layout_width="match_parent"
-                android:layout_height="0.5dp" />
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="14dp">
+
+                <TextView
+                    android:id="@+id/sendConfirmConnectMessageTitleText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|center_vertical"
+                    android:text="@string/message" />
+
+                <TextView
+                    android:id="@+id/sendConfirmConnectMessageText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|center_vertical" />
+
+            </FrameLayout>
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -125,6 +168,7 @@
 
     <ImageView
         android:id="@+id/sendConfirmConnectDoneImage"
+        android:importantForAccessibility="no"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_gravity="center_horizontal|bottom"

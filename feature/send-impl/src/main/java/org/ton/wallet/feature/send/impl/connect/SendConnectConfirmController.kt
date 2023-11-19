@@ -39,6 +39,12 @@ class SendConnectConfirmController(args: Bundle?) : BaseViewModelBottomSheetCont
     private lateinit var buttonsLayout: ViewGroup
     private lateinit var feeLoadingView: View
     private lateinit var doneImage: ImageView
+    private lateinit var senderLayout: ViewGroup
+    private lateinit var senderTitleText: TextView
+    private lateinit var senderText: TextView
+    private lateinit var messageLayout: ViewGroup
+    private lateinit var messageTitleText: TextView
+    private lateinit var messageText: TextView
 
     private var prevIsSent = false
 
@@ -53,8 +59,17 @@ class SendConnectConfirmController(args: Bundle?) : BaseViewModelBottomSheetCont
             amountText.setCompoundDrawablesRelativeWithIntrinsicBounds(animationDrawable, null, null, null)
         }
 
+        senderLayout = view.findViewById(R.id.sendConfirmConnectSenderLayout)
+        senderTitleText = view.findViewById(R.id.sendConfirmConnectSenderTitleText)
+        senderText = view.findViewById(R.id.sendConfirmConnectSenderText)
+
         receiverText = view.findViewById(R.id.sendConfirmConnectReceiverText)
         receiverTitleText = view.findViewById(R.id.sendConfirmConnectReceiverTitleText)
+
+        messageLayout = view.findViewById(R.id.sendConfirmConnectMessageLayout)
+        messageTitleText = view.findViewById(R.id.sendConfirmConnectMessageTitleText)
+        messageText = view.findViewById(R.id.sendConfirmConnectMessageText)
+
         feeTitleText = view.findViewById(R.id.sendConfirmConnectFeeTitleText)
         feeText = view.findViewById(R.id.sendConfirmConnectFeeText)
 
@@ -77,24 +92,33 @@ class SendConnectConfirmController(args: Bundle?) : BaseViewModelBottomSheetCont
 
     override fun onViewCreated(view: View) {
         super.onViewCreated(view)
-        viewModel.state.launchInViewScope(::setState)
+        viewModel.stateFlow.launchInViewScope(::setState)
     }
 
     override fun onAnimationFinished() {
         super.onAnimationFinished()
         rootView.requestLayout()
+        senderTitleText.requestLayout()
         receiverTitleText.requestLayout()
         feeTitleText.requestLayout()
+        messageTitleText.requestLayout()
     }
 
     private fun setState(state: SendConnectConfirmState) {
         val amountString = Formatter.getFormattedAmount(state.amount)
         amountText.text = Formatter.getBeautifiedAmount(amountString)
-        receiverText.text = Formatter.getBeautifiedShortStringSafe(Formatter.getShortAddress(state.receiver), Res.font(RUiKitFont.roboto_regular))
+        senderLayout.isVisible = state.senderUfAddress != null
+        senderText.text = state.senderUfAddress?.let { address ->
+            Formatter.getBeautifiedShortStringSafe(Formatter.getShortAddress(address), Res.font(RUiKitFont.roboto_regular))
+        }
+        receiverText.text = Formatter.getBeautifiedShortStringSafe(Formatter.getShortAddress(state.receiverUfAddress), Res.font(RUiKitFont.roboto_regular))
         feeLoadingView.isVisible = state.feeString == null
         feeText.text = state.feeString
         val continueButton = if (state.isSending) loadingDrawable else emptyDrawable
         confirmButton.setCompoundDrawablesWithIntrinsicBounds(emptyDrawable, null, continueButton, null)
+
+        messageLayout.isVisible = state.payload != null
+        messageText.text = state.payload
 
         if (prevIsSent != state.isSent && state.isSent) {
             buttonsLayout.animate().cancel()

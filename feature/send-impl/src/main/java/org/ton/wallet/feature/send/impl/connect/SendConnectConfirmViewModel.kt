@@ -4,9 +4,12 @@ import android.os.Bundle
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import org.ton.block.Message
 import org.ton.block.StateInit
 import org.ton.boc.BagOfCells
 import org.ton.crypto.base64
+import org.ton.tlb.CellRef
+import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.wallet.core.Res
 import org.ton.wallet.coreui.Formatter
 import org.ton.wallet.data.core.ton.MessageData
@@ -158,10 +161,12 @@ class SendConnectConfirmViewModel(
         _stateFlow.value = _stateFlow.value.copy(isSending = true)
         sendJob = viewModelScope.launch(Dispatchers.IO) {
             try {
-                sendUseCase.invoke(_stateFlow.value.receiverUfAddress, requestAmount, messageData, requestMessage.stateInit)
+                val result = sendUseCase.invoke(_stateFlow.value.receiverUfAddress, requestAmount, messageData, requestMessage.stateInit)
                 _stateFlow.value = _stateFlow.value.copy(isSent = true)
                 executeOnAppScope {
-                    val response = TonConnectApi.SendTransactionResponse.createSuccess(id = args.event.eventId, boc = "")
+                    val externalMessageCell = CellRef(result.externalMessage).toCell(Message.tlbCodec(AnyTlbConstructor))
+                    val boc = base64(BagOfCells(externalMessageCell).toByteArray())
+                    val response = TonConnectApi.SendTransactionResponse.createSuccess(id = args.event.eventId, boc = boc)
                     tonConnectSendResponseUseCase.sendResponse(args.event.clientId, response)
                 }
                 withContext(Dispatchers.Main) {

@@ -16,14 +16,33 @@ import kotlin.time.Duration.Companion.seconds
 
 object TonWalletHelper {
 
-    fun getTransferMessageBody(
+    fun getTransferMessage(
+        address: AddrStd,
+        stateInit: StateInit?,
+        transferCell: Cell,
+    ): Message<Cell> {
+        val info = ExtInMsgInfo(
+            src = AddrNone,
+            dest = address,
+            importFee = Coins()
+        )
+        val maybeStateInit = Maybe.of(stateInit?.let { Either.of<StateInit, CellRef<StateInit>>(null, CellRef(it)) })
+        val body = Either.of<Cell, CellRef<Cell>>(null, CellRef(transferCell))
+        return Message(
+            info = info,
+            init = maybeStateInit,
+            body = body
+        )
+    }
+
+    fun getTransferCell(
         fromAccount: TonAccount,
         toWorkChainId: Int,
         toRawAddress: ByteArray,
         amount: Long,
         msgData: MessageData? = null,
         seed: ByteArray? = null
-    ): ByteArray {
+    ): Cell {
         val transfer = WalletTransfer {
             destination = AddrStd(toWorkChainId, toRawAddress)
             coins = Coins.ofNano(amount)
@@ -34,7 +53,9 @@ object TonWalletHelper {
             storeUInt(fromAccount.subWalletId, 32)
             storeUInt((Clock.System.now() + 60.seconds).epochSeconds.toInt(), 32)
             storeUInt(fromAccount.seqNo, 32)
-            storeUInt(0, 8) // op
+            if (fromAccount.version == 4) {
+                storeUInt(0, 8) // op
+            }
             var sendMode = 3
             if (transfer.sendMode > -1) {
                 sendMode = transfer.sendMode
@@ -46,12 +67,11 @@ object TonWalletHelper {
         val privateKey = seed?.let { PrivateKeyEd25519(it) }
         val signature = privateKey?.let { BitString(it.sign(unsignedBody.hash())) }
 
-        val msgCell = CellBuilder.createCell {
+        return CellBuilder.createCell {
             signature?.let { storeBits(it) }
             storeBits(unsignedBody.bits)
             storeRefs(unsignedBody.refs)
         }
-        return BagOfCells(msgCell).toByteArray()
     }
 
     fun getMessageText(msgData: MessageData, seed: ByteArray?): String? {
@@ -95,10 +115,11 @@ object TonWalletHelper {
         val init = Maybe.of(transfer.stateInit?.let {
             Either.of<StateInit, CellRef<StateInit>>(null, CellRef(it))
         })
-        val body = if (transfer.body == null) {
+        val bodyCell = transfer.body
+        val body = if (bodyCell == null || bodyCell.isEmpty()) {
             Either.of<Cell, CellRef<Cell>>(Cell.empty(), null)
         } else {
-            Either.of<Cell, CellRef<Cell>>(null, CellRef(transfer.body!!))
+            Either.of<Cell, CellRef<Cell>>(null, CellRef(bodyCell))
         }
 
         return MessageRelaxed(

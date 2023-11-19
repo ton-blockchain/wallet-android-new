@@ -56,8 +56,8 @@ class SendProcessingViewModel(private val args: SendProcessingScreenArguments) :
                     return@launch
                 }
 
-                val resultAmount = sendUseCase.invoke(args.address, _amountFlow.value, message, null)
-                _amountFlow.value = resultAmount
+                val sendResult = sendUseCase.invoke(args.address, _amountFlow.value, message, null)
+                _amountFlow.value = sendResult.amount
                 onSendCompleted()
             } catch (e: Exception) {
                 screenApi.navigateBack()

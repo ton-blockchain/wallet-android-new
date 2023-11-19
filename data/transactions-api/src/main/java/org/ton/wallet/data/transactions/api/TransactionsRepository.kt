@@ -20,5 +20,5 @@ interface TransactionsRepository : BaseRepository {
     suspend fun getSendFee(sendParams: SendParams): Long
 
     @Throws(Exception::class)
-    suspend fun performSend(sendParams: SendParams): Long
+    suspend fun performSend(sendParams: SendParams): SendResult
 }

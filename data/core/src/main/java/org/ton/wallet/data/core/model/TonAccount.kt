@@ -44,7 +44,7 @@ class TonAccount(
         return BagOfCells(stateInitCell).toByteArray()
     }
 
-    private fun getStateInit(): StateInit {
+    fun getStateInit(): StateInit {
         val dataCell = getDataCell(seqNo = 0)
         return StateInit(
             code = BagOfCells(getCode()).first(),

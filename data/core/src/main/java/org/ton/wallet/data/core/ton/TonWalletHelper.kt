@@ -8,9 +8,8 @@ import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.contract.wallet.WalletTransfer
-import org.ton.tlb.CellRef
+import org.ton.tlb.*
 import org.ton.tlb.constructor.AnyTlbConstructor
-import org.ton.tlb.storeRef
 import org.ton.wallet.data.core.model.TonAccount
 import kotlin.time.Duration.Companion.seconds
 
@@ -43,10 +42,21 @@ object TonWalletHelper {
         msgData: MessageData? = null,
         seed: ByteArray? = null
     ): Cell {
+        var transferBody: Cell? = null
+        if (msgData is MessageData.Raw) {
+            transferBody = msgData.body
+        } else if (msgData is MessageData.Text) {
+            transferBody = CellBuilder.createCell {
+                storeInt(0, 32)
+                storeTlb(MessageText.Companion, msgData.text.value)
+            }
+        }
+
         val transfer = WalletTransfer {
             destination = AddrStd(toWorkChainId, toRawAddress)
             coins = Coins.ofNano(amount)
-            body = msgData?.body
+            body = transferBody
+            stateInit = msgData?.stateInit?.value
         }
 
         val unsignedBody = CellBuilder.createCell {

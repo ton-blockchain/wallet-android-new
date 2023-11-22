@@ -66,7 +66,8 @@ class SendConfirmViewModel(private val args: SendConfirmScreenArguments) : BaseV
     override fun onScreenChange(isStarted: Boolean, isPush: Boolean, isEnter: Boolean) {
         super.onScreenChange(isStarted, isPush, isEnter)
         if (!isStarted && !isPush && isEnter && passCodeEntered) {
-            screenApi.navigateToSendProcessing(recipientAddress, _amountFlow.value, _feeFlow.value, _messageFlow.value)
+            val message = _messageFlow.value.ifEmpty { null }
+            screenApi.navigateToSendProcessing(recipientAddress, _amountFlow.value, _feeFlow.value, message)
             passCodeEntered = false
         }
     }

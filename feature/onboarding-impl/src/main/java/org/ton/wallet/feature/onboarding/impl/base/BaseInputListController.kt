@@ -3,7 +3,9 @@ package org.ton.wallet.feature.onboarding.impl.base
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.TextView
 import org.ton.wallet.core.Res
 import org.ton.wallet.coreui.KeyboardUtils
 import org.ton.wallet.coreui.ext.*
@@ -16,6 +18,7 @@ abstract class BaseInputListController<VM : BaseInputListViewModel>(args: Bundle
 
     protected abstract val inputLayouts: Array<NumericEditTextLayout>
 
+    private lateinit var rootView: View
     private lateinit var suggestPopupWindow: SuggestWordsPopupWindow
 
     protected var currentFocusedEditText: EditText? = null
@@ -27,6 +30,7 @@ abstract class BaseInputListController<VM : BaseInputListViewModel>(args: Bundle
 
     override fun onViewCreated(view: View) {
         super.onViewCreated(view)
+        rootView = view
         view.setOnClickListener(::dismissSuggestPopupWindow)
         viewModel.suggestWordsFlow.launchInViewScope(::onSuggestWordsChanged)
     }
@@ -52,6 +56,8 @@ abstract class BaseInputListController<VM : BaseInputListViewModel>(args: Bundle
     }
 
     protected open fun onScrolled(v: View?, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int) = Unit
+
+    protected open fun onDoneClicked() = Unit
 
     private fun onSuggestWordsChanged(words: List<String>) {
         if (words.isEmpty()) {
@@ -105,5 +111,22 @@ abstract class BaseInputListController<VM : BaseInputListViewModel>(args: Bundle
     protected val scrollChangeListener = View.OnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
         dismissSuggestPopupWindow()
         onScrolled(v, scrollX, scrollY, oldScrollX, oldScrollY)
+    }
+
+    protected val editorActionListener = TextView.OnEditorActionListener { v, actionId, _ ->
+        val suggestedWords = viewModel.suggestWordsFlow.value
+        if (actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_DONE) {
+            if (suggestedWords.size == 1) {
+                v.text = suggestedWords[0]
+            }
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                v.clearFocus()
+                rootView.requestFocus()
+                KeyboardUtils.hideKeyboard(activity!!.window) {
+                    onDoneClicked()
+                }
+            }
+        }
+        false
     }
 }

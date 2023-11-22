@@ -25,7 +25,6 @@ class RecoveryCheckController(args: Bundle?) : BaseInputListController<RecoveryC
 
     override val viewModel by viewModels { RecoveryCheckViewModel() }
 
-//    override val toolbar: AppToolbar get() = appToolbar
     override val inputLayouts: Array<NumericEditTextLayout> get() = editTextLayouts
 
     private lateinit var animationView: RLottieImageView
@@ -49,7 +48,7 @@ class RecoveryCheckController(args: Bundle?) : BaseInputListController<RecoveryC
 
         continueButton = view.findViewById(R.id.recoveryCheckContinueButton)
         (continueButton.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = continueButtonBottomMargin
-        continueButton.setOnClickListenerWithLock(::onContinueClicked)
+        continueButton.setOnClickListenerWithLock(::onDoneClicked)
 
         // setup subtitle
         val subtitleText = view.findViewById<TextView>(R.id.recoveryCheckSubTitle)
@@ -64,6 +63,7 @@ class RecoveryCheckController(args: Bundle?) : BaseInputListController<RecoveryC
         )
         for (i in editTextLayouts.indices) {
             val editTextLayout = editTextLayouts[i]
+            editTextLayout.editText.setOnEditorActionListener(editorActionListener)
             editTextLayout.editText.setTextWithSelection(viewModel.enteredWords[i])
             editTextLayout.setNumber(viewModel.wordPositions[i] + 1)
             editTextLayout.setTextFocusChangedListener(editTextFocusChangedListener)
@@ -98,16 +98,17 @@ class RecoveryCheckController(args: Bundle?) : BaseInputListController<RecoveryC
         return superInsets
     }
 
-    private fun onErrorStatesChanged(errors: BooleanArray) {
-        editTextLayouts.forEachIndexed { index, numericEditTextLayout ->
-            numericEditTextLayout.editText.setErrorState(errors[index])
-        }
-    }
-
-    private fun onContinueClicked() {
+    override fun onDoneClicked() {
+        super.onDoneClicked()
         dismissSuggestPopupWindow()
         if (checkInputs()) {
             viewModel.onContinueClicked(activity!!)
+        }
+    }
+
+    private fun onErrorStatesChanged(errors: BooleanArray) {
+        editTextLayouts.forEachIndexed { index, numericEditTextLayout ->
+            numericEditTextLayout.editText.setErrorState(errors[index])
         }
     }
 

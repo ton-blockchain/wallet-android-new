@@ -31,7 +31,7 @@ abstract class BaseInputListViewModel : BaseViewModel() {
                 _suggestWords.tryEmit(emptyList())
             } else {
                 val suggestedWords = allRecoveryWords.filter { it.startsWith(word, ignoreCase = true) }
-                if (suggestedWords.isEmpty() || suggestedWords[0] == word) {
+                if (suggestedWords.size <= 1) {
                     _suggestWords.tryEmit(emptyList())
                 } else {
                     _suggestWords.tryEmit(suggestedWords)

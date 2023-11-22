@@ -6,7 +6,6 @@ import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.TextView.OnEditorActionListener
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.NestedScrollView
 import com.bluelinelabs.conductor.ControllerChangeHandler
@@ -44,14 +43,12 @@ class ImportController(args: Bundle?) : BaseInputListController<ImportViewModel>
     private lateinit var doneButton: View
     private lateinit var editTextLayouts: Array<NumericEditTextLayout?>
     private lateinit var scrollView: NestedScrollView
-    private lateinit var rootView: View
 
     private var slidingHeaderController: ToolbarSlidingHeaderController? = null
     private var progressDialog: IndeterminateProgressDialog? = null
 
     override fun createView(inflater: LayoutInflater, container: ViewGroup, savedViewState: Bundle?): View {
         val view = inflater.inflate(R.layout.screen_onboarding_import, container, false)
-        rootView = view
 
         view.findViewById<View>(R.id.importDontHaveButton).setOnClickListenerWithLock(viewModel::onNoPhraseClicked)
         doneButton = view.findViewById(R.id.importDoneButton)
@@ -144,7 +141,7 @@ class ImportController(args: Bundle?) : BaseInputListController<ImportViewModel>
         }
     }
 
-    private fun onDoneClicked() {
+    override fun onDoneClicked() {
         if (checkInputs()) {
             viewModel.onDoneClicked()
         }
@@ -185,23 +182,6 @@ class ImportController(args: Bundle?) : BaseInputListController<ImportViewModel>
                 }
             }
         }
-    }
-
-    private val editorActionListener = OnEditorActionListener { v, actionId, _ ->
-        val suggestedWords = viewModel.suggestWordsFlow.value
-        if (actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_DONE) {
-            if (suggestedWords.size == 1) {
-                v.text = suggestedWords[0]
-            }
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                v.clearFocus()
-                rootView.requestFocus()
-                KeyboardUtils.hideKeyboard(activity!!.window) {
-                    viewModel.onDoneClicked()
-                }
-            }
-        }
-        false
     }
 
     companion object {

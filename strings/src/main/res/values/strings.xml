@@ -73,6 +73,7 @@
     <string name="lets_check_recovery_phrase">Let\'s check that you wrote them\u00A0down correctly. Please enter the\u00A0words %1$d, %2$d and %3$d.</string>
     <string name="message">Message</string>
     <string name="network_error">Network error occurred. Check your connection and retry.</string>
+    <string name="network_invalid">Invalid network</string>
     <string name="no_camera_access">No Camera Access</string>
     <string name="no_camera_access_description">TON Wallet doesn\'t have access to the\u00A0camera. Please enable camera access to\u00A0scan QR codes.</string>
     <string name="no_qr_codes_detected">No QR codes detected</string>
@@ -84,6 +85,7 @@
     <string name="ok">OK</string>
     <string name="ok_sorry">OK, sorry</string>
     <string name="open_settings">Open Settings</string>
+    <string name="payload_incorrect">Payload is incorrect</string>
     <string name="passcode_changed">Passcode successfully changed</string>
     <string name="passcode_for_digit">4-digit code</string>
     <string name="passcode_not_matches">Passcodes do not match</string>

@@ -58,14 +58,40 @@ class SendConnectConfirmViewModel(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            messageData = requestMessage.payload?.let { payloadBase64 ->
+            val payloadCell = requestMessage.payload?.let { payloadBase64 ->
                 try {
-                    val payloadCell = BagOfCells(base64(payloadBase64)).roots.first()
-                    MessageData.raw(payloadCell)
+                    BagOfCells(base64(payloadBase64)).roots.first()
                 } catch (e: Exception) {
+                    L.e(e)
+                    val message = SnackBarMessage(
+                        title = Res.str(RString.error),
+                        message = Res.str(RString.payload_incorrect),
+                        drawable = Res.drawable(RUiKitDrawable.ic_warning_32)
+                    )
+                    snackBarController.showMessage(message)
+                    screenApi.navigateBack()
                     null
                 }
             }
+
+            val stateInitCell = requestMessage.stateInit?.let {stateInitBase64 ->
+                try {
+                    val stateInitCell = BagOfCells(base64(stateInitBase64)).roots.first()
+                    StateInit.loadTlb(stateInitCell)
+                } catch (e: Exception) {
+                    L.e(e)
+                    val message = SnackBarMessage(
+                        title = Res.str(RString.error),
+                        message = Res.str(RString.state_init_incorrect),
+                        drawable = Res.drawable(RUiKitDrawable.ic_warning_32)
+                    )
+                    snackBarController.showMessage(message)
+                    screenApi.navigateBack()
+                    null
+                }
+            }
+
+            messageData = MessageData.raw(payloadCell, stateInitCell)
             messageData?.let { _stateFlow.value = _stateFlow.value.copy(payload = TonWalletHelper.getMessageText(it, walletRepository.seed)) }
 
             val senderUfAddress = request.from?.let { address -> getAddressUseCase.getUfAddress(address) }
@@ -78,26 +104,11 @@ class SendConnectConfirmViewModel(
             }
             _stateFlow.value = _stateFlow.value.copy(senderUfAddress = senderUfAddress)
 
+            // TODO: should work with any format of address, not only raw format
             val receiverUfAddress = getAddressUseCase.getUfAddress(requestMessage.address) ?: requestMessage.address
             _stateFlow.value = _stateFlow.value.copy(receiverUfAddress = receiverUfAddress)
 
-            // if stateInit is not null, check if it is correct
-            requestMessage.stateInit?.let { stateInitBase64 ->
-                try {
-                    StateInit.loadTlb(BagOfCells(base64(stateInitBase64)).roots.first())
-                } catch (e: Exception) {
-                    L.e(e)
-                    val message = SnackBarMessage(
-                        title = Res.str(RString.error),
-                        message = Res.str(RString.state_init_incorrect),
-                        drawable = Res.drawable(RUiKitDrawable.ic_warning_32)
-                    )
-                    snackBarController.showMessage(message)
-                    screenApi.navigateBack()
-                }
-            }
-
-            val fee = getSendFeeUseCase.invoke(receiverUfAddress, requestAmount, messageData, requestMessage.stateInit)
+            val fee = getSendFeeUseCase.invoke(receiverUfAddress, requestAmount, messageData)
             val feeString = Formatter.getFormattedAmount(fee)
             _stateFlow.value = _stateFlow.value.copy(feeString = "≈ $feeString TON")
         }
@@ -161,7 +172,7 @@ class SendConnectConfirmViewModel(
         _stateFlow.value = _stateFlow.value.copy(isSending = true)
         sendJob = viewModelScope.launch(Dispatchers.IO) {
             try {
-                val result = sendUseCase.invoke(_stateFlow.value.receiverUfAddress, requestAmount, messageData, requestMessage.stateInit)
+                val result = sendUseCase.invoke(_stateFlow.value.receiverUfAddress, requestAmount, messageData, null)
                 _stateFlow.value = _stateFlow.value.copy(isSent = true)
                 executeOnAppScope {
                     val externalMessageCell = CellRef(result.externalMessage).toCell(Message.tlbCodec(AnyTlbConstructor))
@@ -193,7 +204,7 @@ class SendConnectConfirmViewModel(
 
     private fun isTransactionExpired(): Boolean {
         val validUntil = request.validUntil ?: return false
-        return System.currentTimeMillis() > validUntil
+        return (System.currentTimeMillis() / 1000) > validUntil
     }
 
     private fun showTransactionExpiredError() {

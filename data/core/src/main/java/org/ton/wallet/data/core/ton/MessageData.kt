@@ -6,12 +6,12 @@ import org.ton.cell.Cell
 import org.ton.tlb.CellRef
 
 sealed interface MessageData {
-    val body: Cell
-    val stateInit: CellRef<StateInit>?
+    val body: Cell?
+    val stateInit: StateInit?
 
     data class Raw(
-        override val body: Cell,
-        override val stateInit: CellRef<StateInit>?
+        override val body: Cell?,
+        override val stateInit: StateInit?
     ) : MessageData
 
     data class Text(
@@ -20,12 +20,12 @@ sealed interface MessageData {
         constructor(text: MessageText) : this(CellRef(text, MessageText))
 
         override val body: Cell get() = text.toCell(MessageText)
-        override val stateInit: CellRef<StateInit>? get() = null
+        override val stateInit: StateInit? get() = null
     }
 
     companion object {
         @JvmStatic
-        fun raw(body: Cell, stateInit: CellRef<StateInit>? = null): Raw =
+        fun raw(body: Cell? = null, stateInit: StateInit? = null): Raw =
             Raw(body, stateInit)
 
         @JvmStatic

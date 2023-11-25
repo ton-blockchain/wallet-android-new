@@ -9,7 +9,6 @@ import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.contract.wallet.WalletTransfer
 import org.ton.tlb.*
-import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.wallet.data.core.model.TonAccount
 import kotlin.time.Duration.Companion.seconds
 
@@ -56,12 +55,15 @@ object TonWalletHelper {
             destination = AddrStd(toWorkChainId, toRawAddress)
             coins = Coins.ofNano(amount)
             body = transferBody
-            stateInit = msgData?.stateInit?.value
+            stateInit = msgData?.stateInit
+
+            build()
         }
 
+        val validUntil = (Clock.System.now() + 60.seconds).epochSeconds.toInt()
         val unsignedBody = CellBuilder.createCell {
             storeUInt(fromAccount.subWalletId, 32)
-            storeUInt((Clock.System.now() + 60.seconds).epochSeconds.toInt(), 32)
+            storeUInt(validUntil, 32)
             storeUInt(fromAccount.seqNo, 32)
             if (fromAccount.version == 4) {
                 storeUInt(0, 8) // op
@@ -70,10 +72,42 @@ object TonWalletHelper {
             if (transfer.sendMode > -1) {
                 sendMode = transfer.sendMode
             }
-            val intMsg = CellRef(createIntMsg(transfer))
             storeUInt(sendMode, 8)
-            storeRef(MessageRelaxed.tlbCodec(AnyTlbConstructor), intMsg)
+
+            val intMsg = createIntMsg(transfer)
+
+            storeRef(CellBuilder.createCell {
+                // store msg info
+                storeTlb(CommonMsgInfoRelaxed.tlbCombinator(), intMsg.info)
+
+                // store state init
+                if (msgData?.stateInit != null) {
+                    // Maybe: state init is exist
+                    storeBit(true)
+                    // Either: state init should be wrapped in CellRef
+                    storeBit(true)
+                    // state init
+                    storeRef(CellBuilder.createCell {
+                        storeTlb(StateInit.tlbCodec(), msgData.stateInit!!)
+                    })
+                } else {
+                    // Maybe: state init is null
+                    storeBit(false)
+                }
+
+                // store body
+                if (transferBody == null || transferBody.isEmpty()) {
+                    // Either: body is null
+                    storeBit(false)
+                } else {
+                    // Either: body should be wrapped in CellRef
+                    storeBit(true)
+                    // body
+                    storeRef(transferBody)
+                }
+            })
         }
+
         val privateKey = seed?.let { PrivateKeyEd25519(it) }
         val signature = privateKey?.let { BitString(it.sign(unsignedBody.hash())) }
 
@@ -99,8 +133,10 @@ object TonWalletHelper {
             }
             is MessageData.Raw -> {
                 try {
-                    BagOfCells(msgData.body).roots.firstOrNull()?.let { cell ->
-                        (MessageText.loadTlb(cell) as? MessageText.Raw)?.text
+                    msgData.body?.let { body ->
+                        BagOfCells(body).roots.firstOrNull()?.let { cell ->
+                            (MessageText.loadTlb(cell) as? MessageText.Raw)?.text
+                        }
                     }
                 } catch (e: Exception) {
                     null

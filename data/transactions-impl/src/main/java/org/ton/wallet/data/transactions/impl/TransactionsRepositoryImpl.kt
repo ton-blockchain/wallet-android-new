@@ -181,9 +181,17 @@ class TransactionsRepositoryImpl(
     }
 
     private suspend fun getSendQueryInfo(sendParams: SendParams): Pair<TonApi.QueryInfo, Message<Cell>> {
-        val accountState = tonClient.sendRequestTyped<TonApi.RawFullAccountState>(TonApi.RawGetAccountState(TonApi.AccountAddress(sendParams.account.address)))
-        val seqNo = accountState.data.copyOfRange(13, 17).toIntOrNull() ?: 0
-        val subWalletId = accountState.data.copyOfRange(17, 21).toIntOrNull() ?: TonAccount.DefaultWalletId
+        val getAccountStateRequest = TonApi.RawGetAccountState(TonApi.AccountAddress(sendParams.account.address))
+        val accountState = tonClient.sendRequestTyped<TonApi.RawFullAccountState>(getAccountStateRequest)
+
+        val isAccountDeployed = accountState.data.size >= 21
+        val seqNo = if(isAccountDeployed) {
+            accountState.data.copyOfRange(13, 17).toIntOrNull() ?: 0
+        } else 0
+        val subWalletId = if(isAccountDeployed) {
+            accountState.data.copyOfRange(17, 21).toIntOrNull() ?: TonAccount.DefaultWalletId
+        } else TonAccount.DefaultWalletId
+
         val account = TonAccount(sendParams.publicKey, sendParams.account.version, sendParams.account.revision, subWalletId, seqNo)
 
         val codeByteArray: ByteArray
@@ -201,16 +209,20 @@ class TransactionsRepositoryImpl(
             dataByteArray = stateInit.data.value?.value?.let { BagOfCells(it).toByteArray() } ?: byteArrayOf()
         }
 
+        val codeCell = BagOfCells(codeByteArray).roots.first()
+        val dataCell = BagOfCells(dataByteArray).roots.first()
+
         val unpackedToAddress = tonClient.sendRequestTyped<TonApi.UnpackedAccountAddress>(TonApi.UnpackAccountAddress(sendParams.toAddress))
         val transferCell = TonWalletHelper.getTransferCell(account, unpackedToAddress.workchainId, unpackedToAddress.addr, sendParams.amount, sendParams.message, sendParams.seed)
+        val stateInitCell = if(isAccountDeployed) null else StateInit(code = codeCell, data = dataCell)
         val transferMessage = TonWalletHelper.getTransferMessage(
             address = AddrStd.parseUserFriendly(sendParams.account.address),
-            stateInit = account.getStateInit(),
+            stateInit = stateInitCell,
             transferCell = transferCell,
         )
 
         val requestBody = BagOfCells(transferCell).toByteArray()
-        val request = TonApi.RawCreateQuery(TonApi.AccountAddress(sendParams.toAddress), codeByteArray, dataByteArray, requestBody)
+        val request = TonApi.RawCreateQuery(TonApi.AccountAddress(sendParams.account.address), codeByteArray, dataByteArray, requestBody)
 
         return tonClient.sendRequestTyped<TonApi.QueryInfo>(request) to transferMessage
     }

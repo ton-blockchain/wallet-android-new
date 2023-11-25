@@ -45,7 +45,7 @@ class SendProcessingViewModel(private val args: SendProcessingScreenArguments) :
                 val message = args.message?.let(MessageData::text)
                 val actualFee = getSendFeeUseCase.invoke(args.address, _amountFlow.value, message)
                 val feeDiff = abs(actualFee - presetFee)
-                if (feeDiff.toDouble() / presetFee > 0.01) {
+                if (feeDiff.toDouble() / presetFee > (0.01 * 1e9)) {
                     snackBarController.showMessage(SnackBarMessage(
                         title = Res.str(RString.fee_changed),
                         message = Res.str(RString.fee_changed_check),

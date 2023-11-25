@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -122,16 +123,18 @@ internal class TonConnectClientImpl(
     }
 
     override suspend fun disconnect(clientId: String) {
-        val mutex = connectionClientIdMutexMap.getOrPut(clientId) { Mutex() }
-        mutex.withLock {
-            store.removeConnection(clientId)
-            val holder = connectionHoldersMap.remove(clientId) ?: return
-            try {
-                holder.eventSource.cancel()
-            } catch (e: Exception) {
-                L.e(e)
-            }
-        }
+//        val mutex = connectionClientIdMutexMap.getOrPut(clientId) { Mutex() }
+//        mutex.withLock {
+//            store.removeConnection(clientId)
+//            val holder = connectionHoldersMap.remove(clientId) ?: return
+//            try {
+//                holder.eventSource.cancel()
+//            } catch (e: Exception) {
+//                L.e(e)
+//            }
+//        }
+        delay(1000L)
+        connect(clientId)
     }
 
     override suspend fun getManifest(url: String): TonConnectApi.AppManifest {
@@ -199,6 +202,26 @@ internal class TonConnectClientImpl(
                 && appRequestEvent.network != null
                 && appRequestEvent.network != TonConnectApi.NetworkMainnet.toString()
             ) {
+                val tonConnectEvent = TonConnectEvent(clientId, appRequest.id, appRequestEvent)
+                val response = TonConnectApi.SendTransactionResponse.createError(
+                    id = tonConnectEvent.eventId,
+                    code = TonConnectApi.ErrorCodeUserDeclinedConnection,
+                    message = TonConnectApi.ErrorMessageUserDeclinedConnection
+                )
+                sendMessage(tonConnectEvent.clientId, json.encodeToString(response))
+                return@launch
+            }
+
+            if (appRequestEvent is TonConnectApi.SendTransactionRequest
+                && appRequestEvent.validUntil != null
+                && appRequestEvent.validUntil < (System.currentTimeMillis() / 1000)) {
+                val tonConnectEvent = TonConnectEvent(clientId, appRequest.id, appRequestEvent)
+                val response = TonConnectApi.SendTransactionResponse.createError(
+                    id = tonConnectEvent.eventId,
+                    code = TonConnectApi.ErrorCodeUserDeclinedConnection,
+                    message = TonConnectApi.ErrorMessageUserDeclinedConnection
+                )
+                sendMessage(tonConnectEvent.clientId, json.encodeToString(response))
                 return@launch
             }
 

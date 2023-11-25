@@ -16,6 +16,7 @@ import org.ton.wallet.data.core.ton.MessageData
 import org.ton.wallet.data.core.ton.TonWalletHelper
 import org.ton.wallet.data.core.util.CoroutineScopes
 import org.ton.wallet.data.wallet.api.WalletRepository
+import org.ton.wallet.domain.blockhain.api.GetAddressTypeUseCase
 import org.ton.wallet.domain.blockhain.api.GetAddressUseCase
 import org.ton.wallet.domain.tonconnect.api.TonConnectSendResponseUseCase
 import org.ton.wallet.domain.transactions.api.GetSendFeeUseCase
@@ -35,8 +36,9 @@ class SendConnectConfirmViewModel(
     private val args: SendConnectConfirmScreenArguments
 ) : BaseViewModel() {
 
-    private val getCurrentAccountDataUseCase: GetCurrentAccountDataUseCase by inject()
+    private val getAddressTypeUseCase: GetAddressTypeUseCase by inject()
     private val getAddressUseCase: GetAddressUseCase by inject()
+    private val getCurrentAccountDataUseCase: GetCurrentAccountDataUseCase by inject()
     private val getSendFeeUseCase: GetSendFeeUseCase by inject()
     private val screenApi: SendConnectConfirmScreenApi by inject()
     private val sendUseCase: SendUseCase by inject()
@@ -94,7 +96,10 @@ class SendConnectConfirmViewModel(
             messageData = MessageData.raw(payloadCell, stateInitCell)
             messageData?.let { _stateFlow.value = _stateFlow.value.copy(payload = TonWalletHelper.getMessageText(it, walletRepository.seed)) }
 
-            val senderUfAddress = request.from?.let { address -> getAddressUseCase.getUfAddress(address) }
+            val senderUfAddress = request.from?.let { address ->
+                val addressType = getAddressTypeUseCase.getAddressType(address)
+                addressType?.ufAddress
+            }
             if (senderUfAddress != null) {
                 val currentAccountAddress = getCurrentAccountDataUseCase.getAccountState()?.address
                 if (senderUfAddress != currentAccountAddress) {
@@ -104,8 +109,8 @@ class SendConnectConfirmViewModel(
             }
             _stateFlow.value = _stateFlow.value.copy(senderUfAddress = senderUfAddress)
 
-            // TODO: should work with any format of address, not only raw format
-            val receiverUfAddress = getAddressUseCase.getUfAddress(requestMessage.address) ?: requestMessage.address
+            val receiverAddressType = getAddressTypeUseCase.getAddressType(requestMessage.address)
+            val receiverUfAddress = receiverAddressType?.ufAddress ?: requestMessage.address
             _stateFlow.value = _stateFlow.value.copy(receiverUfAddress = receiverUfAddress)
 
             val fee = getSendFeeUseCase.invoke(receiverUfAddress, requestAmount, messageData)

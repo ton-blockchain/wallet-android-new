@@ -223,7 +223,6 @@ class TransactionsRepositoryImpl(
 
         val requestBody = BagOfCells(transferCell).toByteArray()
         val request = TonApi.RawCreateQuery(TonApi.AccountAddress(sendParams.account.address), codeByteArray, dataByteArray, requestBody)
-
         return tonClient.sendRequestTyped<TonApi.QueryInfo>(request) to transferMessage
     }
 

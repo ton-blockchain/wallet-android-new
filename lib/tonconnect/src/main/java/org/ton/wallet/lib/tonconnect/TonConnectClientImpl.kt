@@ -214,7 +214,8 @@ internal class TonConnectClientImpl(
 
             if (appRequestEvent is TonConnectApi.SendTransactionRequest
                 && appRequestEvent.validUntil != null
-                && appRequestEvent.validUntil < (System.currentTimeMillis() / 1000)) {
+                && appRequestEvent.validUntil < (System.currentTimeMillis() / 1000)
+            ) {
                 val tonConnectEvent = TonConnectEvent(clientId, appRequest.id, appRequestEvent)
                 val response = TonConnectApi.SendTransactionResponse.createError(
                     id = tonConnectEvent.eventId,

@@ -8,7 +8,8 @@ import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.contract.wallet.WalletTransfer
-import org.ton.tlb.*
+import org.ton.tlb.CellRef
+import org.ton.tlb.storeTlb
 import org.ton.wallet.data.core.model.TonAccount
 import kotlin.time.Duration.Companion.seconds
 
@@ -56,7 +57,6 @@ object TonWalletHelper {
             coins = Coins.ofNano(amount)
             body = transferBody
             stateInit = msgData?.stateInit
-
             build()
         }
 
@@ -75,10 +75,9 @@ object TonWalletHelper {
             storeUInt(sendMode, 8)
 
             val intMsg = createIntMsg(transfer)
-
             storeRef(CellBuilder.createCell {
                 // store msg info
-                storeTlb(CommonMsgInfoRelaxed.tlbCombinator(), intMsg.info)
+                storeTlb(CommonMsgInfoRelaxed.tlbCombinator(), intMsg)
 
                 // store state init
                 if (msgData?.stateInit != null) {
@@ -145,8 +144,8 @@ object TonWalletHelper {
         }
     }
 
-    private fun createIntMsg(transfer: WalletTransfer): MessageRelaxed<Cell> {
-        val info = CommonMsgInfoRelaxed.IntMsgInfoRelaxed(
+    private fun createIntMsg(transfer: WalletTransfer): CommonMsgInfoRelaxed.IntMsgInfoRelaxed {
+        return CommonMsgInfoRelaxed.IntMsgInfoRelaxed(
             ihrDisabled = true,
             bounce = transfer.bounceable,
             bounced = false,
@@ -157,21 +156,6 @@ object TonWalletHelper {
             fwdFee = Coins(),
             createdLt = 0u,
             createdAt = 0u
-        )
-        val init = Maybe.of(transfer.stateInit?.let {
-            Either.of<StateInit, CellRef<StateInit>>(null, CellRef(it))
-        })
-        val bodyCell = transfer.body
-        val body = if (bodyCell == null || bodyCell.isEmpty()) {
-            Either.of<Cell, CellRef<Cell>>(Cell.empty(), null)
-        } else {
-            Either.of<Cell, CellRef<Cell>>(null, CellRef(bodyCell))
-        }
-
-        return MessageRelaxed(
-            info = info,
-            init = init,
-            body = body,
         )
     }
 }

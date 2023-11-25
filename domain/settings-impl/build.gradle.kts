@@ -16,4 +16,5 @@ dependencies {
     implementation(project(Config.Module.dataCore))
     implementation(project(Config.Module.domainSettingsApi))
     implementation(project(Config.Module.libSqlite))
+    implementation(project(Config.Module.libTonConnect))
 }

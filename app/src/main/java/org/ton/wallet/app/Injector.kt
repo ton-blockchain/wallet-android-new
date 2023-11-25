@@ -205,7 +205,8 @@ object Injector {
                 DeleteWalletUseCaseImpl(
                     defaultPreferences = getInstance(DefaultSharedPreferences),
                     securedPreferences = getInstance(SecuredSharedPreferences),
-                    repositories = repositories
+                    repositories = repositories,
+                    tonConnectClient = getInstance()
                 )
             }
             factory<GetAddressTypeUseCase> {

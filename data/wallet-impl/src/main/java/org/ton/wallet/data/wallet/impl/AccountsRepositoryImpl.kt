@@ -89,10 +89,16 @@ class AccountsRepositoryImpl(
             val initialState = TonApi.RawInitialAccountState(account.getCode(), account.getInitialData())
             val addressRequest = TonApi.GetAccountAddress(initialState, account.revision, 0)
             val addressResponse = tonClient.sendRequestTyped<TonApi.AccountAddress>(addressRequest)
-            val address = addressResponse.accountAddress!!
-            dto = accountsDao.put(0, address, type)
+            val ufAddress = addressResponse.accountAddress!!
+
+            val unpackedBounceableAddress = tonClient.sendRequestTyped<TonApi.UnpackedAccountAddress>(TonApi.UnpackAccountAddress(ufAddress))
+            val unpackedNonBounceableAddress = TonApi.UnpackedAccountAddress(unpackedBounceableAddress.workchainId, false, false, unpackedBounceableAddress.addr)
+            val nbUfAccountAddress = tonClient.sendRequestTyped<TonApi.AccountAddress>(TonApi.PackAccountAddress(unpackedNonBounceableAddress))
+            val nbUfAddress = nbUfAccountAddress.accountAddress!!
+
+            dto = accountsDao.put(0, nbUfAddress, type)
             if (dto != null) {
-                getAccountStateMutableFlow(address).value = dto
+                getAccountStateMutableFlow(ufAddress).value = dto
             }
         }
         return dto!!

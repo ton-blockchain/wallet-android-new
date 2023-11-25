@@ -58,7 +58,7 @@ abstract class BaseBottomSheetController @JvmOverloads constructor(
         val rootLayout = FrameLayout(context)
         rootLayout.background = rootBackgroundDrawable
         rootLayout.layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-        rootLayout.setOnClickListenerWithLock(::close)
+        rootLayout.setOnClickListenerWithLock(::closeByUserAction)
 
         bottomSheetLayout = BottomSheetLayout(context)
 
@@ -88,7 +88,7 @@ abstract class BaseBottomSheetController @JvmOverloads constructor(
         return if (isClosed) {
             super.handleBack()
         } else {
-            close()
+            closeByUserAction()
             true
         }
     }
@@ -130,7 +130,7 @@ abstract class BaseBottomSheetController @JvmOverloads constructor(
         }
     }
 
-    private fun close() {
+    protected open fun closeByUserAction() {
         if (isAnimatedClose) {
             startBottomSheetAnimation(bottomSheetLayout.measuredHeight.toFloat(), AnimationSpeedPxPerMillis, actionClose)
         } else {

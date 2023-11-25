@@ -104,6 +104,11 @@ class SendConnectConfirmController(args: Bundle?) : BaseViewModelBottomSheetCont
         messageTitleText.requestLayout()
     }
 
+    override fun closeByUserAction() {
+        viewModel.dismissDialog()
+        super.closeByUserAction()
+    }
+
     private fun setState(state: SendConnectConfirmState) {
         val amountString = Formatter.getFormattedAmount(state.amount)
         amountText.text = Formatter.getBeautifiedAmount(amountString)

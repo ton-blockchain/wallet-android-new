@@ -15,10 +15,12 @@ interface TonConnectClient {
     suspend fun connect(clientId: String)
 
     @Throws(Exception::class)
-    suspend fun sendMessage(clientId: String, jsonString: String)
+    suspend fun disconnect(clientId: String, withClearData: Boolean = true)
 
     @Throws(Exception::class)
-    suspend fun disconnect(clientId: String)
+    suspend fun sendMessage(clientId: String, jsonString: String)
+
+    suspend fun disconnectAllClients()
 
     @Throws(Exception::class)
     suspend fun getManifest(url: String): TonConnectApi.AppManifest

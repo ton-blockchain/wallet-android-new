@@ -23,12 +23,12 @@ class GetAddressUseCaseImpl(
         }
     }
 
-    override suspend fun getUfAddress(rawAddress: String): String? {
+    override suspend fun getUfAddress(rawAddress: String, isBounceable: Boolean): String? {
         return try {
             val splits = rawAddress.split(':')
             val workChainId = splits[0].toIntOrNull() ?: return null
             val addressBytes = splits[1].toHexByteArray()
-            val unpackedAddress = TonApi.UnpackedAccountAddress(workChainId, true, false, addressBytes)
+            val unpackedAddress = TonApi.UnpackedAccountAddress(workChainId, isBounceable, false, addressBytes)
             val response = tonClient.sendRequestTyped<TonApi.AccountAddress>(TonApi.PackAccountAddress(unpackedAddress))
             return response.accountAddress
         } catch (e: Exception) {

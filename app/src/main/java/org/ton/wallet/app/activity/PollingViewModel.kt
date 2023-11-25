@@ -6,8 +6,10 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.ton.wallet.app.Injector
 import org.ton.wallet.app.action.TonConnectEventHandler
+import org.ton.wallet.app.navigation.Navigator
 import org.ton.wallet.data.core.DefaultPrefsKeys
 import org.ton.wallet.data.prices.api.PricesRepository
+import org.ton.wallet.data.settings.api.NetworkStateRepository
 import org.ton.wallet.domain.wallet.api.RefreshCurrentAccountStateUseCase
 import org.ton.wallet.lib.log.L
 import org.ton.wallet.lib.tonconnect.TonConnectClient
@@ -15,13 +17,15 @@ import org.ton.wallet.screen.viewmodel.BaseViewModel
 
 class PollingViewModel : BaseViewModel() {
 
+    private val navigator: Navigator by inject()
     private val refreshCurrentAccountStateUseCase: RefreshCurrentAccountStateUseCase by inject()
     private val tonConnectEventHandler: TonConnectEventHandler by inject()
     private val tonConnectClient: TonConnectClient by inject()
-
-    private val jobsMap = mutableMapOf<String, Job>()
+    private val networkStateRepository: NetworkStateRepository by inject()
     private val pricesRepository: PricesRepository by inject()
     private val preferences: SharedPreferences by inject(Injector.DefaultSharedPreferences)
+
+    private val jobsMap = mutableMapOf<String, Job>()
 
     fun start() {
         initPolling("fiatPrices", 60_000) {

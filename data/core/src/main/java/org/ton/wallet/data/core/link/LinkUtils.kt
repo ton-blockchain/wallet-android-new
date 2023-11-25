@@ -49,7 +49,9 @@ object LinkUtils {
     }
 
     private fun parseTonConnect(uri: Uri): LinkAction.TonConnectAction? {
-        if (uri.scheme != "tc" && (uri.scheme != "https" || uri.authority != "app.tonkeeper.com" || uri.path != "/ton-connect")) {
+        val isValidUri = uri.scheme == "tc" ||
+                (uri.scheme == "https" && uri.authority == "app.tonkeeper.com" && uri.path == "/ton-connect")
+        if (!isValidUri) {
             return null
         }
 

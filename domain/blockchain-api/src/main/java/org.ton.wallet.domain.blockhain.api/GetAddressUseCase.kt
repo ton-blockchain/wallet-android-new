@@ -7,7 +7,7 @@ interface GetAddressUseCase {
     @Throws(Exception::class)
     suspend fun isValidUfAddress(address: String): Boolean
 
-    suspend fun getUfAddress(rawAddress: String): String?
+    suspend fun getUfAddress(rawAddress: String, isBounceable: Boolean = false): String?
 
     suspend fun getRawAddress(ufAddress: String): String?
 

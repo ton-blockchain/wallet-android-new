@@ -17,7 +17,6 @@ import org.ton.wallet.data.core.ton.TonWalletHelper
 import org.ton.wallet.data.core.util.CoroutineScopes
 import org.ton.wallet.data.wallet.api.WalletRepository
 import org.ton.wallet.domain.blockhain.api.GetAddressTypeUseCase
-import org.ton.wallet.domain.blockhain.api.GetAddressUseCase
 import org.ton.wallet.domain.tonconnect.api.TonConnectSendResponseUseCase
 import org.ton.wallet.domain.transactions.api.GetSendFeeUseCase
 import org.ton.wallet.domain.transactions.api.SendUseCase
@@ -37,7 +36,6 @@ class SendConnectConfirmViewModel(
 ) : BaseViewModel() {
 
     private val getAddressTypeUseCase: GetAddressTypeUseCase by inject()
-    private val getAddressUseCase: GetAddressUseCase by inject()
     private val getCurrentAccountDataUseCase: GetCurrentAccountDataUseCase by inject()
     private val getSendFeeUseCase: GetSendFeeUseCase by inject()
     private val screenApi: SendConnectConfirmScreenApi by inject()
@@ -54,48 +52,13 @@ class SendConnectConfirmViewModel(
     private var passCodeEntered = false
     private var sendJob: Job? = null
     private var messageData: MessageData? = null
+    private var isDeclineAlreadySent = false
 
     private val _stateFlow = MutableStateFlow(SendConnectConfirmState(amount = requestAmount, receiverUfAddress = "",))
     val stateFlow: Flow<SendConnectConfirmState> = _stateFlow
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            val payloadCell = requestMessage.payload?.let { payloadBase64 ->
-                try {
-                    BagOfCells(base64(payloadBase64)).roots.first()
-                } catch (e: Exception) {
-                    L.e(e)
-                    val message = SnackBarMessage(
-                        title = Res.str(RString.error),
-                        message = Res.str(RString.payload_incorrect),
-                        drawable = Res.drawable(RUiKitDrawable.ic_warning_32)
-                    )
-                    snackBarController.showMessage(message)
-                    screenApi.navigateBack()
-                    null
-                }
-            }
-
-            val stateInitCell = requestMessage.stateInit?.let {stateInitBase64 ->
-                try {
-                    val stateInitCell = BagOfCells(base64(stateInitBase64)).roots.first()
-                    StateInit.loadTlb(stateInitCell)
-                } catch (e: Exception) {
-                    L.e(e)
-                    val message = SnackBarMessage(
-                        title = Res.str(RString.error),
-                        message = Res.str(RString.state_init_incorrect),
-                        drawable = Res.drawable(RUiKitDrawable.ic_warning_32)
-                    )
-                    snackBarController.showMessage(message)
-                    screenApi.navigateBack()
-                    null
-                }
-            }
-
-            messageData = MessageData.raw(payloadCell, stateInitCell)
-            messageData?.let { _stateFlow.value = _stateFlow.value.copy(payload = TonWalletHelper.getMessageText(it, walletRepository.seed)) }
-
             val senderUfAddress = request.from?.let { address ->
                 val addressType = getAddressTypeUseCase.getAddressType(address)
                 addressType?.ufAddress
@@ -112,6 +75,34 @@ class SendConnectConfirmViewModel(
             val receiverAddressType = getAddressTypeUseCase.getAddressType(requestMessage.address)
             val receiverUfAddress = receiverAddressType?.ufAddress ?: requestMessage.address
             _stateFlow.value = _stateFlow.value.copy(receiverUfAddress = receiverUfAddress)
+
+            val payloadCell = requestMessage.payload?.let { payloadBase64 ->
+                try {
+                    BagOfCells(base64(payloadBase64)).roots.first()
+                } catch (e: Exception) {
+                    L.e(e)
+                    val message = SnackBarMessage(Res.str(RString.error), Res.str(RString.payload_incorrect), Res.drawable(RUiKitDrawable.ic_warning_32))
+                    snackBarController.showMessage(message)
+                    screenApi.navigateBack()
+                    null
+                }
+            }
+
+            val stateInitCell = requestMessage.stateInit?.let {stateInitBase64 ->
+                try {
+                    val stateInitCell = BagOfCells(base64(stateInitBase64)).roots.first()
+                    StateInit.loadTlb(stateInitCell)
+                } catch (e: Exception) {
+                    L.e(e)
+                    val message = SnackBarMessage(Res.str(RString.error), Res.str(RString.state_init_incorrect), Res.drawable(RUiKitDrawable.ic_warning_32))
+                    snackBarController.showMessage(message)
+                    screenApi.navigateBack()
+                    null
+                }
+            }
+
+            messageData = MessageData.raw(payloadCell, stateInitCell)
+            messageData?.let { _stateFlow.value = _stateFlow.value.copy(payload = TonWalletHelper.getMessageText(it, walletRepository.seed)) }
 
             val fee = getSendFeeUseCase.invoke(receiverUfAddress, requestAmount, messageData)
             val feeString = Formatter.getFormattedAmount(fee)
@@ -142,15 +133,12 @@ class SendConnectConfirmViewModel(
         super.onDestroy()
     }
 
+    fun dismissDialog() {
+        performSendDecline()
+    }
+
     fun onCancelClicked() {
-        executeOnAppScope {
-            val response = TonConnectApi.SendTransactionResponse.createError(
-                id = args.event.eventId,
-                code = TonConnectApi.ErrorCodeUserDeclinedConnection,
-                message = TonConnectApi.ErrorMessageUserDeclinedConnection
-            )
-            tonConnectSendResponseUseCase.sendResponse(args.event.clientId, response)
-        }
+        performSendDecline()
         screenApi.navigateBack()
     }
 
@@ -164,6 +152,21 @@ class SendConnectConfirmViewModel(
         }
         passCodeEntered = false
         screenApi.navigateToPassCodeEnter(PassCodeEnterPurposeConfirmSend)
+    }
+
+    private fun performSendDecline() {
+        if (isDeclineAlreadySent) {
+            return
+        }
+        executeOnAppScope {
+            val response = TonConnectApi.SendTransactionResponse.createError(
+                id = args.event.eventId,
+                code = TonConnectApi.ErrorCodeUserDeclinedConnection,
+                message = TonConnectApi.ErrorMessageUserDeclinedConnection
+            )
+            tonConnectSendResponseUseCase.sendResponse(args.event.clientId, response)
+        }
+        isDeclineAlreadySent = true
     }
 
     private fun performSend() {

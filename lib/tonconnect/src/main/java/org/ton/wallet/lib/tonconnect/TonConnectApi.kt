@@ -130,21 +130,21 @@ interface TonConnectApi {
     @Serializable
     class ConnectEvent private constructor(
         val event: String,
-        val id: Int,
+        val id: Long,
         val payload: ConnectEventPayload,
     ) : WalletEvent {
 
         companion object {
 
-            fun createConnectSuccess(id: Int, items: List<ConnectItemReply>, device: Device): ConnectEvent {
+            fun createConnectSuccess(id: Long, items: List<ConnectItemReply>, device: Device): ConnectEvent {
                 return ConnectEvent("connect", id, ConnectEventPayload.createSuccess(items, device))
             }
 
-            fun createConnectError(id: Int, code: Int, message: String): ConnectEvent {
+            fun createConnectError(id: Long, code: Int, message: String): ConnectEvent {
                 return ConnectEvent("connect_error", id, ConnectEventPayload.createError(code, message))
             }
 
-            fun createDisconnect(id: Int): ConnectEvent {
+            fun createDisconnect(id: Long): ConnectEvent {
                 return ConnectEvent("disconnect", id, ConnectEventPayload.createEmpty())
             }
         }
@@ -192,11 +192,11 @@ interface TonConnectApi {
 
             companion object {
 
-                fun createAddress(address: String, network: Int, publicKey: String, stateInit: String): ConnectItemReply {
+                fun createAddress(address: String, network: String, publicKey: String, stateInit: String): ConnectItemReply {
                     return ConnectItemReply(
                         name = NameTonAddress,
                         address = address,
-                        network = network.toString(),
+                        network = network,
                         publicKey = publicKey,
                         walletStateInit = stateInit
                     )
@@ -267,9 +267,11 @@ interface TonConnectApi {
         const val ErrorCodeUserDeclinedConnection = 300
         const val ErrorCodeMethodNotSupported = 400
 
+        const val ErrorMessageNetworkNotMainnet = "Network is not Mainnet"
+        const val ErrorMessageRequestExpired = "Request expired"
         const val ErrorMessageUserDeclinedConnection = "User declined the transaction"
 
-        const val NetworkMainnet = -239
-        const val NetworkTestnet = -3
+        const val NetworkMainnet = "-239"
+        const val NetworkTestnet = "-3"
     }
 }

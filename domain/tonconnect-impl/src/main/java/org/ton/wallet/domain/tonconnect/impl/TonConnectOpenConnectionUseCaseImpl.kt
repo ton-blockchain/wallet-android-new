@@ -52,7 +52,7 @@ class TonConnectOpenConnectionUseCaseImpl(
 
         val deviceInfo = TonConnectApi.ConnectEvent.Device(
             platform = "android",
-            appName = "TON Wallet",
+            appName = "ton_wallet",
             appVersion = appVersion,
             maxProtocolVersion = 2,
             features = listOf(TonConnectApi.ConnectEvent.Device.FeatureSendTransaction)

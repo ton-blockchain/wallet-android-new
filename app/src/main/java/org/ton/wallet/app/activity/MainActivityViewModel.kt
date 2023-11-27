@@ -25,6 +25,7 @@ import org.ton.wallet.data.wallet.api.WalletRepository
 import org.ton.wallet.feature.onboarding.impl.recovery.finished.RecoveryFinishedScreenArguments
 import org.ton.wallet.feature.passcode.api.PassCodeEnterScreenApi
 import org.ton.wallet.feature.passcode.impl.enter.PassCodeEnterScreenArguments
+import org.ton.wallet.feature.wallet.impl.main.MainScreenAdapterHolder
 import org.ton.wallet.lib.security.BiometricUtils
 import org.ton.wallet.lib.tonconnect.TonConnectClient
 import org.ton.wallet.lib.tonconnect.TonConnectEvent
@@ -96,6 +97,9 @@ class MainActivityViewModel : ActivityViewModel() {
             performNavigateWithCreatedWallet()
         } else {
             performNavigateOnboarding()
+        }
+        ThreadUtils.postOnDefault {
+            MainScreenAdapterHolder.init(context)
         }
     }
 

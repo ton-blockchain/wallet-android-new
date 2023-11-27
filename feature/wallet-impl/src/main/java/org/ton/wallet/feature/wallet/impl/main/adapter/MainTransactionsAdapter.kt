@@ -15,19 +15,21 @@ import androidx.recyclerview.widget.RecyclerView
 import org.ton.wallet.core.Res
 import org.ton.wallet.data.transactions.api.model.TransactionDto
 import org.ton.wallet.domain.transactions.api.model.*
+import org.ton.wallet.feature.wallet.impl.main.MainScreenAdapterHolder
 import org.ton.wallet.lib.lists.RecyclerAdapter
 import org.ton.wallet.lib.lists.RecyclerHolder
 import org.ton.wallet.strings.RString
 import org.ton.wallet.uikit.*
 
-class MainTransactionsAdapter(
-    private val callback: AdapterCallback
+internal class MainTransactionsAdapter(
+    var callback: AdapterCallback?
 ) : RecyclerAdapter<Any, RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            ViewTypeHeader -> TransactionHeaderViewHolder(parent)
-            else -> TransactionItemViewHolder(parent, callback)
+            MainScreenAdapterHolder.ViewTypeTransactionItem -> TransactionItemViewHolder(parent, callback)
+            MainScreenAdapterHolder.ViewTypeTransactionHeader -> TransactionHeaderViewHolder(parent)
+            else -> throw IllegalArgumentException("Unknown view type $viewType")
         }
     }
 
@@ -41,9 +43,10 @@ class MainTransactionsAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (getItemAt(position)) {
-            is TransactionHeaderUiListItem -> ViewTypeHeader
-            else -> ViewTypeTransaction
+        return when (val item = getItemAt(position)) {
+            is TransactionDataUiListItem -> MainScreenAdapterHolder.ViewTypeTransactionItem
+            is TransactionHeaderUiListItem -> MainScreenAdapterHolder.ViewTypeTransactionHeader
+            else -> throw IllegalArgumentException("Unknown item type $item")
         }
     }
 
@@ -57,12 +60,6 @@ class MainTransactionsAdapter(
     }
 
 
-    private companion object {
-        private const val ViewTypeTransaction = 0
-        private const val ViewTypeHeader = 1
-    }
-
-
     private abstract class BaseViewHolder<T : TransactionBaseUiListItem>(view: View) : RecyclerHolder<T>(view) {
 
         override fun bind(item: T) {
@@ -73,7 +70,6 @@ class MainTransactionsAdapter(
             }
         }
     }
-
 
     private class TransactionHeaderViewHolder(parent: ViewGroup) : BaseViewHolder<TransactionHeaderUiListItem>(TextView(parent.context)) {
 
@@ -94,7 +90,7 @@ class MainTransactionsAdapter(
 
     private class TransactionItemViewHolder(
         parent: ViewGroup,
-        private val callback: TransactionItemCallback,
+        private val callback: TransactionItemCallback?,
     ) : BaseViewHolder<TransactionDataUiListItem>(ConstraintLayout(parent.context)), View.OnClickListener {
 
         private val imageView = ImageView(parent.context)
@@ -218,7 +214,7 @@ class MainTransactionsAdapter(
         }
 
         override fun onClick(v: View?) {
-            callback.onTransactionClicked(item)
+            callback?.onTransactionClicked(item)
         }
     }
 

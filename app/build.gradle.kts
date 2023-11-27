@@ -72,10 +72,12 @@ dependencies {
     implementation(platform(Config.Lib.okHttpBom))
     implementation(Config.Lib.okHttpCore)
     implementation(Config.Lib.okHttpLogging)
+    implementation(Config.Lib.recyclerView)
     implementation(Config.Lib.security)
 
     implementation(project(Config.Module.libCore))
     implementation(project(Config.Module.libDi))
+    implementation(project(Config.Module.libLists))
     implementation(project(Config.Module.libLog))
     implementation(project(Config.Module.libScreen))
     implementation(project(Config.Module.libSecurity))

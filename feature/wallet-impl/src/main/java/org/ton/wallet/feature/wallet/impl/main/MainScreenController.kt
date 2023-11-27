@@ -24,7 +24,9 @@ import pub.devrel.easypermissions.EasyPermissions
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-class MainScreenController(args: Bundle?) : BaseViewModelController<MainScreenViewModel>(args) {
+class MainScreenController(args: Bundle?) : BaseViewModelController<MainScreenViewModel>(args),
+    MainHeaderAdapter.HeaderItemCallback,
+    MainTransactionsAdapter.AdapterCallback {
 
     override val viewModel by viewModels { MainScreenViewModel() }
     override val useBottomInsetsPadding = false
@@ -32,20 +34,11 @@ class MainScreenController(args: Bundle?) : BaseViewModelController<MainScreenVi
     private val clipboardController: ClipboardController by inject()
     private val notificationsRepository: NotificationsRepository by inject()
 
-    private val headerAdapter = MainHeaderAdapter(object : MainHeaderAdapter.HeaderItemCallback {
-        override fun onReceiveClicked() = viewModel.onReceiveClicked()
-        override fun onSendClicked() = viewModel.onSendClicked()
-    }, clipboardController)
-
+    private val headerAdapter = MainHeaderAdapter(this, clipboardController)
     private val emptyAdapter = MainEmptyAdapter(clipboardController)
-
-    private val transactionsAdapter = MainTransactionsAdapter(object : MainTransactionsAdapter.AdapterCallback {
-        override fun onTransactionClicked(transaction: TransactionDataUiListItem) {
-            viewModel.onTransactionClicked(transaction)
-        }
-    })
-
-    private val concatAdapter = ConcatAdapter(headerAdapter)
+    private val transactionsAdapter = MainTransactionsAdapter(this)
+    private val concatAdapterConfig = ConcatAdapter.Config.Builder().setIsolateViewTypes(false).build()
+    private val concatAdapter = ConcatAdapter(concatAdapterConfig, headerAdapter)
 
     private val bottomSheetDrawable = MainBottomSheetDrawable(Res.context)
     private lateinit var firstOpenAnimationController: MainScreenStartAnimationDelegate
@@ -75,18 +68,22 @@ class MainScreenController(args: Bundle?) : BaseViewModelController<MainScreenVi
         binding.settingsButton.setOnClickListenerWithLock(viewModel::onSettingsClicked)
         binding.pullToRefreshLayout.setPullToRefreshListener(viewModel::onRefresh)
 
-        binding.recyclerView.adapter = concatAdapter
-        binding.recyclerView.addItemDecoration(recyclerDecoration)
-        binding.recyclerView.addOnScrollListener(recyclerScrollChangeListener)
-        binding.recyclerView.isNestedScrollingEnabled = false
-        binding.recyclerView.itemAnimator = null
-        binding.recyclerView.layoutManager = object : LinearLayoutManager(context) {
+        val layoutManager = object : LinearLayoutManager(context) {
             override fun onLayoutCompleted(state: RecyclerView.State?) {
                 super.onLayoutCompleted(state)
                 recyclerScrollChangeListener.onLayoutCompleted(this)
             }
         }
+        layoutManager.recycleChildrenOnDetach = true
+
+        binding.recyclerView.adapter = concatAdapter
+        binding.recyclerView.addItemDecoration(recyclerDecoration)
+        binding.recyclerView.addOnScrollListener(recyclerScrollChangeListener)
+        binding.recyclerView.isNestedScrollingEnabled = false
+        binding.recyclerView.itemAnimator = null
+        binding.recyclerView.layoutManager = layoutManager
         binding.recyclerView.setHasFixedSize(true)
+        binding.recyclerView.setRecycledViewPool(MainScreenAdapterHolder.viewPool)
 
         setStatusBarLight(false)
         setNavigationBarLight(true)
@@ -126,6 +123,20 @@ class MainScreenController(args: Bundle?) : BaseViewModelController<MainScreenVi
         firstOpenAnimationController.reset()
         _binding = null
         super.onDestroyView(view)
+    }
+
+    // MainHeaderAdapter.HeaderItemCallback
+    override fun onReceiveClicked() {
+        viewModel.onReceiveClicked()
+    }
+
+    override fun onSendClicked() {
+        viewModel.onSendClicked()
+    }
+
+    // MainTransactionsAdapter.AdapterCallback
+    override fun onTransactionClicked(transaction: TransactionDataUiListItem) {
+        viewModel.onTransactionClicked(transaction)
     }
 
     private fun onHeaderStatusChanged(state: MainScreenState) {

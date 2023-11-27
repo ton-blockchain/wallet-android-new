@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import org.ton.wallet.core.Res
 import org.ton.wallet.core.ext.weak
 import org.ton.wallet.feature.wallet.impl.R
+import org.ton.wallet.feature.wallet.impl.main.MainScreenAdapterHolder
 import org.ton.wallet.lib.lists.RecyclerAdapter
 import org.ton.wallet.lib.lists.RecyclerHolder
 import org.ton.wallet.rlottie.RLottieImageView
@@ -15,7 +16,7 @@ import org.ton.wallet.uicomponents.util.ClipboardController
 import kotlin.math.max
 
 class MainEmptyAdapter(
-    private val clipboardController: ClipboardController
+    var clipboardController: ClipboardController?
 ) : RecyclerAdapter<MainEmptyAdapter.MainEmptyItem, MainEmptyAdapter.ViewHolder>() {
 
     private val item = MainEmptyItem()
@@ -33,6 +34,10 @@ class MainEmptyAdapter(
         holderRef = weak(viewHolder)
         isAppearanceAnimation?.let { appearance -> performAnimation(viewHolder.itemView, appearance) }
         return viewHolder
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return MainScreenAdapterHolder.ViewTypeMainEmpty
     }
 
     override fun onViewAttachedToWindow(holder: ViewHolder) {
@@ -69,7 +74,7 @@ class MainEmptyAdapter(
     class ViewHolder(
         parent: ViewGroup,
         height: Int,
-        private val clipboardController: ClipboardController
+        private val clipboardController: ClipboardController?
     ) : RecyclerHolder<MainEmptyItem>(R.layout.item_main_empty, parent), View.OnClickListener {
 
         private val animationView: RLottieImageView = itemView.findViewById(R.id.itemMainEmptyAnimationView)
@@ -90,7 +95,7 @@ class MainEmptyAdapter(
         }
 
         override fun onClick(v: View?) {
-            clipboardController.copyToClipboard(item.address ?: "", Res.str(RString.address_copied_to_clipboard))
+            clipboardController?.copyToClipboard(item.address ?: "", Res.str(RString.address_copied_to_clipboard))
         }
 
         fun playAnimation() {

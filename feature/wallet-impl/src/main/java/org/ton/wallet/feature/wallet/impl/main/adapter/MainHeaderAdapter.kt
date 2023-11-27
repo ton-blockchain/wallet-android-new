@@ -6,15 +6,16 @@ import android.widget.TextView
 import org.ton.wallet.core.Res
 import org.ton.wallet.coreui.Formatter
 import org.ton.wallet.feature.wallet.impl.R
+import org.ton.wallet.feature.wallet.impl.main.MainScreenAdapterHolder
 import org.ton.wallet.lib.lists.RecyclerAdapter
 import org.ton.wallet.lib.lists.RecyclerHolder
 import org.ton.wallet.strings.RString
 import org.ton.wallet.uicomponents.util.ClipboardController
 import org.ton.wallet.uicomponents.view.amount.AmountView
 
-class MainHeaderAdapter(
-    private val callback: HeaderItemCallback,
-    private val clipboardController: ClipboardController
+internal class MainHeaderAdapter(
+    var callback: HeaderItemCallback?,
+    var clipboardController: ClipboardController?
 ) : RecyclerAdapter<MainHeaderAdapter.HeaderItem, MainHeaderAdapter.ViewHolder>() {
 
     private val item = HeaderItem()
@@ -27,6 +28,10 @@ class MainHeaderAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(parent, height, callback, clipboardController)
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return MainScreenAdapterHolder.ViewTypeMainHeader
     }
 
     fun setAddress(address: String?) {
@@ -43,8 +48,8 @@ class MainHeaderAdapter(
     class ViewHolder(
         parent: ViewGroup,
         height: Int,
-        private val callback: HeaderItemCallback,
-        private val clipboardController: ClipboardController
+        private val callback: HeaderItemCallback?,
+        private val clipboardController: ClipboardController?
     ) : RecyclerHolder<HeaderItem>(R.layout.item_main_header, parent), View.OnClickListener {
 
         private val addressText: TextView = itemView.findViewById(R.id.itemHeaderAddressText)
@@ -84,9 +89,9 @@ class MainHeaderAdapter(
 
         override fun onClick(v: View?) {
             when (v?.id) {
-                R.id.mainReceiveButtonBackground -> callback.onReceiveClicked()
-                R.id.mainSendButtonBackground -> callback.onSendClicked()
-                R.id.itemHeaderAddressText -> item.addressFull?.let { clipboardController.copyToClipboard(it, Res.str(RString.address_copied_to_clipboard)) }
+                R.id.mainReceiveButtonBackground -> callback?.onReceiveClicked()
+                R.id.mainSendButtonBackground -> callback?.onSendClicked()
+                R.id.itemHeaderAddressText -> item.addressFull?.let { clipboardController?.copyToClipboard(it, Res.str(RString.address_copied_to_clipboard)) }
             }
         }
     }

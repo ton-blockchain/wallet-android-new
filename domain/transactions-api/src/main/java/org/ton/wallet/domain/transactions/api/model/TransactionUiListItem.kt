@@ -14,4 +14,18 @@ class TransactionDataUiListItem(
     val timeString: String?,
     val feeString: String?,
     val messageText: String?
-) : TransactionBaseUiListItem()
+) : TransactionBaseUiListItem() {
+
+    companion object {
+
+        val Empty = TransactionDataUiListItem(
+            internalId = 0,
+            type = TransactionDto.Type.Unknown,
+            value = null,
+            peerAddressShort = null,
+            timeString = null,
+            feeString = null,
+            messageText = null
+        )
+    }
+}

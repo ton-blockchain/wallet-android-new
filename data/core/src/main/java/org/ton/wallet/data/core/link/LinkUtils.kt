@@ -14,6 +14,8 @@ object LinkUtils {
     private const val ParameterAmount = "amount"
     private const val ParameterText = "text"
 
+    private const val TonConnectHttpsAuthority = "wallet.ton.org"
+
     fun getTransferLink(address: String, amount: Long? = null, comment: String? = null): String {
         val builder = Uri.Builder()
             .scheme(DeepLinkScheme)
@@ -50,7 +52,7 @@ object LinkUtils {
 
     private fun parseTonConnect(uri: Uri): LinkAction.TonConnectAction? {
         val isValidUri = uri.scheme == "tc" ||
-                (uri.scheme == "https" && uri.authority == "app.tonkeeper.com" && uri.path == "/ton-connect")
+                (uri.scheme == "https" && uri.authority == TonConnectHttpsAuthority && uri.path == "/ton-connect")
         if (!isValidUri) {
             return null
         }

@@ -4,11 +4,12 @@ import drinkless.org.ton.TonApi
 import org.ton.wallet.core.ext.toHexByteArray
 import org.ton.wallet.core.ext.toHexString
 import org.ton.wallet.data.tonclient.api.*
+import org.ton.wallet.domain.blockhain.api.GetAddressUseCase
 import org.ton.wallet.domain.blockhain.api.UnpackedAddress
 
 class GetAddressUseCaseImpl(
     private val tonClient: TonClient
-) : org.ton.wallet.domain.blockhain.api.GetAddressUseCase {
+) : GetAddressUseCase {
 
     override suspend fun isValidUfAddress(address: String): Boolean {
         return try {

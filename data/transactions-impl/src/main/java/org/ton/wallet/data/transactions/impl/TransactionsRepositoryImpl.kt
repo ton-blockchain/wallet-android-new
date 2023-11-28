@@ -226,7 +226,7 @@ class TransactionsRepositoryImpl(
         return tonClient.sendRequestTyped<TonApi.QueryInfo>(request) to transferMessage
     }
 
-    private fun mapRawTransactionToDto(raw: TonApi.RawTransaction, accountId: Int): TransactionDto {
+    private suspend fun mapRawTransactionToDto(raw: TonApi.RawTransaction, accountId: Int): TransactionDto {
         var value = 0L
         var message: String? = null
         var inMsgBodyHash: String? = null
@@ -243,13 +243,14 @@ class TransactionsRepositoryImpl(
             }
         }
 
-        val peerAddress: String? =
+        var peerAddress: String? =
             if (value > 0) {
                 raw.inMsg?.source?.accountAddress
             } else {
                 if (raw.transactionId.lt == 0L) raw.inMsg?.destination?.accountAddress
                 else raw.outMsgs?.firstOrNull()?.destination?.accountAddress
             }
+        peerAddress = peerAddress?.let { getUfNonBounceableAddress(it) } ?: peerAddress
 
         return TransactionDto(
             hash = Base64.encodeToString(raw.transactionId.hash, Base64.NO_WRAP),
@@ -283,6 +284,17 @@ class TransactionsRepositoryImpl(
                 }
             }
             else -> null
+        }
+    }
+
+    private suspend fun getUfNonBounceableAddress(ufAddress: String): String? {
+        return try {
+            val unpackedAddress = tonClient.sendRequestTyped<TonApi.UnpackedAccountAddress>(TonApi.UnpackAccountAddress(ufAddress))
+            unpackedAddress.bounceable = false
+            val response = tonClient.sendRequestTyped<TonApi.AccountAddress>(TonApi.PackAccountAddress(unpackedAddress))
+            response.accountAddress
+        } catch (e: Exception) {
+            null
         }
     }
 }

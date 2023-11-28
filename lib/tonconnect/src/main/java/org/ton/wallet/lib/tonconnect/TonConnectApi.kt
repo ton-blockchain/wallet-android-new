@@ -233,7 +233,13 @@ interface TonConnectApi {
             val appName: String,
             val appVersion: String,
             val maxProtocolVersion: Int,
-            val features: List<String>
+            val features: List<Feature>
+        )
+
+        @Serializable
+        class Feature(
+            val name: String,
+            val maxMessages: Int? = null
         ) {
 
             companion object {

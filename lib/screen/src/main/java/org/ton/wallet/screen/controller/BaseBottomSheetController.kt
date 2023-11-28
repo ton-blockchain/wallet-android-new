@@ -58,7 +58,7 @@ abstract class BaseBottomSheetController @JvmOverloads constructor(
         val rootLayout = FrameLayout(context)
         rootLayout.background = rootBackgroundDrawable
         rootLayout.layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-        rootLayout.setOnClickListenerWithLock(::closeByUserAction)
+        rootLayout.setOnClickListenerWithLock(::close)
 
         bottomSheetLayout = BottomSheetLayout(context)
 
@@ -70,12 +70,18 @@ abstract class BaseBottomSheetController @JvmOverloads constructor(
         bottomSheetLayout.addView(contentView)
         bottomSheetLayout.isInvisible = savedViewState == null
 
-        setStatusBarLight(false)
-        setNavigationBarLight(true)
         return rootLayout
     }
 
     abstract fun createBottomSheetView(inflater: LayoutInflater, container: ViewGroup?, savedViewState: Bundle?): View
+
+    override fun onChangeStarted(changeHandler: ControllerChangeHandler, changeType: ControllerChangeType) {
+        super.onChangeStarted(changeHandler, changeType)
+        if (changeType.isEnter) {
+            setStatusBarLight(false)
+            setNavigationBarLight(true)
+        }
+    }
 
     override fun onChangeEnded(changeHandler: ControllerChangeHandler, changeType: ControllerChangeType) {
         super.onChangeEnded(changeHandler, changeType)
@@ -88,7 +94,7 @@ abstract class BaseBottomSheetController @JvmOverloads constructor(
         return if (isClosed) {
             super.handleBack()
         } else {
-            closeByUserAction()
+            close()
             true
         }
     }
@@ -116,6 +122,11 @@ abstract class BaseBottomSheetController @JvmOverloads constructor(
 
     protected open fun onAnimationFinished() = Unit
 
+    protected open fun onClose() {
+        isClosed = true
+        activity?.onBackPressed()
+    }
+
     private fun show() {
         if (isAnimatedOpen) {
             val widthSpec = View.MeasureSpec.makeMeasureSpec(Res.screenWidth, View.MeasureSpec.AT_MOST)
@@ -130,11 +141,11 @@ abstract class BaseBottomSheetController @JvmOverloads constructor(
         }
     }
 
-    protected open fun closeByUserAction() {
+    private fun close() {
         if (isAnimatedClose) {
-            startBottomSheetAnimation(bottomSheetLayout.measuredHeight.toFloat(), AnimationSpeedPxPerMillis, actionClose)
+            startBottomSheetAnimation(bottomSheetLayout.measuredHeight.toFloat(), AnimationSpeedPxPerMillis, ::onClose)
         } else {
-            actionClose.invoke()
+            onClose()
         }
     }
 
@@ -176,11 +187,6 @@ abstract class BaseBottomSheetController @JvmOverloads constructor(
         staticState =
             if (newState == STATE_HIDDEN || newState == STATE_HALF_EXPANDED || newState == STATE_EXPANDED) newState
             else staticState
-    }
-
-    private val actionClose: () -> Unit = {
-        isClosed = true
-        activity?.onBackPressed()
     }
 
 
@@ -303,7 +309,7 @@ abstract class BaseBottomSheetController @JvmOverloads constructor(
                         else abs(velocityPixelsPerMillis).coerceAtLeast(DefaultAnimationSpeedPxPerMillis)
                     val translationToHide = min(bottomSheetLayout.measuredHeight / 3f, Res.dp(200f))
                     if (bottomSheetLayout.translationY > translationToHide || (isEnoughVelocityToAction && velocityPixelsPerMillis > 0)) {
-                        startBottomSheetAnimation(bottomSheetLayout.measuredHeight.toFloat(), velocity, actionOnEnd = actionClose)
+                        startBottomSheetAnimation(bottomSheetLayout.measuredHeight.toFloat(), velocity, actionOnEnd = ::onClose)
                     } else {
                         startBottomSheetAnimation(0f)
                     }
@@ -311,7 +317,7 @@ abstract class BaseBottomSheetController @JvmOverloads constructor(
                     if (velocityPixelsPerMillis > 0) {
                         val translationToHide = halfExpandedTranslation + min((bottomSheetLayout.measuredHeight - halfExpandedTranslation) / 4, Res.dp(200f))
                         if (bottomSheetLayout.translationY > translationToHide || isEnoughVelocityToAction) {
-                            startBottomSheetAnimation(bottomSheetLayout.measuredHeight.toFloat(), velocityPixelsPerMillis / 4, actionOnEnd = actionClose)
+                            startBottomSheetAnimation(bottomSheetLayout.measuredHeight.toFloat(), velocityPixelsPerMillis / 4, actionOnEnd = ::onClose)
                         } else {
                             startBottomSheetAnimation(halfExpandedTranslation)
                         }

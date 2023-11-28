@@ -55,7 +55,12 @@ class TonConnectOpenConnectionUseCaseImpl(
             appName = "TON Wallet",
             appVersion = appVersion,
             maxProtocolVersion = 2,
-            features = listOf(TonConnectApi.ConnectEvent.Device.FeatureSendTransaction)
+            features = listOf(
+                TonConnectApi.ConnectEvent.Feature(
+                    name = TonConnectApi.ConnectEvent.Feature.FeatureSendTransaction,
+                    maxMessages = 4
+                )
+            )
         )
         val connectEventSuccess = TonConnectApi.ConnectEvent.createConnectSuccess(id = 0, items = payloadItems, device = deviceInfo)
         val connectEventJson = json.encodeToString(connectEventSuccess)

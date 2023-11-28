@@ -36,6 +36,7 @@ internal class MainTransactionsAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, payloads: MutableList<Any>) {
         super.onBindViewHolder(holder, position, payloads)
         if (holder is TransactionItemViewHolder) {
+            holder.callback = callback
             holder.bind(getItemAt(position) as TransactionDataUiListItem, payloads)
         } else if (holder is TransactionHeaderViewHolder) {
             holder.bind(getItemAt(position) as TransactionHeaderUiListItem, payloads)
@@ -90,7 +91,7 @@ internal class MainTransactionsAdapter(
 
     private class TransactionItemViewHolder(
         parent: ViewGroup,
-        private val callback: TransactionItemCallback?,
+        var callback: TransactionItemCallback?,
     ) : BaseViewHolder<TransactionDataUiListItem>(ConstraintLayout(parent.context)), View.OnClickListener {
 
         private val imageView = ImageView(parent.context)

@@ -52,7 +52,7 @@ class SendConnectConfirmViewModel(
     private var passCodeEntered = false
     private var sendJob: Job? = null
     private var messageData: MessageData? = null
-    private var isDeclineAlreadySent = false
+    private var isResponseAlreadySent = false
 
     private val _stateFlow = MutableStateFlow(SendConnectConfirmState(amount = requestAmount, receiverUfAddress = "",))
     val stateFlow: Flow<SendConnectConfirmState> = _stateFlow
@@ -155,7 +155,7 @@ class SendConnectConfirmViewModel(
     }
 
     private fun performSendDecline() {
-        if (isDeclineAlreadySent) {
+        if (isResponseAlreadySent) {
             return
         }
         executeOnAppScope {
@@ -166,7 +166,7 @@ class SendConnectConfirmViewModel(
             )
             tonConnectSendResponseUseCase.sendResponse(args.event.clientId, response)
         }
-        isDeclineAlreadySent = true
+        isResponseAlreadySent = true
     }
 
     private fun performSend() {
@@ -187,6 +187,7 @@ class SendConnectConfirmViewModel(
                     val boc = base64(BagOfCells(externalMessageCell).toByteArray())
                     val response = TonConnectApi.SendTransactionResponse.createSuccess(id = args.event.eventId, boc = boc)
                     tonConnectSendResponseUseCase.sendResponse(args.event.clientId, response)
+                    isResponseAlreadySent = true
                 }
                 withContext(Dispatchers.Main) {
                     delay(1000L)

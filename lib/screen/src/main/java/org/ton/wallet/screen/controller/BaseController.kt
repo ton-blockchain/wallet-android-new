@@ -46,8 +46,8 @@ abstract class BaseController(args: Bundle?) : Controller(args),
 
     override fun onPreCreateView() {
         super.onPreCreateView()
-        barsHelper.setStatusBarLight(true)
-        barsHelper.setNavigationBarLight(true)
+        setStatusBarLight(true)
+        setNavigationBarLight(true)
         permissionsHelper.addCallback(this)
     }
 

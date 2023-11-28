@@ -104,9 +104,9 @@ class SendConnectConfirmController(args: Bundle?) : BaseViewModelBottomSheetCont
         messageTitleText.requestLayout()
     }
 
-    override fun closeByUserAction() {
+    override fun onClose() {
         viewModel.dismissDialog()
-        super.closeByUserAction()
+        super.onClose()
     }
 
     private fun setState(state: SendConnectConfirmState) {

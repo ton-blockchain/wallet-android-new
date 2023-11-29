@@ -5,5 +5,5 @@ import org.ton.wallet.data.transactions.api.model.SendResult
 
 interface SendUseCase {
 
-    suspend fun invoke(toAddress: String, amount: Long, message: MessageData?, stateInitBase64: String?): SendResult
+    suspend fun invoke(messages: List<MessageData>): SendResult
 }

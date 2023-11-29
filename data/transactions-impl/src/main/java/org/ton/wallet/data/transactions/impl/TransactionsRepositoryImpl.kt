@@ -11,6 +11,7 @@ import org.ton.crypto.base64
 import org.ton.wallet.core.ext.toIntOrNull
 import org.ton.wallet.data.core.BuildConfig
 import org.ton.wallet.data.core.model.TonAccount
+import org.ton.wallet.data.core.ton.MessageData
 import org.ton.wallet.data.core.ton.MessageText
 import org.ton.wallet.data.core.ton.TonWalletHelper
 import org.ton.wallet.data.core.util.LoadType
@@ -151,7 +152,7 @@ class TransactionsRepositoryImpl(
         if (sendParams.password == null) throw IllegalArgumentException("Password is null")
         if (sendParams.seed == null) throw IllegalArgumentException("Seed is null")
 
-        val (queryInfo, message) = getSendQueryInfo(sendParams)
+        val (queryInfo, inMessage, outMessages) = getSendQueryInfo(sendParams)
         val sendQuery = TonApi.QuerySend(queryInfo.id)
         tonClient.sendRequestTyped<TonApi.Ok>(sendQuery)
 
@@ -162,10 +163,15 @@ class TransactionsRepositoryImpl(
             accountId = sendParams.account.id,
             status = TransactionStatus.Pending,
             timestampSec = System.currentTimeMillis() / 1000,
-            amount = -sendParams.amount,
-            peerAddress = sendParams.toAddress,
-            message = sendParams.message?.let { msg -> TonWalletHelper.getMessageText(msg, sendParams.seed) },
             validUntilSec = validUntil,
+            inMessage = null,
+            outMessages = outMessages.map { outMessage ->
+                OutMessageDto(
+                    amount = -outMessage.amount,
+                    destination = outMessage.destination,
+                    message = TonWalletHelper.getMessageText(outMessage, sendParams.seed),
+                )
+            },
         )
         val internalId = transactionsDao.add(sendParams.account.id, transaction)
         if (internalId != null) {
@@ -173,14 +179,24 @@ class TransactionsRepositoryImpl(
             (transactionsAddedFlow as MutableSharedFlow).emit(transaction)
         }
 
-        return SendResult(sendParams.amount, message)
+        val amount = transaction.outMessages.sumOf { it.amount ?: 0L }
+
+        return SendResult(amount, inMessage, outMessages)
     }
 
     override suspend fun deleteWallet() {
         transactionsDao.deleteAll()
     }
 
-    private suspend fun getSendQueryInfo(sendParams: SendParams): Pair<TonApi.QueryInfo, Message<Cell>> {
+    private suspend fun getSendQueryInfo(sendParams: SendParams): Triple<TonApi.QueryInfo, Message<Cell>, List<MessageData>> {
+        // TODO: возможно имеет смысл вынести выше
+        if (sendParams.messages.isEmpty()) {
+            throw IllegalArgumentException("Messages is empty")
+        }
+        if (sendParams.messages.count() > 4) {
+            throw IllegalArgumentException("Messages count is more than 4")
+        }
+
         val getAccountStateRequest = TonApi.RawGetAccountState(TonApi.AccountAddress(sendParams.account.address))
         val accountState = tonClient.sendRequestTyped<TonApi.RawFullAccountState>(getAccountStateRequest)
 
@@ -194,26 +210,13 @@ class TransactionsRepositoryImpl(
 
         val account = TonAccount(sendParams.publicKey, sendParams.account.version, sendParams.account.revision, subWalletId, seqNo)
 
-        val codeByteArray: ByteArray
-        val dataByteArray: ByteArray
-        if (sendParams.stateInitBase64 == null) {
-            codeByteArray = account.getCode()
-            dataByteArray = account.getInitialData()
-        } else {
-            val stateInit = try {
-                StateInit.loadTlb(BagOfCells(base64(sendParams.stateInitBase64!!)).roots.first())
-            } catch (e: Exception) {
-                throw IllegalArgumentException("StateInit is incorrect")
-            }
-            codeByteArray = stateInit.code.value?.value?.let { BagOfCells(it).toByteArray() } ?: byteArrayOf()
-            dataByteArray = stateInit.data.value?.value?.let { BagOfCells(it).toByteArray() } ?: byteArrayOf()
-        }
+        val codeByteArray: ByteArray = account.getCode()
+        val dataByteArray: ByteArray = account.getInitialData()
 
         val codeCell = BagOfCells(codeByteArray).roots.first()
         val dataCell = BagOfCells(dataByteArray).roots.first()
 
-        val unpackedToAddress = tonClient.sendRequestTyped<TonApi.UnpackedAccountAddress>(TonApi.UnpackAccountAddress(sendParams.toAddress))
-        val transferCell = TonWalletHelper.getTransferCell(account, unpackedToAddress.workchainId, unpackedToAddress.addr, sendParams.amount, sendParams.message, sendParams.seed)
+        val transferCell = TonWalletHelper.getTransferCell(account, sendParams.messages, sendParams.seed)
         val stateInitCell = if(isAccountDeployed) null else StateInit(code = codeCell, data = dataCell)
         val transferMessage = TonWalletHelper.getTransferMessage(
             address = AddrStd.parseUserFriendly(sendParams.account.address),
@@ -223,7 +226,9 @@ class TransactionsRepositoryImpl(
 
         val requestBody = BagOfCells(transferCell).toByteArray()
         val request = TonApi.RawCreateQuery(TonApi.AccountAddress(sendParams.account.address), codeByteArray, dataByteArray, requestBody)
-        return tonClient.sendRequestTyped<TonApi.QueryInfo>(request) to transferMessage
+        val queryInfo = tonClient.sendRequestTyped<TonApi.QueryInfo>(request)
+
+        return Triple(queryInfo, transferMessage, sendParams.messages)
     }
 
     private suspend fun mapRawTransactionToDto(raw: TonApi.RawTransaction, accountId: Int): TransactionDto {
@@ -257,12 +262,24 @@ class TransactionsRepositoryImpl(
             accountId = accountId,
             timestampSec = raw.utime,
             status = TransactionStatus.Executed,
-            amount = value,
             fee = raw.fee,
             storageFee = raw.storageFee,
-            peerAddress = peerAddress,
-            message = message,
-            inMsgBodyHash = inMsgBodyHash
+            // TODO: must check that inMsg is an internal message, not external (don't display external messages in UI)
+            inMessage = raw.inMsg?.let { msg ->
+                InMessageDto(
+                    amount = msg.value,
+                    source = msg.source?.accountAddress,
+                    message = getMessage(msg.msgData),
+                    inMsgBodyHash = inMsgBodyHash,
+                )
+            },
+            outMessages = outMessages.map { msg ->
+                OutMessageDto(
+                    amount = -msg.value,
+                    destination = msg.destination?.accountAddress,
+                    message = getMessage(msg.msgData),
+                )
+            },
         )
     }
 

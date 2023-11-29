@@ -4,5 +4,5 @@ import org.ton.wallet.data.core.ton.MessageData
 
 interface GetSendFeeUseCase {
 
-    suspend fun invoke(toAddress: String, amount: Long, message: MessageData?, stateInitBase64: String? = null): Long
+    suspend fun invoke(messages: List<MessageData>): Long
 }

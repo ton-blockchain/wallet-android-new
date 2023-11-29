@@ -15,7 +15,7 @@ class SendUseCaseImpl(
     private val walletRepository: WalletRepository
 ) : SendUseCase {
 
-    override suspend fun invoke(toAddress: String, amount: Long, message: MessageData?, stateInitBase64: String?): SendResult {
+    override suspend fun invoke(messages: List<MessageData>): SendResult {
         val account = getCurrentAccountDataUseCase.getAccountState() ?: throw Exception("Account is null")
         val secret = walletRepository.secret
         val password = walletRepository.password
@@ -23,10 +23,7 @@ class SendUseCaseImpl(
         val sendParams = SendParams(
             account = account,
             publicKey = walletRepository.publicKey,
-            toAddress = toAddress,
-            amount = amount,
-            message = message,
-            stateInitBase64 = stateInitBase64,
+            messages = messages,
             secret = secret,
             password = password,
             seed = seed,

@@ -4,6 +4,7 @@ import android.os.Bundle
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import org.ton.block.AddrStd
 import org.ton.block.Message
 import org.ton.block.StateInit
 import org.ton.boc.BagOfCells
@@ -45,16 +46,14 @@ class SendConnectConfirmViewModel(
     private val walletRepository: WalletRepository by inject()
 
     private val request = (args.event.request as TonConnectApi.SendTransactionRequest)
-    private val requestMessage = request.messages.firstOrNull()
-        ?: throw IllegalArgumentException("Messages is empty")
-    private val requestAmount: Long = requestMessage.amount.toLong()
+    private val requestMessages = request.messages
 
     private var passCodeEntered = false
     private var sendJob: Job? = null
-    private var messageData: MessageData? = null
+    private var messages: List<MessageData> = emptyList()
     private var isResponseAlreadySent = false
 
-    private val _stateFlow = MutableStateFlow(SendConnectConfirmState(amount = requestAmount, receiverUfAddress = "",))
+    private val _stateFlow = MutableStateFlow(SendConnectConfirmState(requestMessages = emptyList()))
     val stateFlow: Flow<SendConnectConfirmState> = _stateFlow
 
     init {
@@ -63,48 +62,55 @@ class SendConnectConfirmViewModel(
                 val addressType = getAddressTypeUseCase.getAddressType(address)
                 addressType?.ufAddress
             }
-            if (senderUfAddress != null) {
-                val currentAccountAddress = getCurrentAccountDataUseCase.getAccountState()?.address
-                if (senderUfAddress != currentAccountAddress) {
+            val accountState = getCurrentAccountDataUseCase.getAccountState()
+            if (senderUfAddress != null && accountState != null) {
+                val senderRawAddress = AddrStd.parse(senderUfAddress)
+                val currentAccountRawAddress = AddrStd.parse(accountState.address)
+
+
+                if (senderRawAddress != currentAccountRawAddress) {
                     screenApi.navigateBack()
                     return@launch
                 }
             }
             _stateFlow.value = _stateFlow.value.copy(senderUfAddress = senderUfAddress)
 
-            val receiverAddressType = getAddressTypeUseCase.getAddressType(requestMessage.address)
-            val receiverUfAddress = receiverAddressType?.ufAddress ?: requestMessage.address
-            _stateFlow.value = _stateFlow.value.copy(receiverUfAddress = receiverUfAddress)
+//            val receiverAddressType = getAddressTypeUseCase.getAddressType(requestMessage.address)
+//            val receiverUfAddress = receiverAddressType?.ufAddress ?: requestMessage.address
+//            _stateFlow.value = _stateFlow.value.copy(receiverUfAddress = receiverUfAddress)
 
-            val payloadCell = requestMessage.payload?.let { payloadBase64 ->
-                try {
-                    BagOfCells(base64(payloadBase64)).roots.first()
-                } catch (e: Exception) {
-                    L.e(e)
-                    val message = SnackBarMessage(Res.str(RString.error), Res.str(RString.payload_incorrect), Res.drawable(RUiKitDrawable.ic_warning_32))
-                    snackBarController.showMessage(message)
-                    screenApi.navigateBack()
-                    null
+            messages = requestMessages.map { message ->
+                val payloadCell = message.payload?.let { payloadBase64 ->
+                    try {
+                        BagOfCells(base64(payloadBase64)).roots.first()
+                    } catch (e: Exception) {
+                        L.e(e)
+                        val message = SnackBarMessage(Res.str(RString.error), Res.str(RString.payload_incorrect), Res.drawable(RUiKitDrawable.ic_warning_32))
+                        snackBarController.showMessage(message)
+                        screenApi.navigateBack()
+                        null
+                    }
                 }
-            }
 
-            val stateInitCell = requestMessage.stateInit?.let {stateInitBase64 ->
-                try {
-                    val stateInitCell = BagOfCells(base64(stateInitBase64)).roots.first()
-                    StateInit.loadTlb(stateInitCell)
-                } catch (e: Exception) {
-                    L.e(e)
-                    val message = SnackBarMessage(Res.str(RString.error), Res.str(RString.state_init_incorrect), Res.drawable(RUiKitDrawable.ic_warning_32))
-                    snackBarController.showMessage(message)
-                    screenApi.navigateBack()
-                    null
+                val stateInitCell = message.stateInit?.let {stateInitBase64 ->
+                    try {
+                        val stateInitCell = BagOfCells(base64(stateInitBase64)).roots.first()
+                        StateInit.loadTlb(stateInitCell)
+                    } catch (e: Exception) {
+                        L.e(e)
+                        val message = SnackBarMessage(Res.str(RString.error), Res.str(RString.state_init_incorrect), Res.drawable(RUiKitDrawable.ic_warning_32))
+                        snackBarController.showMessage(message)
+                        screenApi.navigateBack()
+                        null
+                    }
                 }
+
+                MessageData.raw(message.address, message.amount.toLong(), payloadCell, stateInitCell)
             }
+            // TODO: show all messages payload
+//            messageData?.let { _stateFlow.value = _stateFlow.value.copy(payload = TonWalletHelper.getMessageText(it, walletRepository.seed)) }
 
-            messageData = MessageData.raw(payloadCell, stateInitCell)
-            messageData?.let { _stateFlow.value = _stateFlow.value.copy(payload = TonWalletHelper.getMessageText(it, walletRepository.seed)) }
-
-            val fee = getSendFeeUseCase.invoke(receiverUfAddress, requestAmount, messageData)
+            val fee = getSendFeeUseCase.invoke(messages)
             val feeString = Formatter.getFormattedAmount(fee)
             _stateFlow.value = _stateFlow.value.copy(feeString = "≈ $feeString TON")
         }
@@ -180,7 +186,7 @@ class SendConnectConfirmViewModel(
         _stateFlow.value = _stateFlow.value.copy(isSending = true)
         sendJob = viewModelScope.launch(Dispatchers.IO) {
             try {
-                val result = sendUseCase.invoke(_stateFlow.value.receiverUfAddress, requestAmount, messageData, null)
+                val result = sendUseCase.invoke(messages)
                 _stateFlow.value = _stateFlow.value.copy(isSent = true)
                 executeOnAppScope {
                     val externalMessageCell = CellRef(result.externalMessage).toCell(Message.tlbCodec(AnyTlbConstructor))

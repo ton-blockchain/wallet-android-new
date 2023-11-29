@@ -42,8 +42,8 @@ class SendProcessingViewModel(private val args: SendProcessingScreenArguments) :
     init {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val message = args.message?.let(MessageData::text)
-                val actualFee = getSendFeeUseCase.invoke(args.address, _amountFlow.value, message)
+                val messages = listOf(MessageData.text(destination = address, amount = _amountFlow.value, text = args.message ?: ""))
+                val actualFee = getSendFeeUseCase.invoke(messages)
                 val feeDiff = abs(actualFee - presetFee)
                 if (feeDiff.toDouble() / presetFee > (0.01 * 1e9)) {
                     snackBarController.showMessage(SnackBarMessage(
@@ -56,7 +56,7 @@ class SendProcessingViewModel(private val args: SendProcessingScreenArguments) :
                     return@launch
                 }
 
-                val sendResult = sendUseCase.invoke(args.address, _amountFlow.value, message, null)
+                val sendResult = sendUseCase.invoke(messages)
                 _amountFlow.value = sendResult.amount
                 onSendCompleted()
             } catch (e: Exception) {

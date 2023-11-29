@@ -221,11 +221,14 @@ class TransactionsDaoImpl(
                     accountId = cursor.getInt(cursorIndexAccountId),
                     timestampSec = cursor.getLongOrNull(cursorIndexTimestampSec),
                     status = TransactionStatus.entries[cursor.getInt(cursorIndexStatus)],
-                    amount = cursor.getLongOrNull(cursorIndexAmount),
+                    // TODO: fix DTO, reading and writing to the database
+//                    amount = cursor.getLongOrNull(cursorIndexAmount),
                     fee = cursor.getLongOrNull(cursorIndexFee),
                     storageFee = cursor.getLongOrNull(cursorIndexStorageFee),
-                    peerAddress = cursor.getStringOrNull(cursorIndexPeerAddress),
-                    message = cursor.getStringOrNull(cursorIndexMessage),
+//                    peerAddress = cursor.getStringOrNull(cursorIndexPeerAddress),
+//                    message = cursor.getStringOrNull(cursorIndexMessage),
+                    inMessage = null,
+                    outMessages = emptyList(),
                     validUntilSec = cursor.getLongOrNull(cursorIndexValidUntil)
                 )
                 transactions.add(transaction)

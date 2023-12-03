@@ -105,13 +105,15 @@ class SendConfirmViewModel(private val args: SendConfirmScreenArguments) : BaseV
         calculateFeeJob = viewModelScope.launch(Dispatchers.IO) {
             val amount = _amountFlow.value
             try {
-                val fee = getSendFeeUseCase.invoke(recipientAddress, amount, MessageData.text(message))
+                val messages = listOf(MessageData.text(destination = recipientAddress, amount = amount, message))
+                val fee = getSendFeeUseCase.invoke(messages)
                 _feeFlow.emit(fee)
             } catch (e: TonApiException) {
                 if (e.message == "NOT_ENOUGH_FUNDS") {
                     var zeroAmountFee: Long? = null
                     try {
-                        zeroAmountFee = getSendFeeUseCase.invoke(recipientAddress, 0, MessageData.text(message))
+                        val messages = listOf(MessageData.text(destination = recipientAddress, amount = 0, message))
+                        zeroAmountFee = getSendFeeUseCase.invoke(messages)
                     } catch (e: TonApiException) {
                         if (e.message == "NOT_ENOUGH_FUNDS") {
                             showNotEnoughFundsError()
@@ -124,7 +126,8 @@ class SendConfirmViewModel(private val args: SendConfirmScreenArguments) : BaseV
                     if (zeroAmountFee != null) {
                         val decreasedAmount = amount - zeroAmountFee
                         try {
-                            val decreasedAmountFee = getSendFeeUseCase.invoke(recipientAddress, decreasedAmount, MessageData.text(message))
+                            val messages = listOf(MessageData.text(destination = recipientAddress, amount = decreasedAmount, message))
+                            val decreasedAmountFee = getSendFeeUseCase.invoke(messages)
                             _feeFlow.emit(decreasedAmountFee)
                             _amountFlow.emit(decreasedAmount)
                             snackBarController.showMessage(SnackBarMessage(

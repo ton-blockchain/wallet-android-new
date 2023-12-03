@@ -127,6 +127,13 @@ class SendAmountViewModel(private val args: SendAmountScreenArguments) : BaseVie
 
     fun onSendAllClicked() {
         _isSendAllCheckedFlow.value = !_isSendAllCheckedFlow.value
+        // TODO:
+        //  if you choose to send the entire balance, then:
+        //   1. The user should be asked to confirm that he wants to send the entire balance
+        //   2. The entire balance should be displayed in the UI
+        //   3. When sending a transaction, mod +128 (SendAll) +2 (IgnoreErrors) must be specified
+        //  if you choose to send a specific amount, then:
+        //   1. When sending a transaction, mod +1 (PayFeeSeparately) +2 (IgnoreErrors) must be specified
         if (_isSendAllCheckedFlow.value) {
             val balanceDecimal = balanceDecimalFlow.value
             if (balanceDecimal != null) {

@@ -14,9 +14,9 @@ class GetSendFeeUseCaseImpl(
     private val walletRepository: WalletRepository
 ) : GetSendFeeUseCase {
 
-    override suspend fun invoke(toAddress: String, amount: Long, message: MessageData?, stateInitBase64: String?): Long {
+    override suspend fun invoke(messages: List<MessageData>): Long {
         val account = getCurrentAccountDataUseCase.getAccountState() ?: throw IllegalArgumentException("Account is null")
-        val sendParams = SendParams(account, walletRepository.publicKey, toAddress, amount, message, stateInitBase64)
+        val sendParams = SendParams(account, walletRepository.publicKey, messages)
         return try {
             transactionsRepository.getSendFee(sendParams)
         } catch (e: TonApiException) {

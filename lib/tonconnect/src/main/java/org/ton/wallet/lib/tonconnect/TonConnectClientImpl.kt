@@ -260,6 +260,7 @@ internal class TonConnectClientImpl(
     private suspend fun sendDisconnect(clientId: String) {
         val requestId = store.getLastRequestId(clientId)
         val disconnectEvent = TonConnectApi.ConnectEvent.createDisconnect(requestId + 1)
+        // TODO: no need to send an event when reconnecting
         sendMessage(clientId, json.encodeToString(disconnectEvent))
     }
 
@@ -296,7 +297,7 @@ internal class TonConnectClientImpl(
     private companion object {
 
         private val BridgeHttpUrl = "https://bridge.tonapi.io/bridge".toHttpUrl()
-        private const val MaxClients = 1
+        private const val MaxClients = 10
     }
 
     private class ConnectionHolder(

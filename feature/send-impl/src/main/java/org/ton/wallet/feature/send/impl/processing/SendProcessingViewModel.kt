@@ -42,7 +42,6 @@ class SendProcessingViewModel(private val args: SendProcessingScreenArguments) :
     init {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                // TODO check case of isAllAmount
                 val sendMode =
                     if (args.isAllAmount) MessageData.AllBalanceSendMode
                     else MessageData.OrdinarySendMode

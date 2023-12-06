@@ -187,8 +187,8 @@ class SendConnectConfirmViewModel(
                 _stateFlow.value = _stateFlow.value.copy(isSent = true)
                 executeOnAppScope {
                     val externalMessageCell = CellRef(result.externalMessage).toCell(Message.tlbCodec(AnyTlbConstructor))
-                    val boc = base64(BagOfCells(externalMessageCell).toByteArray())
-                    val response = TonConnectApi.SendTransactionResponse.createSuccess(id = args.event.eventId, boc = boc)
+                    val base64Boc = base64(BagOfCells(externalMessageCell).toByteArray())
+                    val response = TonConnectApi.SendTransactionResponse.createSuccess(id = args.event.eventId, boc = base64Boc)
                     tonConnectSendResponseUseCase.sendResponse(args.event.clientId, response)
                     isResponseAlreadySent = true
                 }

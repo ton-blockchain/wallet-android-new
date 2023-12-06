@@ -14,7 +14,6 @@ import org.ton.wallet.lib.security.SecurityUtils
 
 class WalletRepositoryImpl(
     private val tonClient: TonClient,
-    private val defaultPreferences: SharedPreferences,
     private val securedPreferences: SharedPreferences
 ) : WalletRepository {
 
@@ -22,12 +21,6 @@ class WalletRepositoryImpl(
 
     override val publicKey: String
         get() = securedPreferences.getString(SecuredPrefsKeys.PublicKey, "") ?: ""
-
-    override val password: ByteArray
-        get() = Base64.decode(securedPreferences.getString(SecuredPrefsKeys.Password, "") ?: "", Base64.NO_WRAP)
-
-    override val secret: ByteArray
-        get() = Base64.decode(securedPreferences.getString(SecuredPrefsKeys.Secret, "") ?: "", Base64.NO_WRAP)
 
     override val seed: ByteArray
         get() = Mnemonic.toSeed(getRecoveryPhrase())

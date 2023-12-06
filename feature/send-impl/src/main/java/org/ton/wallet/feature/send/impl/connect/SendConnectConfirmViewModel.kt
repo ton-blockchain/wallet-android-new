@@ -4,17 +4,14 @@ import android.os.Bundle
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import org.ton.block.AddrStd
-import org.ton.block.Message
-import org.ton.block.StateInit
+import org.ton.block.*
 import org.ton.boc.BagOfCells
 import org.ton.crypto.base64
 import org.ton.tlb.CellRef
 import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.wallet.core.Res
 import org.ton.wallet.coreui.Formatter
-import org.ton.wallet.data.core.ton.MessageData
-import org.ton.wallet.data.core.ton.TonWalletHelper
+import org.ton.wallet.data.core.model.MessageData
 import org.ton.wallet.data.core.util.CoroutineScopes
 import org.ton.wallet.data.wallet.api.WalletRepository
 import org.ton.wallet.domain.blockhain.api.GetAddressTypeUseCase
@@ -105,7 +102,7 @@ class SendConnectConfirmViewModel(
                     }
                 }
 
-                MessageData.raw(message.address, message.amount.toLong(), payloadCell, stateInitCell)
+                MessageData.buildRaw(message.address, message.amount.toLong(), payloadCell, stateInitCell)
             }
             // TODO: show all messages payload
 //            messageData?.let { _stateFlow.value = _stateFlow.value.copy(payload = TonWalletHelper.getMessageText(it, walletRepository.seed)) }

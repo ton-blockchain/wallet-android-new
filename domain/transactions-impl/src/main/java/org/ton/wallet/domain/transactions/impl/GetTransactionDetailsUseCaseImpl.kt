@@ -3,6 +3,7 @@ package org.ton.wallet.domain.transactions.impl
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import org.ton.wallet.core.Res
 import org.ton.wallet.coreui.Formatter
 import org.ton.wallet.data.transactions.api.TransactionsRepository
@@ -22,6 +23,7 @@ class GetTransactionDetailsUseCaseImpl(
 
         var amountSpannable: SpannableStringBuilder? = null
         val amount = transaction.amount
+        Log.d("GetTransactionDetailsUseCaseImpl", "amount: $amount")
         if (amount != null) {
             val amountString = Formatter.getFormattedAmount(amount)
             amountSpannable = Formatter.getBeautifiedAmount(amountString)
@@ -61,7 +63,7 @@ class GetTransactionDetailsUseCaseImpl(
             hash = hash,
             status = transaction.status,
             type = transaction.type,
-            amount = transaction.amount,
+            amount = amount,
             amountString = amountSpannable,
             fee = feeText,
             date = dateText,

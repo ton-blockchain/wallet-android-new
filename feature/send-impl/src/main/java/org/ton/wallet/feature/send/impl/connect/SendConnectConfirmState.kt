@@ -1,6 +1,6 @@
 package org.ton.wallet.feature.send.impl.connect
 
-import org.ton.wallet.data.core.ton.MessageData
+import org.ton.wallet.data.core.model.MessageData
 
 data class SendConnectConfirmState(
     val requestMessages: List<MessageData> = emptyList(),

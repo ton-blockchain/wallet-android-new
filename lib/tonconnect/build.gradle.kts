@@ -24,11 +24,11 @@ android {
 dependencies {
     implementation(Config.Lib.annotation)
     implementation(Config.Lib.coroutines)
-    implementation(Config.Lib.json)
     implementation(platform(Config.Lib.okHttpBom))
     implementation(Config.Lib.okHttpCore)
     implementation(Config.Lib.okHttpLogging)
     implementation(Config.Lib.okHttpSse)
+    implementation(Config.Lib.serializationJson)
 
     implementation(project(Config.Module.dataCore))
     implementation(project(Config.Module.libCore))

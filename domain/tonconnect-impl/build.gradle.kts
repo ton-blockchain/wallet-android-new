@@ -14,7 +14,7 @@ android {
 
 dependencies {
     implementation(Config.Lib.coroutines)
-    implementation(Config.Lib.json)
+    implementation(Config.Lib.serializationJson)
     implementation(Config.Lib.tonKotlin)
     implementation(project(Config.Module.dataCore))
     implementation(project(Config.Module.dataWalletApi))

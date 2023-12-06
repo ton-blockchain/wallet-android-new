@@ -14,4 +14,5 @@ android {
 
 dependencies {
     implementation(Config.Lib.appCompat)
+    implementation(Config.Lib.serializationCore)
 }

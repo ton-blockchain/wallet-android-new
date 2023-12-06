@@ -27,6 +27,7 @@ object Config {
     object Lib {
 
         private const val CameraVersion = "1.2.3"
+        private const val Serialization = "1.6.2"
 
         const val activity = "androidx.activity:activity:1.7.1"
         const val annotation = "androidx.annotation:annotation:1.6.0"
@@ -45,7 +46,8 @@ object Config {
         const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
         const val desugar = "com.android.tools:desugar_jdk_libs:2.0.3"
         const val easyPermissions = "pub.devrel:easypermissions:3.0.0"
-        const val json = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0"
+        const val serializationCore = "org.jetbrains.kotlinx:kotlinx-serialization-core:${Serialization}"
+        const val serializationJson = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Serialization}"
         const val okHttpBom = "com.squareup.okhttp3:okhttp-bom:4.11.0"
         const val okHttpCore = "com.squareup.okhttp3:okhttp"
         const val okHttpLogging = "com.squareup.okhttp3:logging-interceptor"

@@ -9,6 +9,7 @@ import org.ton.wallet.screen.ScreenArguments
 class SendConfirmScreenArguments(
     val address: String,
     val amount: Long,
+    val isAllAmount: Boolean,
     val message: String?
 ) : ScreenArguments {
 

@@ -4,5 +4,5 @@ interface SendAmountScreenApi {
 
     fun navigateBack()
 
-    fun navigateToConfirm(address: String, amount: Long, message: String?)
+    fun navigateToConfirm(address: String, amount: Long, isAllAmount: Boolean, message: String?)
 }

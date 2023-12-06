@@ -260,7 +260,6 @@ internal class TonConnectClientImpl(
     private suspend fun sendDisconnect(clientId: String) {
         val requestId = store.getLastRequestId(clientId)
         val disconnectEvent = TonConnectApi.ConnectEvent.createDisconnect(requestId + 1)
-        // TODO: no need to send an event when reconnecting
         sendMessage(clientId, json.encodeToString(disconnectEvent))
     }
 

@@ -20,9 +20,9 @@ android {
 dependencies {
     implementation(Config.Lib.annotation)
     implementation(Config.Lib.coroutines)
-    implementation(Config.Lib.json)
     implementation(platform(Config.Lib.okHttpBom))
     implementation(Config.Lib.okHttpCore)
+    implementation(Config.Lib.serializationJson)
     implementation(Config.Lib.tonKotlin)
 
     implementation(project(Config.Module.libCore))

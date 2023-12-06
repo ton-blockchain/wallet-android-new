@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.ton.wallet.core.Res
 import org.ton.wallet.coreui.Formatter
-import org.ton.wallet.data.core.ton.MessageData
+import org.ton.wallet.data.core.model.MessageData
 import org.ton.wallet.domain.transactions.api.GetSendFeeUseCase
 import org.ton.wallet.domain.transactions.api.SendUseCase
 import org.ton.wallet.feature.send.api.SendProcessingScreenApi
@@ -42,18 +42,31 @@ class SendProcessingViewModel(private val args: SendProcessingScreenArguments) :
     init {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val messages = listOf(MessageData.text(destination = address, amount = _amountFlow.value, text = args.message ?: ""))
-                val actualFee = getSendFeeUseCase.invoke(messages)
-                val feeDiff = abs(actualFee - presetFee)
-                if (feeDiff.toDouble() / presetFee > (0.01 * 1e9)) {
-                    snackBarController.showMessage(SnackBarMessage(
-                        title = Res.str(RString.fee_changed),
-                        message = Res.str(RString.fee_changed_check),
-                        drawable = Res.drawable(RUiKitDrawable.ic_warning_32)
-                    ))
-                    setResult(SendProcessingScreenApi.ResultKeyFeeChanged, Bundle.EMPTY)
-                    screenApi.navigateBack()
-                    return@launch
+                // TODO check case of isAllAmount
+                val sendMode =
+                    if (args.isAllAmount) MessageData.AllBalanceSendMode
+                    else MessageData.OrdinarySendMode
+                val message = MessageData.buildText(
+                    destination = address,
+                    amount = _amountFlow.value,
+                    text = args.message ?: "",
+                    sendMode = sendMode
+                )
+                val messages = listOf(message)
+
+                if (!args.isAllAmount) {
+                    val actualFee = getSendFeeUseCase.invoke(messages)
+                    val feeDiff = abs(actualFee - presetFee)
+                    if (feeDiff.toDouble() / presetFee > (0.01 * 1e9)) {
+                        snackBarController.showMessage(SnackBarMessage(
+                            title = Res.str(RString.fee_changed),
+                            message = Res.str(RString.fee_changed_check),
+                            drawable = Res.drawable(RUiKitDrawable.ic_warning_32)
+                        ))
+                        setResult(SendProcessingScreenApi.ResultKeyFeeChanged, Bundle.EMPTY)
+                        screenApi.navigateBack()
+                        return@launch
+                    }
                 }
 
                 val sendResult = sendUseCase.invoke(messages)

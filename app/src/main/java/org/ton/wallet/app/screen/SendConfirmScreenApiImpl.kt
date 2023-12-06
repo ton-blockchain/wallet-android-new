@@ -14,8 +14,8 @@ class SendConfirmScreenApiImpl(
         navigator.pop(false)
     }
 
-    override fun navigateToSendProcessing(address: String, amount: Long, fee: Long, message: String?) {
-        navigator.push(SendProcessingScreenArguments(address, amount, fee, message))
+    override fun navigateToSendProcessing(address: String, amount: Long, isAllAmount: Boolean, fee: Long, message: String?) {
+        navigator.push(SendProcessingScreenArguments(address, amount, isAllAmount, fee, message))
     }
 
     override fun navigateToPassCodeEnter(purpose: String) {

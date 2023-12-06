@@ -34,7 +34,7 @@ class TonConnectApproveViewModel(args: TonConnectApproveScreenArguments) : BaseV
             val manifestUrl = action!!.request.manifestUrl
             val account = getCurrentAccountUseCase.getAccountState()
                 ?: throw IllegalArgumentException("Current account is null")
-            val accountType = TonAccountType.getAccountType(account.version, account.revision)
+            val accountType = TonAccountType.get(account.version, account.revision)
             try {
                 val manifest = tonConnectClient.getManifest(manifestUrl)
                 val state = TonConnectApproveState(

@@ -9,6 +9,7 @@ import org.ton.wallet.core.ext.*
 import org.ton.wallet.data.core.connect.TonConnectRequest
 import org.ton.wallet.data.core.link.LinkAction
 import org.ton.wallet.data.core.model.TonAccount
+import org.ton.wallet.data.core.model.TonAccountType
 import org.ton.wallet.data.wallet.api.WalletRepository
 import org.ton.wallet.data.wallet.api.model.AccountDto
 import org.ton.wallet.domain.blockhain.api.GetAddressUseCase
@@ -68,13 +69,13 @@ class TonConnectOpenConnectionUseCaseImpl(
     }
 
     private suspend fun getAddressItem(accountDto: AccountDto): TonConnectApi.ConnectEvent.ConnectItemReply {
-        val account = TonAccount(walletRepository.publicKey, accountDto.version, accountDto.revision)
+        val account = TonAccount(walletRepository.publicKey, TonAccountType.get(accountDto.version, accountDto.revision))
         val rawAddress = getAddressUseCase.getRawAddress(accountDto.address) ?: ""
         return TonConnectApi.ConnectEvent.ConnectItemReply.createAddress(
             address = rawAddress,
             network = TonConnectApi.NetworkMainnet,
             publicKey = walletRepository.publicKey,
-            stateInit = base64(account.getStateInitBytes())
+            stateInit = account.getStateInitBytes()?.let(::base64)
         )
     }
 

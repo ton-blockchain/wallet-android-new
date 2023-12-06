@@ -1,6 +1,6 @@
 package org.ton.wallet.domain.transactions.api
 
-import org.ton.wallet.data.core.ton.MessageData
+import org.ton.wallet.data.core.model.MessageData
 
 interface GetSendFeeUseCase {
 

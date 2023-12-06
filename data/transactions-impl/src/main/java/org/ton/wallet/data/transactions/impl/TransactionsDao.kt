@@ -2,6 +2,7 @@ package org.ton.wallet.data.transactions.impl
 
 import android.content.ContentValues
 import androidx.core.database.*
+import org.ton.wallet.core.serializer.ByteArraySerializer
 import org.ton.wallet.data.transactions.api.model.*
 import org.ton.wallet.lib.sqlite.SqliteDatabase
 
@@ -90,25 +91,36 @@ class TransactionsDaoImpl(
     }
 
     override suspend fun getAllSendUnique(accountId: Int): List<RecentTransactionDto> {
-        val items = mutableListOf<RecentTransactionDto>()
+        val map = mutableMapOf<String, Long>()
+
         db.readableDatabase.query(
             table = SqlTableTransactions.tableName,
-            columns = arrayOf(SqlTableTransactions.ColumnPeerAddress, "MAX(${SqlTableTransactions.ColumnTimestampSec})"),
-            selection = "${SqlTableTransactions.ColumnAccountId} = ? AND ${SqlTableTransactions.ColumnAmount} < 0",
+            columns = arrayOf(SqlTableTransactions.ColumnOutMessages, "MAX(${SqlTableTransactions.ColumnTimestampSec})"),
+            selection = "${SqlTableTransactions.ColumnAccountId} = ? AND ${SqlTableTransactions.ColumnOutMessages} IS NOT NULL",
             selectionArgs = arrayOf(accountId.toString()),
-            groupBy = SqlTableTransactions.ColumnPeerAddress
+            groupBy = SqlTableTransactions.ColumnOutMessages
         )?.use { cursor ->
-            val columnIndexAddress = cursor.getColumnIndex(SqlTableTransactions.ColumnPeerAddress)
-            val columnIndexTimestamp = columnIndexAddress + 1
+            val columnOutMessages = cursor.getColumnIndex(SqlTableTransactions.ColumnOutMessages)
+            val columnIndexTimestamp = columnOutMessages + 1
             while (cursor.moveToNext()) {
-                val peerAddress = cursor.getStringOrNull(columnIndexAddress)
+                val outMessagesBytes = cursor.getBlobOrNull(columnOutMessages)
                 val timestamp = cursor.getLongOrNull(columnIndexTimestamp)
-                if (peerAddress != null && timestamp != null) {
-                    items.add(RecentTransactionDto(peerAddress, timestamp))
+                if (outMessagesBytes != null && timestamp != null) {
+                    val outMessages = ByteArraySerializer.deserialize<List<TransactionMessageDto>>(outMessagesBytes)
+                    for (i in outMessages.indices) {
+                        val currentAddress = outMessages[i].address ?: continue
+                        val currentAddressTimestamp = map.getOrPut(currentAddress) { timestamp }
+                        if (currentAddressTimestamp < timestamp) {
+                            map[currentAddress] = timestamp
+                        }
+                    }
                 }
             }
         }
-        return items
+
+        return map.map { (address, timestamp) ->
+            RecentTransactionDto(address = address, timestampSec = timestamp)
+        }
     }
 
     override suspend fun get(internalId: Long): TransactionDto? {
@@ -181,17 +193,23 @@ class TransactionsDaoImpl(
     }
 
     private fun fillTransactionContentValues(accountId: Int, transaction: TransactionDto, values: ContentValues) {
+        values.clear()
         values.put(SqlTableTransactions.ColumnHash, transaction.hash)
         values.put(SqlTableTransactions.ColumnAccountId, accountId)
         values.put(SqlTableTransactions.ColumnTimestampSec, transaction.timestampSec)
         values.put(SqlTableTransactions.ColumnStatus, transaction.status.ordinal)
-        values.put(SqlTableTransactions.ColumnAmount, transaction.amount)
         values.put(SqlTableTransactions.ColumnFee, transaction.fee)
         values.put(SqlTableTransactions.ColumnStorageFee, transaction.storageFee)
-        values.put(SqlTableTransactions.ColumnPeerAddress, transaction.peerAddress)
-        values.put(SqlTableTransactions.ColumnMessage, transaction.message)
-        if (transaction.validUntilSec != null) {
-            values.put(SqlTableTransactions.ColumnValidUntil, transaction.validUntilSec)
+        transaction.validUntilSec?.let { validUntilSec ->
+            values.put(SqlTableTransactions.ColumnValidUntil, validUntilSec)
+        }
+        transaction.inMessage?.let { inMsg ->
+            values.put(SqlTableTransactions.ColumnInMessage, ByteArraySerializer.serialize(inMsg))
+        }
+        transaction.outMessages?.let { outMessages ->
+            if (outMessages.isNotEmpty()) {
+                values.put(SqlTableTransactions.ColumnOutMessages, ByteArraySerializer.serialize(outMessages))
+            }
         }
     }
 
@@ -201,34 +219,33 @@ class TransactionsDaoImpl(
             table = SqlTableTransactions.tableName,
             selection = selection,
             selectionArgs = selectionArgs,
-            orderBy = "${SqlTableTransactions.ColumnTimestampSec} DESC, ${SqlTableTransactions.ColumnAmount} DESC"
+            orderBy = "${SqlTableTransactions.ColumnTimestampSec} DESC"
         )?.use { cursor ->
             val cursorIndexInternalId = cursor.getColumnIndex(SqlTableTransactions.ColumnInternalId)
             val cursorIndexHash = cursor.getColumnIndex(SqlTableTransactions.ColumnHash)
             val cursorIndexAccountId = cursor.getColumnIndex(SqlTableTransactions.ColumnAccountId)
             val cursorIndexTimestampSec = cursor.getColumnIndex(SqlTableTransactions.ColumnTimestampSec)
             val cursorIndexStatus = cursor.getColumnIndex(SqlTableTransactions.ColumnStatus)
-            val cursorIndexAmount = cursor.getColumnIndex(SqlTableTransactions.ColumnAmount)
             val cursorIndexFee = cursor.getColumnIndex(SqlTableTransactions.ColumnFee)
             val cursorIndexStorageFee = cursor.getColumnIndex(SqlTableTransactions.ColumnStorageFee)
-            val cursorIndexPeerAddress = cursor.getColumnIndex(SqlTableTransactions.ColumnPeerAddress)
-            val cursorIndexMessage = cursor.getColumnIndex(SqlTableTransactions.ColumnMessage)
             val cursorIndexValidUntil = cursor.getColumnIndex(SqlTableTransactions.ColumnValidUntil)
+            val cursorIndexInMessage = cursor.getColumnIndex(SqlTableTransactions.ColumnInMessage)
+            val cursorIndexOutMessages = cursor.getColumnIndex(SqlTableTransactions.ColumnOutMessages)
             while (cursor.moveToNext()) {
+                val inMsgByteArray = cursor.getBlobOrNull(cursorIndexInMessage)
+                val outMsgByteArray = cursor.getBlobOrNull(cursorIndexOutMessages)
+                val inMessage = inMsgByteArray?.let { ByteArraySerializer.deserialize<TransactionMessageDto>(it) }
+                val outMessages = outMsgByteArray?.let { ByteArraySerializer.deserialize<List<TransactionMessageDto>>(it) }
                 val transaction = TransactionDto(
                     internalId = cursor.getLong(cursorIndexInternalId),
                     hash = cursor.getString(cursorIndexHash),
                     accountId = cursor.getInt(cursorIndexAccountId),
                     timestampSec = cursor.getLongOrNull(cursorIndexTimestampSec),
                     status = TransactionStatus.entries[cursor.getInt(cursorIndexStatus)],
-                    // TODO: fix DTO, reading and writing to the database
-//                    amount = cursor.getLongOrNull(cursorIndexAmount),
                     fee = cursor.getLongOrNull(cursorIndexFee),
                     storageFee = cursor.getLongOrNull(cursorIndexStorageFee),
-//                    peerAddress = cursor.getStringOrNull(cursorIndexPeerAddress),
-//                    message = cursor.getStringOrNull(cursorIndexMessage),
-                    inMessage = null,
-                    outMessages = emptyList(),
+                    inMessage = inMessage,
+                    outMessages = outMessages ?: emptyList(),
                     validUntilSec = cursor.getLongOrNull(cursorIndexValidUntil)
                 )
                 transactions.add(transaction)

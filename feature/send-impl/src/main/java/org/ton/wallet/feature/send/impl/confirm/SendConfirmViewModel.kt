@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.*
 import org.ton.wallet.core.Res
 import org.ton.wallet.coreui.Formatter
 import org.ton.wallet.coreui.KeyboardUtils
-import org.ton.wallet.data.core.ton.MessageData
+import org.ton.wallet.data.core.model.MessageData
 import org.ton.wallet.data.tonclient.api.TonApiException
 import org.ton.wallet.domain.transactions.api.GetSendFeeUseCase
 import org.ton.wallet.feature.passcode.api.PassCodeEnterScreenApi
@@ -67,7 +67,7 @@ class SendConfirmViewModel(private val args: SendConfirmScreenArguments) : BaseV
         super.onScreenChange(isStarted, isPush, isEnter)
         if (!isStarted && !isPush && isEnter && passCodeEntered) {
             val message = _messageFlow.value.ifEmpty { null }
-            screenApi.navigateToSendProcessing(recipientAddress, _amountFlow.value, _feeFlow.value, message)
+            screenApi.navigateToSendProcessing(recipientAddress, _amountFlow.value, args.isAllAmount, _feeFlow.value, message)
             passCodeEntered = false
         }
     }
@@ -100,19 +100,30 @@ class SendConfirmViewModel(private val args: SendConfirmScreenArguments) : BaseV
     }
 
     private fun calculateFee(message: String) {
+        if (args.isAllAmount) {
+            _feeFlow.value = 0L
+            return
+        }
+
         calculateFeeJob?.cancel()
         _isFeeLoadingFlow.tryEmit(true)
         calculateFeeJob = viewModelScope.launch(Dispatchers.IO) {
             val amount = _amountFlow.value
             try {
-                val messages = listOf(MessageData.text(destination = recipientAddress, amount = amount, message))
-                val fee = getSendFeeUseCase.invoke(messages)
+                val messageData = MessageData.buildText(
+                    destination = recipientAddress,
+                    amount = amount,
+                    text = message,
+                    sendMode = MessageData.OrdinarySendMode
+                )
+                val fee = getSendFeeUseCase.invoke(listOf(messageData))
                 _feeFlow.emit(fee)
             } catch (e: TonApiException) {
                 if (e.message == "NOT_ENOUGH_FUNDS") {
                     var zeroAmountFee: Long? = null
                     try {
-                        val messages = listOf(MessageData.text(destination = recipientAddress, amount = 0, message))
+                        val messages =
+                            listOf(MessageData.buildText(destination = recipientAddress, amount = 0, message))
                         zeroAmountFee = getSendFeeUseCase.invoke(messages)
                     } catch (e: TonApiException) {
                         if (e.message == "NOT_ENOUGH_FUNDS") {
@@ -126,15 +137,23 @@ class SendConfirmViewModel(private val args: SendConfirmScreenArguments) : BaseV
                     if (zeroAmountFee != null) {
                         val decreasedAmount = amount - zeroAmountFee
                         try {
-                            val messages = listOf(MessageData.text(destination = recipientAddress, amount = decreasedAmount, message))
+                            val messages = listOf(
+                                MessageData.buildText(
+                                    destination = recipientAddress,
+                                    amount = decreasedAmount,
+                                    message
+                                )
+                            )
                             val decreasedAmountFee = getSendFeeUseCase.invoke(messages)
                             _feeFlow.emit(decreasedAmountFee)
                             _amountFlow.emit(decreasedAmount)
-                            snackBarController.showMessage(SnackBarMessage(
-                                title = null,
-                                message = Res.str(RString.decreased_amount),
-                                drawable = Res.drawable(RUiKitDrawable.ic_warning_32),
-                            ))
+                            snackBarController.showMessage(
+                                SnackBarMessage(
+                                    title = null,
+                                    message = Res.str(RString.decreased_amount),
+                                    drawable = Res.drawable(RUiKitDrawable.ic_warning_32),
+                                )
+                            )
                         } catch (e: TonApiException) {
                             if (e.message == "NOT_ENOUGH_FUNDS") {
                                 showNotEnoughFundsError()

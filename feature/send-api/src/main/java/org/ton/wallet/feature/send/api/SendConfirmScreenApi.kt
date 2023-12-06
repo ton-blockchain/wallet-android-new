@@ -4,7 +4,7 @@ interface SendConfirmScreenApi {
 
     fun navigateBack()
 
-    fun navigateToSendProcessing(address: String, amount: Long, fee: Long, message: String?)
+    fun navigateToSendProcessing(address: String, amount: Long, isAllAmount: Boolean, fee: Long, message: String?)
 
     fun navigateToPassCodeEnter(purpose: String)
 }

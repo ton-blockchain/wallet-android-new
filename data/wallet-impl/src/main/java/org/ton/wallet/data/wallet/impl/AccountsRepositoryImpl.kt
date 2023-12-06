@@ -85,9 +85,9 @@ class AccountsRepositoryImpl(
     override suspend fun createAccount(type: TonAccountType): AccountDto {
         var dto = accountsDao.get(type)
         if (dto == null) {
-            val account = TonAccount(publicKey, type.version, type.revision)
-            val initialState = TonApi.RawInitialAccountState(account.getCode(), account.getInitialData())
-            val addressRequest = TonApi.GetAccountAddress(initialState, account.revision, 0)
+            val account = TonAccount(publicKey, type)
+            val initialState = TonApi.RawInitialAccountState(account.getCodeBytes(), account.getDataBytes())
+            val addressRequest = TonApi.GetAccountAddress(initialState, account.type.revision, 0)
             val addressResponse = tonClient.sendRequestTyped<TonApi.AccountAddress>(addressRequest)
             val ufAddress = addressResponse.accountAddress!!
 

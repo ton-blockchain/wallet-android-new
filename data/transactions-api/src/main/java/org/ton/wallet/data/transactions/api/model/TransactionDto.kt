@@ -6,8 +6,8 @@ class TransactionDto(
     val accountId: Int,
     val status: TransactionStatus,
     val timestampSec: Long?,
-    val inMessage: InMessageDto?,
-    val outMessages: List<OutMessageDto>,
+    val inMessage: TransactionMessageDto?,
+    val outMessages: List<TransactionMessageDto>?,
     val fee: Long? = null,
     val storageFee: Long? = null,
     val validUntilSec: Long? = null,
@@ -15,52 +15,26 @@ class TransactionDto(
 ) {
     // TODO: remove usage of amount, peerAddress, message, type
     @Deprecated("Remove usage of amount")
-    val amount: Long? = inMessage?.amount ?: outMessages.firstOrNull()?.amount
+    val amount: Long?
+        get() = outMessages?.firstOrNull()?.amount ?: inMessage?.amount
+
     @Deprecated("Remove usage of peerAddress")
-    val peerAddress: String? = inMessage?.source ?: outMessages.firstOrNull()?.destination
+    val peerAddress: String?
+        get() = outMessages?.firstOrNull()?.address ?: inMessage?.address
+
     @Deprecated("Remove usage of message")
-    val message: String? = null
+    val message: String?
+        get() = outMessages?.firstOrNull()?.message ?: inMessage?.message
+
     @Deprecated("Remove usage of type")
-    val type: Type = inMessage?.type ?: outMessages.firstOrNull()?.type ?: Type.Unknown
+    val type: Type =
+        if (outMessages?.isNotEmpty() == true) Type.Out
+        else if (inMessage != null) Type.In
+        else Type.Unknown
 
     enum class Type {
         In,
         Out,
         Unknown
     }
-}
-
-class InMessageDto (
-    val amount: Long?,
-    val source: String?,
-    val message: String?,
-    val inMsgBodyHash: String?,
-) {
-
-    // TODO: in message can be only Type.In
-    val type: TransactionDto.Type =
-        if (amount != null) {
-            if (amount > 0) TransactionDto.Type.In
-            else if (amount < 0) TransactionDto.Type.Out
-            else TransactionDto.Type.Unknown
-        } else {
-            TransactionDto.Type.Unknown
-        }
-}
-
-class OutMessageDto (
-    val amount: Long?,
-    val destination: String?,
-    val message: String?
-) {
-
-    // TODO: out message can be only Type.Out
-    val type: TransactionDto.Type =
-        if (amount != null) {
-            if (amount > 0) TransactionDto.Type.In
-            else if (amount < 0) TransactionDto.Type.Out
-            else TransactionDto.Type.Unknown
-        } else {
-            TransactionDto.Type.Unknown
-        }
 }

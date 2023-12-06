@@ -1,7 +1,7 @@
 package org.ton.wallet.domain.transactions.impl
 
 import org.ton.wallet.core.ext.clear
-import org.ton.wallet.data.core.ton.MessageData
+import org.ton.wallet.data.core.model.MessageData
 import org.ton.wallet.data.transactions.api.TransactionsRepository
 import org.ton.wallet.data.transactions.api.model.SendParams
 import org.ton.wallet.data.transactions.api.model.SendResult
@@ -17,20 +17,14 @@ class SendUseCaseImpl(
 
     override suspend fun invoke(messages: List<MessageData>): SendResult {
         val account = getCurrentAccountDataUseCase.getAccountState() ?: throw Exception("Account is null")
-        val secret = walletRepository.secret
-        val password = walletRepository.password
         val seed = walletRepository.seed
         val sendParams = SendParams(
             account = account,
             publicKey = walletRepository.publicKey,
             messages = messages,
-            secret = secret,
-            password = password,
             seed = seed,
         )
         val result = transactionsRepository.performSend(sendParams)
-        secret.clear()
-        password.clear()
         seed.clear()
         return result
     }

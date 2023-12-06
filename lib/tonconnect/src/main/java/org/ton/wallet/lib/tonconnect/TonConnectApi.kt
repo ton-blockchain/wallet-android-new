@@ -192,7 +192,7 @@ interface TonConnectApi {
 
             companion object {
 
-                fun createAddress(address: String, network: String, publicKey: String, stateInit: String): ConnectItemReply {
+                fun createAddress(address: String, network: String, publicKey: String, stateInit: String?): ConnectItemReply {
                     return ConnectItemReply(
                         name = NameTonAddress,
                         address = address,

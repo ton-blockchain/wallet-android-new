@@ -9,9 +9,9 @@ import org.ton.tlb.providers.TlbCombinatorProvider
 import org.ton.tlb.providers.TlbConstructorProvider
 
 sealed interface MessageText {
-    data class Raw(
-        val text: String
-    ) : MessageText {
+
+    data class Raw(val text: String) : MessageText {
+
         fun encrypt(publicKey: PublicKey): Encrypted {
             val encrypted = publicKey.encrypt(text.encodeToByteArray())
             return Encrypted(encrypted.asByteString())
@@ -20,9 +20,8 @@ sealed interface MessageText {
         companion object : TlbConstructorProvider<Raw> by TextTlbConstructor
     }
 
-    data class Encrypted(
-        val text: ByteString
-    ) : MessageText {
+    data class Encrypted(val text: ByteString) : MessageText {
+
         fun decrypt(privateKey: PrivateKey): Raw {
             val decrypted = privateKey.decrypt(text.toByteArray())
             return Raw(decrypted.decodeToString())

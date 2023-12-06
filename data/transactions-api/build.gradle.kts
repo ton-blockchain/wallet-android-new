@@ -1,6 +1,7 @@
 plugins {
     id("com.android.library")
     kotlin("android")
+    id("kotlinx-serialization")
 }
 
 android {
@@ -17,4 +18,5 @@ dependencies {
     implementation(Config.Lib.tonKotlin)
     implementation(project(Config.Module.dataCore))
     implementation(project(Config.Module.dataWalletApi))
+    implementation(project(Config.Module.libCore))
 }

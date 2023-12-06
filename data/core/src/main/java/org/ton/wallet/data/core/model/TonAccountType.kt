@@ -14,7 +14,7 @@ enum class TonAccountType(
 
     companion object {
 
-        fun getAccountType(version: Int, revision: Int): TonAccountType {
+        fun get(version: Int, revision: Int): TonAccountType {
             return when (version) {
                 3 -> if (revision == 1) v3r1 else v3r2
                 4 -> v4r2

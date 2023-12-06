@@ -12,10 +12,11 @@ class SendAmountScreenApiImpl(
         navigator.pop(false)
     }
 
-    override fun navigateToConfirm(address: String, amount: Long, message: String?) {
+    override fun navigateToConfirm(address: String, amount: Long, isAllAmount: Boolean, message: String?) {
         navigator.push(SendConfirmScreenArguments(
             address = address,
             amount = amount,
+            isAllAmount = isAllAmount,
             message = message
         ))
     }

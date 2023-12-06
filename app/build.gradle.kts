@@ -68,12 +68,12 @@ dependencies {
     implementation(Config.Lib.browser)
     implementation(Config.Lib.conductor)
     implementation(Config.Lib.easyPermissions)
-    implementation(Config.Lib.json)
     implementation(platform(Config.Lib.okHttpBom))
     implementation(Config.Lib.okHttpCore)
     implementation(Config.Lib.okHttpLogging)
     implementation(Config.Lib.recyclerView)
     implementation(Config.Lib.security)
+    implementation(Config.Lib.serializationJson)
 
     implementation(project(Config.Module.libCore))
     implementation(project(Config.Module.libDi))

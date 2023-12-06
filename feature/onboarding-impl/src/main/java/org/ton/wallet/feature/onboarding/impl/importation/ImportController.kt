@@ -32,6 +32,7 @@ class ImportController(args: Bundle?) : BaseInputListController<ImportViewModel>
 
     override val viewModel by viewModels { ImportViewModel() }
     override val useTopInsetsPadding: Boolean = false
+    override val isSecured: Boolean = true
 
     override val inputLayouts: Array<NumericEditTextLayout>
         get() = editTextLayouts as Array<NumericEditTextLayout>

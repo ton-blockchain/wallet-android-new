@@ -1,6 +1,6 @@
 package org.ton.wallet.domain.transactions.impl
 
-import org.ton.wallet.data.core.ton.MessageData
+import org.ton.wallet.data.core.model.MessageData
 import org.ton.wallet.data.tonclient.api.TonApiException
 import org.ton.wallet.data.transactions.api.TransactionsRepository
 import org.ton.wallet.data.transactions.api.model.SendParams

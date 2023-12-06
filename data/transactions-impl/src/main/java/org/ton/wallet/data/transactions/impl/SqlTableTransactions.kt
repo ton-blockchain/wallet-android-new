@@ -12,13 +12,12 @@ object SqlTableTransactions : SqlTable {
     const val ColumnHash = "hash"
     const val ColumnAccountId = "accountId"
     const val ColumnTimestampSec = "timestampSec"
-    const val ColumnAmount = "amount"
     const val ColumnFee = "fee"
     const val ColumnStorageFee = "storageFee"
-    const val ColumnPeerAddress = "peerAddress"
-    const val ColumnMessage = "message"
     const val ColumnStatus = "status"
     const val ColumnValidUntil = "validUntil"
+    const val ColumnInMessage = "inMessage"
+    const val ColumnOutMessages = "outMessages"
 
     override fun getCreateSqlQuery(): String {
         return SqlTableBuilder(tableName)
@@ -38,14 +37,15 @@ object SqlTableTransactions : SqlTable {
                 isNotNull = true
                 isUnique = true
             }
-            .addColumn(ColumnStatus, SqlColumnBuilder.Type.INTEGER) { isNotNull = true }
+            .addColumn(ColumnStatus, SqlColumnBuilder.Type.INTEGER) {
+                isNotNull = true
+            }
             .addColumn(ColumnTimestampSec, SqlColumnBuilder.Type.INTEGER)
-            .addColumn(ColumnAmount, SqlColumnBuilder.Type.INTEGER)
             .addColumn(ColumnFee, SqlColumnBuilder.Type.INTEGER)
             .addColumn(ColumnStorageFee, SqlColumnBuilder.Type.INTEGER)
-            .addColumn(ColumnPeerAddress, SqlColumnBuilder.Type.TEXT)
-            .addColumn(ColumnMessage, SqlColumnBuilder.Type.TEXT)
             .addColumn(ColumnValidUntil, SqlColumnBuilder.Type.INTEGER)
+            .addColumn(ColumnInMessage, SqlColumnBuilder.Type.BLOB)
+            .addColumn(ColumnOutMessages, SqlColumnBuilder.Type.BLOB)
             .buildCreateSql()
     }
 }

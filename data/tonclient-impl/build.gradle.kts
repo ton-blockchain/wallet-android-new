@@ -14,10 +14,10 @@ android {
 
 dependencies {
     implementation(Config.Lib.coroutines)
-    implementation(Config.Lib.json)
-    implementation(Config.Lib.tonKotlin)
     implementation(platform(Config.Lib.okHttpBom))
     implementation(Config.Lib.okHttpCore)
+    implementation(Config.Lib.serializationJson)
+    implementation(Config.Lib.tonKotlin)
 
     implementation(project(Config.Module.dataCore))
     implementation(project(Config.Module.dataTonApi))

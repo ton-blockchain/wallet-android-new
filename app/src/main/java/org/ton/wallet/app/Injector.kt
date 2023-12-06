@@ -178,7 +178,6 @@ object Injector {
             singleton<WalletRepository> {
                 WalletRepositoryImpl(
                     tonClient = getInstance(),
-                    defaultPreferences = getInstance(DefaultSharedPreferences),
                     securedPreferences = getInstance(SecuredSharedPreferences),
                 )
             }

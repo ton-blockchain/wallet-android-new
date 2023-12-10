@@ -16,7 +16,7 @@ import org.ton.wallet.uicomponents.util.ClipboardController
 import kotlin.math.max
 
 class MainEmptyAdapter(
-    var clipboardController: ClipboardController?
+    private val clipboardController: ClipboardController?
 ) : RecyclerAdapter<MainEmptyAdapter.MainEmptyItem, MainEmptyAdapter.ViewHolder>() {
 
     private val item = MainEmptyItem()

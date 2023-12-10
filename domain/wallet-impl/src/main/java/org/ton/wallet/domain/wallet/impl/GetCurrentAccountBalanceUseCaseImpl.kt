@@ -36,8 +36,7 @@ class GetCurrentAccountBalanceUseCaseImpl(
                     var fiatBalance = BigDecimal(balance ?: 0)
                     fiatBalance = fiatBalance.movePointLeft(TonCoin.Decimals)
                     fiatBalance = fiatBalance.multiply(BigDecimal.valueOf(fiatPrice))
-                    val formattedAmount = Formatter.getFormattedAmount(fiatBalance, fiatCurrency.currencySymbol)
-                    "≈ $formattedAmount"
+                    Formatter.getFormattedAmount(fiatBalance, fiatCurrency.currencySymbol, true)
                 }
         }
     }

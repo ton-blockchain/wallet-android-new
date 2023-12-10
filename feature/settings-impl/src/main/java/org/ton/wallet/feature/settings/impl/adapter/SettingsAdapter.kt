@@ -4,6 +4,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import org.ton.wallet.lib.lists.diff.DiffUtilObjectCallback
 import org.ton.wallet.lib.lists.diff.DiffUtilRecyclerAdapter
+import org.ton.wallet.uicomponents.vh.*
 
 class SettingsAdapter(
     private val callback: SettingsAdapterCallback

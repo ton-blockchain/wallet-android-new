@@ -46,7 +46,7 @@ object Formatter {
         return spannableBuilder
     }
 
-    fun getFormattedAmount(amount: Long): String {
+    fun getFormattedAmount(amount: Long, isApproximate: Boolean = false): String {
         val divider = 10.0.pow(9.0).toLong()
         val integerPart = amount / divider
         val decimalPart = amount % divider
@@ -64,13 +64,18 @@ object Formatter {
         }
 
         val formatBuilder = stringBuilder.getSafe().clear()
+            .apply {
+                if (isApproximate) {
+                    append("≈ ")
+                }
+            }
             .append("%d.%0")
             .append(decimals)
             .append('d')
         return String.format(locale, formatBuilder.toString(), abs(integerPart), abs(decimalPart / (pow / 10)))
     }
 
-    fun getFormattedAmount(balance: BigDecimal, currencySymbol: String): String {
+    fun getFormattedAmount(balance: BigDecimal, currencySymbol: String, isApproximate: Boolean = false): String {
         var value = balance.stripTrailingZeros()
         if (value.scale() > 0) {
             value = value.setScale(2, RoundingMode.HALF_UP)
@@ -78,7 +83,14 @@ object Formatter {
 
         val decimals = value.scale()
         val format = stringBuilder.getSafe().clear()
-            .append("%s%.").append(decimals).append('f')
+            .apply {
+                if (isApproximate) {
+                    append("≈ ")
+                }
+            }
+            .append("%s%.")
+            .append(decimals)
+            .append('f')
             .toString()
         return String.format(Res.getCurrentLocale(), format, currencySymbol, balance)
     }
@@ -99,11 +111,11 @@ object Formatter {
         return hash?.hiddenMiddle(6, 6)
     }
 
-    fun getBeautifiedShortString(shortString: String, font: Typeface): SpannableStringBuilder {
+    fun getBeautifiedShortString(shortString: CharSequence, font: Typeface): SpannableStringBuilder {
         return getBeautifiedShortStringSafe(shortString, font)!!
     }
 
-    fun getBeautifiedShortStringSafe(shortString: String?, font: Typeface): SpannableStringBuilder? {
+    fun getBeautifiedShortStringSafe(shortString: CharSequence?, font: Typeface): SpannableStringBuilder? {
         if (shortString.isNullOrEmpty()) {
             return null
         }

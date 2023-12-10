@@ -1,4 +1,4 @@
-package org.ton.wallet.feature.settings.impl.adapter
+package org.ton.wallet.uicomponents.vh
 
 import org.ton.wallet.lib.lists.diff.DiffUtilItem
 

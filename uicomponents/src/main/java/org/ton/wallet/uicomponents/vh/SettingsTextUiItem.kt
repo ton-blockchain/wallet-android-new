@@ -1,26 +1,31 @@
-package org.ton.wallet.feature.settings.impl.adapter
+package org.ton.wallet.uicomponents.vh
 
-import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.util.TypedValue
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-import android.widget.LinearLayout
+import android.view.ViewGroup.MarginLayoutParams
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.annotation.ColorInt
+import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import org.ton.wallet.core.Res
+import org.ton.wallet.core.ThreadUtils
 import org.ton.wallet.lib.lists.RecyclerHolder
 import org.ton.wallet.lib.lists.diff.DiffUtilItem
 import org.ton.wallet.uikit.*
 
 data class SettingsTextUiItem(
     override val id: Int,
-    val title: String,
-    var value: String? = null,
+    val title: CharSequence,
+    var value: CharSequence? = null,
     @ColorInt
-    val titleColor: Int = Color.TRANSPARENT
+    val titleColor: Int? = null,
+    @ColorInt
+    val valueColor: Int? = null,
+    val valueDrawableStart: Drawable? = null
 ) : SettingsUiItem, DiffUtilItem {
 
     override fun areItemsTheSame(newItem: DiffUtilItem): Boolean {
@@ -36,42 +41,47 @@ class SettingsTextValueChangePayload(val value: String?)
 
 class SettingsTextViewHolder(
     parent: ViewGroup,
-    private val callback: SettingsTextItemCallback
-) : RecyclerHolder<SettingsTextUiItem>(LinearLayout(parent.context)), View.OnClickListener {
+    private val callback: SettingsTextItemCallback? = null
+) : RecyclerHolder<SettingsTextUiItem>(FrameLayout(parent.context)), View.OnLayoutChangeListener, View.OnClickListener {
 
     private val titleView = TextView(parent.context)
     private val valueView = TextView(parent.context)
 
     init {
-        val rootLayout = itemView as LinearLayout
+        val rootLayout = itemView as FrameLayout
         rootLayout.layoutParams = RecyclerView.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
-        rootLayout.orientation = LinearLayout.HORIZONTAL
         rootLayout.setBackgroundResource(RUiKitDrawable.ripple_rect)
-        rootLayout.setOnClickListener(this)
         rootLayout.setPadding(Res.dp(20), Res.dp(16), Res.dp(20), Res.dp(16))
+        if (callback != null) {
+            rootLayout.setOnClickListener(this)
+        }
 
-        val titleLayoutParams = LinearLayout.LayoutParams(0, WRAP_CONTENT)
-        titleLayoutParams.weight = 1f
+        titleView.addOnLayoutChangeListener(this)
+        titleView.gravity = Gravity.START
         titleView.includeFontPadding = false
-        titleView.setTextColor(DefaultTextColor)
         titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
         titleView.typeface = Res.font(RUiKitFont.roboto_regular)
-        rootLayout.addView(titleView, titleLayoutParams)
+        rootLayout.addView(titleView, WRAP_CONTENT, WRAP_CONTENT)
 
-        val valueLayoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
-        valueLayoutParams.marginStart = Res.dp(8)
+        valueView.compoundDrawablePadding = Res.dp(5)
         valueView.includeFontPadding = false
-        valueView.setTextColor(Res.color(RUiKitColor.blue))
         valueView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
         valueView.typeface = Res.font(RUiKitFont.roboto_regular)
+        val valueLayoutParams = FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
+        valueLayoutParams.marginStart = Res.dp(8)
+        valueLayoutParams.gravity = Gravity.END or Gravity.CENTER_VERTICAL
         rootLayout.addView(valueView, valueLayoutParams)
     }
 
     override fun bind(item: SettingsTextUiItem) {
         super.bind(item)
         titleView.text = item.title
-        titleView.setTextColor(if (item.titleColor == Color.TRANSPARENT) DefaultTextColor else item.titleColor)
+        titleView.setTextColor(item.titleColor ?: DefaultTextColor)
+
+        valueView.compoundDrawablePadding = if (item.value == null) 0 else Res.dp(5)
         valueView.text = item.value
+        valueView.setTextColor(item.valueColor ?: DefaultValueColor)
+        valueView.setCompoundDrawablesWithIntrinsicBounds(item.valueDrawableStart, null, null, null)
     }
 
     override fun bindPayload(payload: Any) {
@@ -84,13 +94,21 @@ class SettingsTextViewHolder(
         }
     }
 
+    override fun onLayoutChange(v: View, left: Int, top: Int, right: Int, bottom: Int, oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int) {
+        if (v == titleView && (oldRight - oldLeft) != (right - left)) {
+            valueView.updateLayoutParams<MarginLayoutParams> { marginStart = v.width + Res.dp(8) }
+            ThreadUtils.postOnMain { valueView.requestLayout() }
+        }
+    }
+
     override fun onClick(v: View?) {
-        callback.onTextItemClicked(item)
+        callback?.onTextItemClicked(item)
     }
 
     private companion object {
 
-        private val DefaultTextColor = Res.color(R.color.common_black)
+        private val DefaultTextColor = Res.color(RUiKitColor.common_black)
+        private val DefaultValueColor = Res.color(RUiKitColor.blue)
     }
 }
 

@@ -7,6 +7,7 @@ import android.os.SystemClock
 import android.text.*
 import android.util.AttributeSet
 import android.view.View
+import androidx.annotation.ColorInt
 import androidx.core.math.MathUtils.clamp
 import org.ton.wallet.core.Res
 import org.ton.wallet.coreui.Formatter
@@ -173,6 +174,11 @@ class AmountView @JvmOverloads constructor(
         }
 
         requestLayout()
+    }
+
+    fun setTextColor(@ColorInt color: Int) {
+        defaultTextPaint.color = color
+        smallTextPaint.color = color
     }
 
     private fun getFormattedTextStaticLayout(text: CharSequence, paint: TextPaint): StaticLayout {

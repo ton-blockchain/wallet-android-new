@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import org.ton.wallet.core.Res
 import org.ton.wallet.lib.lists.RecyclerHolder
 import org.ton.wallet.lib.lists.diff.DiffUtilItem
+import org.ton.wallet.uicomponents.vh.SettingsUiItem
 import org.ton.wallet.uicomponents.view.SwitchView
 import org.ton.wallet.uikit.*
 

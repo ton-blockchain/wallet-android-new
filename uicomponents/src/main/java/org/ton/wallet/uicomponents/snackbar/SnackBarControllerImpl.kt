@@ -33,9 +33,11 @@ class SnackBarControllerImpl : SnackBarController {
     override fun showMessage(message: SnackBarMessage) {
         if (snackBarPopupWindow.isShowing) {
             handler.removeCallbacksAndMessages(null)
-            snackBarPopupWindow.close {
-                handler.post {
-                    showMessageInternal(message)
+            handler.post {
+                snackBarPopupWindow.close {
+                    handler.post {
+                        showMessageInternal(message)
+                    }
                 }
             }
         } else {

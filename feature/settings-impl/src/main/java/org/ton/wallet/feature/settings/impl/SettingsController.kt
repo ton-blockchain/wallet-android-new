@@ -18,6 +18,8 @@ import org.ton.wallet.uicomponents.dialog.AlertDialog
 import org.ton.wallet.uicomponents.drawable.TopRoundRectDrawable
 import org.ton.wallet.uicomponents.popup.BasePopupWindow
 import org.ton.wallet.uicomponents.popup.MenuPopupWindow
+import org.ton.wallet.uicomponents.vh.SettingsTextUiItem
+import org.ton.wallet.uicomponents.vh.SettingsUiItem
 import org.ton.wallet.uicomponents.view.AppToolbar
 import org.ton.wallet.uikit.RUiKitColor
 import org.ton.wallet.uikit.RUiKitDimen

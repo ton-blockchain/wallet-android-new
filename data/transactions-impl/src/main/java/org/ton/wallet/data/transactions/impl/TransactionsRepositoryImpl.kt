@@ -5,10 +5,10 @@ import drinkless.org.ton.TonApi
 import drinkless.org.ton.TonApi.QueryInfo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import org.ton.block.AddrStd
-import org.ton.block.Message
+import org.ton.block.*
 import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
+import org.ton.tlb.loadTlb
 import org.ton.wallet.data.core.BuildConfig
 import org.ton.wallet.data.core.model.*
 import org.ton.wallet.data.core.ton.MessageText
@@ -208,18 +208,27 @@ class TransactionsRepositoryImpl(
         )
         val queryInfo = tonClient.sendRequestTyped<QueryInfo>(request)
 
-        val stateInitCell = account.getStateInit()
+        val stateInitCell = if (account.isAccountDeployed) account.getStateInit() else null
         val externalMessage = TonMessageBuilder.buildExternalMessage(
             destAddress = AddrStd.parseUserFriendly(sendParams.account.address),
             stateInit = stateInitCell,
             cell = transactionCell,
         )
+
         return SendInfo(queryInfo = queryInfo, externalMessage = externalMessage)
     }
 
     private suspend fun mapRawTransactionToDto(raw: TonApi.RawTransaction, accountId: Int): TransactionDto {
-        // TODO: must check that inMsg is an internal message, not external (don't display external messages in UI)
-        val inMessageDto = if (raw.outMsgs.isNullOrEmpty()) {
+        var isInMsgInternal = false
+        val firstDataCell = BagOfCells(raw.data).roots.firstOrNull()
+        if (firstDataCell != null) {
+            val tx = firstDataCell.beginParse()
+                .loadTlb(Transaction)
+            val inMsgInfo = tx.r1.value.inMsg.value?.value?.info
+            isInMsgInternal = inMsgInfo !is ExtInMsgInfo
+        }
+
+        val inMessageDto = if (isInMsgInternal) {
             TransactionMessageDto(
                 amount = raw.inMsg.value,
                 address = raw.inMsg.source?.accountAddress?.let { getUfNonBounceableAddress(it) },

@@ -3,6 +3,7 @@ package org.ton.wallet.feature.wallet.impl.main.adapter
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.annotation.Px
 import org.ton.wallet.core.Res
 import org.ton.wallet.coreui.Formatter
 import org.ton.wallet.feature.wallet.impl.R
@@ -14,12 +15,13 @@ import org.ton.wallet.uicomponents.util.ClipboardController
 import org.ton.wallet.uicomponents.view.amount.AmountView
 
 internal class MainHeaderAdapter(
-    var callback: HeaderItemCallback?,
-    var clipboardController: ClipboardController?
+    private val callback: HeaderItemCallback?,
+    private val clipboardController: ClipboardController?
 ) : RecyclerAdapter<MainHeaderAdapter.HeaderItem, MainHeaderAdapter.ViewHolder>() {
 
     private val item = HeaderItem()
 
+    @Px
     var height = 0
 
     init {

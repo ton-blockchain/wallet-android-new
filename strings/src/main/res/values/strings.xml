@@ -126,6 +126,7 @@
     <string name="share_this_address">Share this address with other TON\u00A0wallet owners to\u00A0receive TON from\u00A0them.</string>
     <string name="share_your_ton_address">Share your TON wallet address</string>
     <string name="share_wallet_address">Share Wallet Address</string>
+    <string name="show_details">Show details</string>
     <string name="show_recovery_phrase">Show recovery phrase</string>
     <string name="skip">Skip</string>
     <string name="start_description">TON Wallet allows you to\u00A0make fast and\u00A0secure blockchain-based payments without\u00A0intermediaries.</string>
@@ -145,6 +146,7 @@
     <string name="ton_transfer">TON Transfer</string>
     <string name="toncoin_have_been_sent">%1$s Toncoin have been sent to</string>
     <string name="too_bad">Too Bad!</string>
+    <string name="total_amount">Total Amount</string>
     <string name="transaction_expired">Transaction expired</string>
     <string name="transaction_title">Transaction</string>
     <string name="transaction_hash_copied_to_clipboard">Transaction hash copied to clipboard</string>

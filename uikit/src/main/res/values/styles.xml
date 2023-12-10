@@ -4,6 +4,7 @@
     <!-- Text -->
     <style name="Text" parent="Widget.AppCompat.TextView">
         <item name="android:fontFamily">@font/roboto_regular</item>
+        <item name="android:includeFontPadding">false</item>
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">15sp</item>
     </style>

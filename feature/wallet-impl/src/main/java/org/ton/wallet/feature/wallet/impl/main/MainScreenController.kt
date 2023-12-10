@@ -37,7 +37,9 @@ class MainScreenController(args: Bundle?) : BaseViewModelController<MainScreenVi
     private val headerAdapter = MainHeaderAdapter(this, clipboardController)
     private val emptyAdapter = MainEmptyAdapter(clipboardController)
     private val transactionsAdapter = MainTransactionsAdapter(this)
-    private val concatAdapterConfig = ConcatAdapter.Config.Builder().setIsolateViewTypes(false).build()
+    private val concatAdapterConfig = ConcatAdapter.Config.Builder()
+        .setIsolateViewTypes(false)
+        .build()
     private val concatAdapter = ConcatAdapter(concatAdapterConfig, headerAdapter)
 
     private val bottomSheetDrawable = MainBottomSheetDrawable(Res.context)

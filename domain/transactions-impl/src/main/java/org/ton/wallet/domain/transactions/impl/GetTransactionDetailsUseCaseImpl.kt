@@ -22,7 +22,7 @@ class GetTransactionDetailsUseCaseImpl(
         val transaction = transactionsRepository.getTransaction(id) ?: return null
 
         var amountSpannable: SpannableStringBuilder? = null
-        val amount = transaction.amount
+        val amount = transaction.getTotalAmount()
         Log.d("GetTransactionDetailsUseCaseImpl", "amount: $amount")
         if (amount != null) {
             val amountString = Formatter.getFormattedAmount(amount)
@@ -56,7 +56,7 @@ class GetTransactionDetailsUseCaseImpl(
             if (transaction.status == TransactionStatus.Pending) null
             else Formatter.getBeautifiedShortStringSafe(Formatter.getShortHash(hash), Res.font(RUiKitFont.roboto_regular))
         val peerShortAddress = Formatter.getBeautifiedShortStringSafe(
-            shortString = Formatter.getShortAddressSafe(transaction.peerAddress),
+            shortString = Formatter.getShortAddressSafe(transaction.getFirstAddress()),
             font = Res.font(RUiKitFont.roboto_regular)
         )
         return TransactionDetailsState(
@@ -67,8 +67,8 @@ class GetTransactionDetailsUseCaseImpl(
             amountString = amountSpannable,
             fee = feeText,
             date = dateText,
-            message = transaction.message,
-            peerAddress = transaction.peerAddress,
+            message = transaction.getMessage(),
+            peerAddress = transaction.getFirstAddress(),
             peerDns = null,
             peerShortAddress = peerShortAddress,
             hashShort = hashShort,

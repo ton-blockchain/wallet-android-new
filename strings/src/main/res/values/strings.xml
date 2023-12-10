@@ -165,4 +165,9 @@
     <string name="your_wallet_address">Your wallet address</string>
     <string name="you_didnt_have_time">You didn\'t have enough time to\u00A0write these words down.</string>
 
+    <plurals name="addresses">
+        <item quantity="one">%1$d address</item>
+        <item quantity="other">%1$d addresses</item>
+    </plurals>
+
 </resources>

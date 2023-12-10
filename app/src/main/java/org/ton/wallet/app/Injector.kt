@@ -257,7 +257,8 @@ object Injector {
                 GetTransactionsUseCaseImpl(
                     accountsRepository = getInstance(),
                     transactionsRepository = getInstance(),
-                    settingsRepository = getInstance()
+                    settingsRepository = getInstance(),
+                    getAddressTypeUseCase = getInstance()
                 )
             }
             singleton<RefreshCurrentAccountStateUseCase> {

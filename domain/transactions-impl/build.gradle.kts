@@ -19,6 +19,7 @@ dependencies {
     implementation(project(Config.Module.dataTonClientApi))
     implementation(project(Config.Module.dataTransactionsApi))
     implementation(project(Config.Module.dataWalletApi))
+    implementation(project(Config.Module.domainBlockchainApi))
     implementation(project(Config.Module.domainTransactionsApi))
     implementation(project(Config.Module.domainWalletApi))
     implementation(project(Config.Module.libCore))

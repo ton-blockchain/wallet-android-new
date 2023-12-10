@@ -239,7 +239,7 @@ class SendConnectConfirmViewModel(
                     val messageItem = SettingsTextUiItem(id = 0, title = Res.str(RString.message), value = message, valueColor = valueColor)
                     adapterItems.add(messageItem)
                 }
-                if (isMultipleItems) {
+                if (isMultipleItems || messages.size == 1) {
                     adapterItems.add(SectionDividerItem)
                 }
             }

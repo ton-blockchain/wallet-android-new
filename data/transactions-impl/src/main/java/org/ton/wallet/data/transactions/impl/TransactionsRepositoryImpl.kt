@@ -49,14 +49,7 @@ class TransactionsRepositoryImpl(
         }
 
         // collect pending transactions
-        val lastHashes = transactionsDao.getLastExecutedTransactionHashes(account.id)
         val nonExecutedTransactions = transactionsDao.getAllNonExecuted(account.id)
-        val pendingTransactionsHashes = hashSetOf<String>()
-        nonExecutedTransactions.forEach { dto ->
-            if (dto.status == TransactionStatus.Pending) {
-                pendingTransactionsHashes.add(dto.hash)
-            }
-        }
 
         // load transactions from api
         val accountAddress = TonApi.AccountAddress(account.address)
@@ -72,20 +65,7 @@ class TransactionsRepositoryImpl(
                 null
             } ?: break
 
-            if (lastHashes.isNotEmpty()) {
-                for (rawTransaction in transactionsResponse.transactions) {
-                    val rawTransactionHash = Base64.encodeToString(rawTransaction.transactionId.hash, Base64.NO_WRAP)
-                    val rawTransactionInMsgHash = Base64.encodeToString(rawTransaction.inMsg?.bodyHash ?: byteArrayOf(), Base64.NO_WRAP)
-                    if (pendingTransactionsHashes.contains(rawTransactionHash) || pendingTransactionsHashes.contains(rawTransactionInMsgHash)) {
-                        pendingTransactionsHashes.remove(rawTransactionHash)
-                        pendingTransactionsHashes.remove(rawTransactionInMsgHash)
-                    }
-                    apiTransactions.add(rawTransaction)
-                }
-            } else {
-                apiTransactions.addAll(transactionsResponse.transactions)
-            }
-
+            apiTransactions.addAll(transactionsResponse.transactions)
             fromId = if (transactionsResponse.previousTransactionId.lt == 0L) {
                 null
             } else {
@@ -101,7 +81,7 @@ class TransactionsRepositoryImpl(
             // check if this transaction was non-executed locally
             var foundNonExecuted = false
             for (nonExecutedTransaction in nonExecutedTransactions) {
-                if (nonExecutedTransaction.hash == dto.hash || nonExecutedTransaction.hash == dto.inMsgBodyHash) {
+                if (nonExecutedTransaction.hash == dto.hash) {
                     transactionsDao.update(nonExecutedTransaction.internalId, dto)
                     foundNonExecuted = true
                 }

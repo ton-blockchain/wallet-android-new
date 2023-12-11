@@ -13,6 +13,7 @@ import org.ton.wallet.coreui.Formatter
 import org.ton.wallet.coreui.KeyboardUtils
 import org.ton.wallet.data.core.link.LinkAction
 import org.ton.wallet.data.core.link.LinkUtils
+import org.ton.wallet.domain.blockhain.api.AddressType
 import org.ton.wallet.domain.blockhain.api.GetAddressTypeUseCase
 import org.ton.wallet.domain.transactions.api.GetRecentSendTransactionsUseCase
 import org.ton.wallet.feature.scanqr.api.ScanQrScreenApi
@@ -49,7 +50,11 @@ class SendAddressViewModel(private val args: SendAddressScreenArguments) : BaseV
         }
 
         viewModelScope.launch(Dispatchers.IO) {
-            val recent = getRecentSendTransactionsUseCase.invoke().map { dto ->
+            val recent = getRecentSendTransactionsUseCase.invoke().mapNotNull { dto ->
+                val addressType = getAddressTypeUseCase.guessAddressType(dto.address)
+                if (addressType !is AddressType.UserFriendlyAddress) {
+                    return@mapNotNull null
+                }
                 RecentAddressItem(
                     address = dto.address,
                     shortAddress = Formatter.getShortAddress(dto.address),

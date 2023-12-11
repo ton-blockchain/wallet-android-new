@@ -83,8 +83,9 @@ class TonClientImpl(
                 override fun onResult(result: TonApi.Object) {
                     if (result is TonApi.Error) {
                         L.e("TonApi.Error ${result.code}: ${result.message}")
-                        val retryRequest = result.message.startsWith("LITE_SERVER_NOTREADY")
-                                || result.message.contains("LITE_SERVER_UNKNOWN: block is not applied")
+//                        val retryRequest = result.message.startsWith("LITE_SERVER_NOTREADY")
+//                                || result.message.contains("LITE_SERVER_UNKNOWN: block is not applied")
+                        val retryRequest = false
                         if (retryRequest) {
                             L.d("Retry send request")
                             trySendRequest(cont, request, this, exceptionHandler)

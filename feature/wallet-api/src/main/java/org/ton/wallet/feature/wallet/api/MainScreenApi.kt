@@ -12,5 +12,5 @@ interface MainScreenApi {
 
     fun navigateToSend()
 
-    fun navigateToTransactionsDetails(internalId: Long)
+    fun navigateToTransactionsDetails(internalId: Long, isMultiMessage: Boolean)
 }

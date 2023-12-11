@@ -7,7 +7,8 @@ import org.ton.wallet.screen.ScreenArguments
 
 @Parcelize
 class TransactionDetailsScreenArguments(
-    val internalId: Long
+    val internalId: Long,
+    val isMultiMessage: Boolean
 ) : ScreenArguments {
 
     @IgnoredOnParcel

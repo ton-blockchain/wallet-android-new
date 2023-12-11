@@ -25,7 +25,6 @@ import org.ton.wallet.domain.settings.api.DeleteWalletUseCase
 import org.ton.wallet.feature.passcode.api.PassCodeEnterScreenApi
 import org.ton.wallet.feature.passcode.api.PassCodeSetupScreenApi
 import org.ton.wallet.feature.settings.api.SettingsScreenApi
-import org.ton.wallet.feature.settings.impl.adapter.SettingsHeaderItem
 import org.ton.wallet.feature.settings.impl.adapter.SettingsSwitchItem
 import org.ton.wallet.lib.security.BiometricUtils
 import org.ton.wallet.screen.viewmodel.BaseViewModel
@@ -33,6 +32,7 @@ import org.ton.wallet.strings.RString
 import org.ton.wallet.uicomponents.popup.MenuPopupWindow
 import org.ton.wallet.uicomponents.snackbar.SnackBarController
 import org.ton.wallet.uicomponents.snackbar.SnackBarMessage
+import org.ton.wallet.uicomponents.vh.SettingsHeaderItem
 import org.ton.wallet.uicomponents.vh.SettingsTextUiItem
 import org.ton.wallet.uikit.RUiKitColor
 import pub.devrel.easypermissions.EasyPermissions

@@ -15,12 +15,15 @@ android {
 
 dependencies {
     implementation(Config.Lib.conductor)
+    implementation(Config.Lib.recyclerView)
+    implementation(project(Config.Module.dataCore))
     implementation(project(Config.Module.dataTransactionsApi))
     implementation(project(Config.Module.domainTransactionsApi))
     implementation(project(Config.Module.featureTransactionsApi))
     implementation(project(Config.Module.libCore))
     implementation(project(Config.Module.libCoreUi))
     implementation(project(Config.Module.libLog))
+    implementation(project(Config.Module.libLists))
     implementation(project(Config.Module.libRLottie))
     implementation(project(Config.Module.libScreen))
     implementation(project(Config.Module.strings))

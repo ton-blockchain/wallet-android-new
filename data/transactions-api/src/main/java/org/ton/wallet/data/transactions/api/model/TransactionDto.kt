@@ -14,6 +14,9 @@ data class TransactionDto(
     val inMsgBodyHash: String? = null,
 ) {
 
+    val isMultiMessage: Boolean
+        get() = (outMessages?.size ?: 0) > 1
+
     val type: Type =
         if (outMessages?.isNotEmpty() == true) Type.Out
         else if (inMessage != null) Type.In
@@ -23,7 +26,7 @@ data class TransactionDto(
         return outMessages?.firstOrNull()?.address ?: inMessage?.address
     }
 
-    fun getMessage(): String? {
+    fun getTextMessage(): String? {
         return outMessages?.firstOrNull()?.message ?: inMessage?.message
     }
 

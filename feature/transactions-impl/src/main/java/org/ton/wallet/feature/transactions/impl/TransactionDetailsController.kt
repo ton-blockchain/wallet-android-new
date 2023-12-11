@@ -2,40 +2,59 @@ package org.ton.wallet.feature.transactions.impl
 
 import android.os.Bundle
 import android.view.*
+import android.widget.TextView
 import androidx.core.view.isVisible
-import com.bluelinelabs.conductor.ControllerChangeHandler
-import com.bluelinelabs.conductor.ControllerChangeType
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import org.ton.wallet.core.Res
-import org.ton.wallet.coreui.ext.setOnClickListener
+import org.ton.wallet.core.ThreadUtils
 import org.ton.wallet.coreui.ext.setOnClickListenerWithLock
-import org.ton.wallet.data.transactions.api.model.TransactionDto
-import org.ton.wallet.data.transactions.api.model.TransactionStatus
 import org.ton.wallet.domain.transactions.api.model.TransactionDetailsState
 import org.ton.wallet.screen.controller.BaseViewModelBottomSheetController
 import org.ton.wallet.screen.getScreenArguments
 import org.ton.wallet.screen.viewmodel.viewModels
-import org.ton.wallet.strings.RString
 import org.ton.wallet.uicomponents.BottomSheetHelper
-import org.ton.wallet.uicomponents.drawable.IndeterminateProgressDrawable
-import org.ton.wallet.uikit.RUiKitColor
+import org.ton.wallet.uicomponents.vh.LineDividerItemDecoration
+import org.ton.wallet.uicomponents.vh.SettingsTextUiItem
+import org.ton.wallet.uicomponents.view.AppToolbar
+import org.ton.wallet.uikit.RUiKitDrawable
+import org.ton.wallet.uikit.RUiKitStyle
 
-class TransactionDetailsController(args: Bundle?) : BaseViewModelBottomSheetController<TransactionDetailsViewModel>(args) {
+class TransactionDetailsController(args: Bundle?) : BaseViewModelBottomSheetController<TransactionDetailsViewModel>(args),
+    TransactionDetailsAdapter.Callback {
 
-    override val viewModel by viewModels { TransactionDetailsViewModel(args.getScreenArguments()) }
+    private val screenArguments: TransactionDetailsScreenArguments = args.getScreenArguments()
+    
+    override val viewModel by viewModels { TransactionDetailsViewModel(screenArguments) }
+    override val isFullHeight: Boolean = screenArguments.isMultiMessage
 
-    private var _binding: TransactionDetailsBinding? = null
-    private val binding get() = _binding!!
+    private val adapter = TransactionDetailsAdapter(this)
+
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var button: TextView
+    private lateinit var bottomShadowView: View
 
     override fun createBottomSheetView(inflater: LayoutInflater, container: ViewGroup?, savedViewState: Bundle?): View {
-        _binding = TransactionDetailsBinding(inflater, container)
-        BottomSheetHelper.connectAppToolbarWithScrollableView(binding.toolbar, binding.scrollView)
+        val view = inflater.inflate(R.layout.screen_transaction_details, container, false)
+        view.minimumHeight = Res.dp(300)
+        view.setOnClickListener { }
 
-        binding.explorerButton.setOnClickListenerWithLock { viewModel.onViewExplorerClicked(activity!!) }
-        binding.hashLayout.setOnClickListener(viewModel::onHashClicked)
-        binding.peerAddressLayout.setOnClickListener(viewModel::onPeerAddressClicked)
-        binding.button.setOnClickListenerWithLock(viewModel::onButtonClicked)
+        recyclerView = view.findViewById(R.id.transactionRecyclerView)
+        recyclerView.adapter = adapter
+        recyclerView.addItemDecoration(LineDividerItemDecoration())
+        recyclerView.itemAnimator = null
+        recyclerView.layoutManager = LinearLayoutManager(activity)
+        recyclerView.setHasFixedSize(true)
 
-        return binding.root
+        button = view.findViewById(R.id.transactionButton)
+        button.setOnClickListenerWithLock { viewModel.onButtonClicked(activity!!) }
+
+        bottomShadowView = view.findViewById(R.id.transactionBottomShadow)
+
+        val toolbar = view.findViewById<AppToolbar>(R.id.transactionToolbar)
+        BottomSheetHelper.connectAppToolbarWithScrollableView(toolbar, recyclerView)
+
+        return view
     }
 
     override fun onViewCreated(view: View) {
@@ -43,65 +62,23 @@ class TransactionDetailsController(args: Bundle?) : BaseViewModelBottomSheetCont
         viewModel.stateFlow.launchInViewScope(::onStateChanged)
     }
 
-    override fun onDestroyView(view: View) {
-        _binding = null
-        super.onDestroyView(view)
+    override fun onTextItemClicked(item: SettingsTextUiItem) {
+        viewModel.onTextItemClicked(activity!!, item)
     }
 
-    override fun onChangeEnded(changeHandler: ControllerChangeHandler, changeType: ControllerChangeType) {
-        super.onChangeEnded(changeHandler, changeType)
-        if (changeType.isEnter) {
-            binding.animationView.playAnimation()
-        }
-    }
+    private fun onStateChanged(state: TransactionDetailsState) {
+        adapter.setItems(state.adapterItems)
+        ThreadUtils.postOnMain({
+            bottomShadowView.isVisible = recyclerView.canScrollVertically(1) || recyclerView.canScrollVertically(-1)
+        }, 32)
 
-    private fun onStateChanged(state: TransactionDetailsState?) {
-        if (state == null) {
-            return
+        button.text = state.buttonTitle
+        if (state.isButtonStylePrimary) {
+            button.setBackgroundResource(RUiKitDrawable.bkg_button_primary)
+            button.setTextAppearance(RUiKitStyle.Button_Big_Primary)
+        } else {
+            button.setBackgroundResource(RUiKitDrawable.bkg_button_secondary)
+            button.setTextAppearance(RUiKitStyle.Button_Big_Secondary)
         }
-        binding.amountText.text = state.amountString
-        binding.feeText.text = state.fee
-        binding.feeText.isVisible = state.fee != null
-        binding.dateText.text = state.date
-        binding.dateText.isVisible = state.date != null
-        binding.messageText.text = state.message
-        binding.messageText.isVisible = !state.message.isNullOrEmpty()
-        binding.recipientLayout.isVisible = state.peerDns != null
-        binding.recipientAddressText.text = state.peerDns
-        binding.button.text = state.buttonText
-
-        binding.peerAddressTitleText.text = when (state.type) {
-            TransactionDto.Type.In -> Res.str(RString.sender_address)
-            TransactionDto.Type.Out -> Res.str(RString.recipient_address)
-            TransactionDto.Type.Unknown -> null
-        }
-        binding.peerAddressValueText.text = state.peerShortAddress
-        binding.peerAddressLayout.isVisible = state.type != TransactionDto.Type.Unknown
-        binding.hashValueText.text = state.hashShort
-        binding.hashLayout.isVisible = state.hashShort != null
-        binding.explorerButton.isVisible = state.hashShort != null
-
-        when (state.status) {
-            TransactionStatus.Executed -> Unit
-            TransactionStatus.Pending -> {
-                binding.statusText.text = Res.str(RString.pending)
-                binding.statusText.setTextColor(Res.color(RUiKitColor.blue))
-            }
-            TransactionStatus.Cancelled -> {
-                binding.statusText.text = Res.str(RString.cancelled)
-                binding.statusText.setTextColor(Res.color(RUiKitColor.text_error))
-            }
-        }
-        val startDrawable =
-            if (state.status != TransactionStatus.Pending) {
-                null
-            } else {
-                IndeterminateProgressDrawable(Res.dp(13)).apply {
-                    setStrokeWidth(Res.dp(1.5f))
-                    setColor(Res.color(RUiKitColor.blue))
-                }
-            }
-        binding.statusText.setCompoundDrawablesRelativeWithIntrinsicBounds(startDrawable, null, null, null)
-        binding.statusText.isVisible = state.status != TransactionStatus.Executed
     }
 }

@@ -2,7 +2,6 @@ package org.ton.wallet.feature.send.impl.connect
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.text.SpannableStringBuilder
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.ton.block.*
@@ -12,7 +11,6 @@ import org.ton.tlb.CellRef
 import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.wallet.core.Res
 import org.ton.wallet.coreui.Formatter
-import org.ton.wallet.coreui.util.FontSpan
 import org.ton.wallet.data.core.model.MessageData
 import org.ton.wallet.data.core.model.getText
 import org.ton.wallet.data.core.util.CoroutineScopes
@@ -225,10 +223,8 @@ class SendConnectConfirmViewModel(
             if (isNeedShowMessage) {
                 val recipientAddressType = getAddressTypeUseCase.getAddressType(messageData.destination)
                 val recipientAddress = recipientAddressType?.ufAddress?.let(Formatter::getShortAddress) ?: messageData.destination
-                val recipientAddressSequence = SpannableStringBuilder(recipientAddress)
-                recipientAddressSequence.setSpan(FontSpan(Res.font(R.font.robotomono_regular)), 0, recipientAddressSequence.length, SpannableStringBuilder.SPAN_INCLUSIVE_INCLUSIVE)
-                val recipientAddressResultSequence = Formatter.getBeautifiedShortString(recipientAddressSequence, Res.font(RUiKitFont.roboto_regular))
-                val recipientItem = SettingsTextUiItem(id = 0, title = Res.str(RString.recipient), value = recipientAddressResultSequence, valueColor = valueColor)
+                val recipientAddressSequence = Formatter.getBeautifiedAddressString(recipientAddress, Res.font(R.font.robotomono_regular), Res.font(RUiKitFont.roboto_regular))
+                val recipientItem = SettingsTextUiItem(id = 0, title = Res.str(RString.recipient), value = recipientAddressSequence, valueColor = valueColor)
                 adapterItems.add(recipientItem)
 
                 val amountItem = SettingsTextUiItem(id = 0, title = Res.str(RString.total_amount), value = Formatter.getFormattedAmount(messageData.amount, true), valueColor = valueColor, valueDrawableStart = gemDrawable)

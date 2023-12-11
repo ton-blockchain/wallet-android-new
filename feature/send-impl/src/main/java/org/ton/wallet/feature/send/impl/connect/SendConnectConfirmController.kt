@@ -48,7 +48,6 @@ class SendConnectConfirmController(args: Bundle?) : BaseViewModelBottomSheetCont
         recyclerView = view.findViewById(R.id.sendConfirmRecyclerView)
         recyclerView.adapter = adapter
         recyclerView.addItemDecoration(LineDividerItemDecoration())
-        recyclerView.isNestedScrollingEnabled = false
         recyclerView.itemAnimator = null
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.setHasFixedSize(true)

@@ -140,7 +140,8 @@ class GetTransactionsUseCaseImpl(
             peerAddressShort = peerAddressBuilder,
             timeString = timeString,
             feeString = feeString,
-            messageText = dto.getMessage()
+            messageText = dto.getTextMessage(),
+            isMultiMessage = dto.isMultiMessage
         )
     }
 }

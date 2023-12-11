@@ -111,6 +111,12 @@ object Formatter {
         return hash?.hiddenMiddle(6, 6)
     }
 
+    fun getBeautifiedAddressString(address: String, contentFont: Typeface, dotsFont: Typeface): SpannableStringBuilder {
+        val recipientAddressSequence = SpannableStringBuilder(getShortAddress(address))
+        recipientAddressSequence.setSpan(FontSpan(contentFont), 0, recipientAddressSequence.length, SpannableStringBuilder.SPAN_INCLUSIVE_INCLUSIVE)
+        return getBeautifiedShortString(recipientAddressSequence, dotsFont)
+    }
+
     fun getBeautifiedShortString(shortString: CharSequence, font: Typeface): SpannableStringBuilder {
         return getBeautifiedShortStringSafe(shortString, font)!!
     }
@@ -120,12 +126,11 @@ object Formatter {
             return null
         }
         val stringBuilder = SpannableStringBuilder(shortString)
-        stringBuilder.setSpan(
-            FontSpan(font),
-            shortString.indexOfFirst { it == '.' },
-            shortString.indexOfLast { it == '.' } + 1,
-            Spannable.SPAN_INCLUSIVE_INCLUSIVE
-        )
+        val indexOfFirstDot = shortString.indexOfFirst { it == '.' }
+        val indexOfLastDot = shortString.indexOfLast { it == '.' } + 1
+        if (indexOfFirstDot > -1 && indexOfLastDot > -1) {
+            stringBuilder.setSpan(FontSpan(font), indexOfFirstDot, indexOfLastDot, Spannable.SPAN_INCLUSIVE_INCLUSIVE)
+        }
         return stringBuilder
     }
 

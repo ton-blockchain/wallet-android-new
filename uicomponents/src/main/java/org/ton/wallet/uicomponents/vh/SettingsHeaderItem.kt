@@ -1,4 +1,4 @@
-package org.ton.wallet.feature.settings.impl.adapter
+package org.ton.wallet.uicomponents.vh
 
 import android.text.TextUtils
 import android.util.TypedValue

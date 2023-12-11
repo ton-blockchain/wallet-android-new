@@ -35,7 +35,7 @@ internal class MainScreenApiImpl(
         navigator.push(SendAddressScreenArguments())
     }
 
-    override fun navigateToTransactionsDetails(internalId: Long) {
-        navigator.push(TransactionDetailsScreenArguments(internalId))
+    override fun navigateToTransactionsDetails(internalId: Long, isMultiMessage: Boolean) {
+        navigator.push(TransactionDetailsScreenArguments(internalId, isMultiMessage))
     }
 }

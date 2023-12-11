@@ -121,7 +121,7 @@ class MainScreenViewModel : BaseViewModel() {
     }
 
     fun onTransactionClicked(item: TransactionDataUiListItem) {
-        screenApi.navigateToTransactionsDetails(item.internalId)
+        screenApi.navigateToTransactionsDetails(item.internalId, item.isMultiMessage)
     }
 
     fun onRefresh() {

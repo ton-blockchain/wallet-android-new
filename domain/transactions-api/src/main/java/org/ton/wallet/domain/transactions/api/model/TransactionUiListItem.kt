@@ -13,5 +13,6 @@ class TransactionDataUiListItem(
     val peerAddressShort: CharSequence?,
     val timeString: String?,
     val feeString: String?,
-    val messageText: String?
+    val messageText: String?,
+    val isMultiMessage: Boolean
 ) : TransactionBaseUiListItem()

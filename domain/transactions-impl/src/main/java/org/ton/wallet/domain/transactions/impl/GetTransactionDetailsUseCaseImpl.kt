@@ -60,19 +60,22 @@ class GetTransactionDetailsUseCaseImpl(
             font = Res.font(RUiKitFont.roboto_regular)
         )
         return TransactionDetailsState(
-            hash = hash,
-            status = transaction.status,
-            type = transaction.type,
-            amount = amount,
-            amountString = amountSpannable,
-            fee = feeText,
-            date = dateText,
-            message = transaction.getMessage(),
-            peerAddress = transaction.getFirstAddress(),
-            peerDns = null,
-            peerShortAddress = peerShortAddress,
-            hashShort = hashShort,
-            buttonText = buttonText
+            emptyList(),
+            "",
+            true
+//            hash = hash,
+//            status = transaction.status,
+//            type = transaction.type,
+//            amount = amount,
+//            amountString = amountSpannable,
+//            fee = feeText,
+//            date = dateText,
+//            message = transaction.getMessage(),
+//            peerAddress = transaction.getFirstAddress(),
+//            peerDns = null,
+//            peerShortAddress = peerShortAddress,
+//            hashShort = hashShort,
+//            buttonText = buttonText
         )
     }
 }

@@ -81,7 +81,7 @@ class TransactionsRepositoryImpl(
             // check if this transaction was non-executed locally
             var foundNonExecuted = false
             for (nonExecutedTransaction in nonExecutedTransactions) {
-                if (nonExecutedTransaction.hash == dto.hash) {
+                if (nonExecutedTransaction.hash == dto.hash || nonExecutedTransaction.hash == Base64.encodeToString(rawTransaction.inMsg.bodyHash, Base64.NO_WRAP)) {
                     transactionsDao.update(nonExecutedTransaction.internalId, dto)
                     foundNonExecuted = true
                 }

@@ -79,15 +79,16 @@ class TonClientImpl(
     private suspend fun sendRequestInternal(request: TonApi.Function): TonApi.Object {
         return suspendCoroutine { cont ->
             val exceptionHandler = Client.ExceptionHandler(cont::resumeWithException)
+            var retriesCount = 1
             val resultHandler = object : Client.ResultHandler {
                 override fun onResult(result: TonApi.Object) {
                     if (result is TonApi.Error) {
                         L.e("TonApi.Error ${result.code}: ${result.message}")
-//                        val retryRequest = result.message.startsWith("LITE_SERVER_NOTREADY")
-//                                || result.message.contains("LITE_SERVER_UNKNOWN: block is not applied")
-                        val retryRequest = false
-                        if (retryRequest) {
-                            L.d("Retry send request")
+                        val retryRequest = result.message.startsWith("LITE_SERVER_NOTREADY")
+                                || result.message.contains("LITE_SERVER_UNKNOWN: block is not applied")
+                        if (retryRequest && retriesCount < 3) {
+                            retriesCount++
+                            L.d("Retry send ($retriesCount attempt): $request")
                             trySendRequest(cont, request, this, exceptionHandler)
                         } else {
                             cont.resumeWithException(TonApiException(result))

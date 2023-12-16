@@ -12,6 +12,7 @@ object SqlTableTransactions : SqlTable {
     const val ColumnHash = "hash"
     const val ColumnAccountId = "accountId"
     const val ColumnTimestampSec = "timestampSec"
+    const val ColumnLt = "lt"
     const val ColumnFee = "fee"
     const val ColumnStorageFee = "storageFee"
     const val ColumnStatus = "status"
@@ -40,7 +41,12 @@ object SqlTableTransactions : SqlTable {
             .addColumn(ColumnStatus, SqlColumnBuilder.Type.INTEGER) {
                 isNotNull = true
             }
-            .addColumn(ColumnTimestampSec, SqlColumnBuilder.Type.INTEGER)
+            .addColumn(ColumnTimestampSec, SqlColumnBuilder.Type.INTEGER) {
+                isNotNull = true
+            }
+            .addColumn(ColumnLt, SqlColumnBuilder.Type.INTEGER) {
+                isNotNull = true
+            }
             .addColumn(ColumnFee, SqlColumnBuilder.Type.INTEGER)
             .addColumn(ColumnStorageFee, SqlColumnBuilder.Type.INTEGER)
             .addColumn(ColumnValidUntil, SqlColumnBuilder.Type.INTEGER)

@@ -197,6 +197,7 @@ class TransactionsDaoImpl(
         values.put(SqlTableTransactions.ColumnHash, transaction.hash)
         values.put(SqlTableTransactions.ColumnAccountId, accountId)
         values.put(SqlTableTransactions.ColumnTimestampSec, transaction.timestampSec)
+        values.put(SqlTableTransactions.ColumnLt, transaction.lt)
         values.put(SqlTableTransactions.ColumnStatus, transaction.status.ordinal)
         values.put(SqlTableTransactions.ColumnFee, transaction.fee)
         values.put(SqlTableTransactions.ColumnStorageFee, transaction.storageFee)
@@ -219,12 +220,13 @@ class TransactionsDaoImpl(
             table = SqlTableTransactions.tableName,
             selection = selection,
             selectionArgs = selectionArgs,
-            orderBy = "${SqlTableTransactions.ColumnTimestampSec} DESC"
+            orderBy = "${SqlTableTransactions.ColumnTimestampSec} DESC, ${SqlTableTransactions.ColumnLt} DESC"
         )?.use { cursor ->
             val cursorIndexInternalId = cursor.getColumnIndex(SqlTableTransactions.ColumnInternalId)
             val cursorIndexHash = cursor.getColumnIndex(SqlTableTransactions.ColumnHash)
             val cursorIndexAccountId = cursor.getColumnIndex(SqlTableTransactions.ColumnAccountId)
             val cursorIndexTimestampSec = cursor.getColumnIndex(SqlTableTransactions.ColumnTimestampSec)
+            val cursorIndexLt = cursor.getColumnIndex(SqlTableTransactions.ColumnLt)
             val cursorIndexStatus = cursor.getColumnIndex(SqlTableTransactions.ColumnStatus)
             val cursorIndexFee = cursor.getColumnIndex(SqlTableTransactions.ColumnFee)
             val cursorIndexStorageFee = cursor.getColumnIndex(SqlTableTransactions.ColumnStorageFee)
@@ -240,7 +242,8 @@ class TransactionsDaoImpl(
                     internalId = cursor.getLong(cursorIndexInternalId),
                     hash = cursor.getString(cursorIndexHash),
                     accountId = cursor.getInt(cursorIndexAccountId),
-                    timestampSec = cursor.getLongOrNull(cursorIndexTimestampSec),
+                    timestampSec = cursor.getLong(cursorIndexTimestampSec),
+                    lt = cursor.getLong(cursorIndexLt),
                     status = TransactionStatus.entries[cursor.getInt(cursorIndexStatus)],
                     fee = cursor.getLongOrNull(cursorIndexFee),
                     storageFee = cursor.getLongOrNull(cursorIndexStorageFee),

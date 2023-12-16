@@ -49,20 +49,24 @@ class TonAccount(
         return Base64.decode(publicKeyBase64, Base64.URL_SAFE).copyOfRange(2, 34)
     }
 
-    fun getStateInitBytes(): ByteArray? {
-        val stateInit = getStateInit() ?: return null
+    fun getStateInitBytes(): ByteArray {
+        val stateInit = getStateInit()
         val stateInitCell = CellBuilder()
             .storeTlb(StateInit.tlbCodec(), stateInit)
             .endCell()
         return BagOfCells(stateInitCell).toByteArray()
     }
 
-    fun getStateInit(): StateInit? {
+    fun getStateInitOrNullIfDeployed(): StateInit? {
         return if (isAccountDeployed) {
             null
         } else {
-            StateInit(code = getCodeCell(), data = getDataCell())
+            getStateInit()
         }
+    }
+
+    private fun getStateInit(): StateInit {
+        return StateInit(code = getCodeCell(), data = getDataCell())
     }
 
 

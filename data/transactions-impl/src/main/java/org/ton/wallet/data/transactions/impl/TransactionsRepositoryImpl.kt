@@ -140,6 +140,7 @@ class TransactionsRepositoryImpl(
             accountId = sendParams.account.id,
             status = TransactionStatus.Pending,
             timestampSec = System.currentTimeMillis() / 1000,
+            lt = 0,
             validUntilSec = queryInfo.validUntil,
             inMessage = null,
             outMessages = sendParams.messages.map { outMessage ->
@@ -188,7 +189,7 @@ class TransactionsRepositoryImpl(
         )
         val queryInfo = tonClient.sendRequestTyped<QueryInfo>(request)
 
-        val stateInitCell = if (account.isAccountDeployed) account.getStateInit() else null
+        val stateInitCell = account.getStateInitOrNullIfDeployed()
         val externalMessage = TonMessageBuilder.buildExternalMessage(
             destAddress = AddrStd.parseUserFriendly(sendParams.account.address),
             stateInit = stateInitCell,
@@ -232,6 +233,7 @@ class TransactionsRepositoryImpl(
             hash = Base64.encodeToString(raw.transactionId.hash, Base64.NO_WRAP),
             accountId = accountId,
             timestampSec = raw.utime,
+            lt = raw.transactionId?.lt ?: 0L,
             status = TransactionStatus.Executed,
             fee = raw.fee,
             storageFee = raw.storageFee,

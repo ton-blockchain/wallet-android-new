@@ -35,6 +35,7 @@ class ScanQrViewModel(private val args: ScanQrScreenArguments) : BaseViewModel()
             context.vibrate()
             val bundle = Bundle()
             bundle.putParcelable(ScanQrScreenApi.ArgumentKeyLinkAction, linkAction)
+            bundle.putString(ScanQrScreenApi.ArgumentKeyQrValue, value)
             setResult(ScanQrScreenApi.ResultCodeQrDetected, bundle)
             true
         } else {

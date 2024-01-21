@@ -1,20 +1,20 @@
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.kotlinSerialization)
     id("kotlin-parcelize")
-    id("kotlinx-serialization")
 }
+
+apply(from = "${rootDir}/gradle/common.gradle")
 
 android {
     namespace = "org.ton.wallet.app"
-    compileSdk = Config.Build.compileSdk
 
     defaultConfig {
         applicationId = "org.ton.wallet"
-        minSdk = Config.Build.minSdk
-        targetSdk = Config.Build.targetSdk
-        versionCode = Config.App.versionCode
-        versionName = Config.App.versionName
+        targetSdk = 34
+        versionCode = 1
+        versionName = "1.0.0"
     }
     buildFeatures {
         buildConfig = true
@@ -54,81 +54,78 @@ android {
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
-        sourceCompatibility = Config.Version.javaSource
-        targetCompatibility = Config.Version.javaTarget
     }
-    kotlinOptions.jvmTarget = Config.Version.jvmTarget
 }
 
 dependencies {
-    coreLibraryDesugaring(Config.Lib.desugar)
+    coreLibraryDesugaring(libs.desugar)
 
-    implementation(Config.Lib.appCompat)
-    implementation(Config.Lib.biometric)
-    implementation(Config.Lib.browser)
-    implementation(Config.Lib.conductor)
-    implementation(Config.Lib.easyPermissions)
-    implementation(platform(Config.Lib.okHttpBom))
-    implementation(Config.Lib.okHttpCore)
-    implementation(Config.Lib.okHttpLogging)
-    implementation(Config.Lib.recyclerView)
-    implementation(Config.Lib.security)
-    implementation(Config.Lib.serializationJson)
+    implementation(libs.appcompat)
+    implementation(libs.biometric)
+    implementation(libs.browser)
+    implementation(libs.conductor)
+    implementation(libs.easyPermissions)
+    implementation(libs.serializationJson)
+    implementation(platform(libs.okHttpBom))
+    implementation(libs.okHttpCore)
+    implementation(libs.okHttpLogging)
+    implementation(libs.recyclerview)
+    implementation(libs.security)
 
-    implementation(project(Config.Module.libCore))
-    implementation(project(Config.Module.libDi))
-    implementation(project(Config.Module.libLists))
-    implementation(project(Config.Module.libLog))
-    implementation(project(Config.Module.libScreen))
-    implementation(project(Config.Module.libSecurity))
-    implementation(project(Config.Module.libSqlite))
-    implementation(project(Config.Module.libTonConnect))
+    implementation(project(":lib:core"))
+    implementation(project(":lib:di"))
+    implementation(project(":lib:lists"))
+    implementation(project(":lib:log"))
+    implementation(project(":lib:screen"))
+    implementation(project(":lib:security"))
+    implementation(project(":lib:sqlite"))
+    implementation(project(":lib:tonconnect"))
 
-    implementation(project(Config.Module.dataAuthApi))
-    implementation(project(Config.Module.dataAuthImpl))
-    implementation(project(Config.Module.dataCore))
-    implementation(project(Config.Module.dataNotificationsApi))
-    implementation(project(Config.Module.dataNotificationsImpl))
-    implementation(project(Config.Module.dataPricesApi))
-    implementation(project(Config.Module.dataPricesImpl))
-    implementation(project(Config.Module.dataSettingsApi))
-    implementation(project(Config.Module.dataSettingsImpl))
-    implementation(project(Config.Module.dataTransactionsApi))
-    implementation(project(Config.Module.dataTransactionsImpl))
-    implementation(project(Config.Module.dataTonClientApi))
-    implementation(project(Config.Module.dataTonClientImpl))
-    implementation(project(Config.Module.dataWalletApi))
-    implementation(project(Config.Module.dataWalletImpl))
+    implementation(project(":data:auth-api"))
+    implementation(project(":data:auth-impl"))
+    implementation(project(":data:core"))
+    implementation(project(":data:notifications-api"))
+    implementation(project(":data:notifications-impl"))
+    implementation(project(":data:prices-api"))
+    implementation(project(":data:prices-impl"))
+    implementation(project(":data:settings-api"))
+    implementation(project(":data:settings-impl"))
+    implementation(project(":data:transactions-api"))
+    implementation(project(":data:transactions-impl"))
+    implementation(project(":data:tonclient-api"))
+    implementation(project(":data:tonclient-impl"))
+    implementation(project(":data:wallet-api"))
+    implementation(project(":data:wallet-impl"))
 
-    implementation(project(Config.Module.domainBlockchainApi))
-    implementation(project(Config.Module.domainBlockchainImpl))
-    implementation(project(Config.Module.domainSettingsApi))
-    implementation(project(Config.Module.domainSettingsImpl))
-    implementation(project(Config.Module.domainTonConnectApi))
-    implementation(project(Config.Module.domainTonConnectImpl))
-    implementation(project(Config.Module.domainTransactionsApi))
-    implementation(project(Config.Module.domainTransactionsImpl))
-    implementation(project(Config.Module.domainWalletApi))
-    implementation(project(Config.Module.domainWalletImpl))
+    implementation(project(":domain:blockchain-api"))
+    implementation(project(":domain:blockchain-impl"))
+    implementation(project(":domain:settings-api"))
+    implementation(project(":domain:settings-impl"))
+    implementation(project(":domain:tonconnect-api"))
+    implementation(project(":domain:tonconnect-impl"))
+    implementation(project(":domain:transactions-api"))
+    implementation(project(":domain:transactions-impl"))
+    implementation(project(":domain:wallet-api"))
+    implementation(project(":domain:wallet-impl"))
 
-    implementation(project(Config.Module.featureOnboardingApi))
-    implementation(project(Config.Module.featureOnboardingImpl))
-    implementation(project(Config.Module.featurePasscodeApi))
-    implementation(project(Config.Module.featurePasscodeImpl))
-    implementation(project(Config.Module.featureScanQrApi))
-    implementation(project(Config.Module.featureScanQrImpl))
-    implementation(project(Config.Module.featureSendApi))
-    implementation(project(Config.Module.featureSendImpl))
-    implementation(project(Config.Module.featureSettingsApi))
-    implementation(project(Config.Module.featureSettingsImpl))
-    implementation(project(Config.Module.featureTonConnectApi))
-    implementation(project(Config.Module.featureTonConnectImpl))
-    implementation(project(Config.Module.featureTransactionsApi))
-    implementation(project(Config.Module.featureTransactionsImpl))
-    implementation(project(Config.Module.featureWalletApi))
-    implementation(project(Config.Module.featureWalletImpl))
+    implementation(project(":feature:onboarding-api"))
+    implementation(project(":feature:onboarding-impl"))
+    implementation(project(":feature:passcode-api"))
+    implementation(project(":feature:passcode-impl"))
+    implementation(project(":feature:scanqr-api"))
+    implementation(project(":feature:scanqr-impl"))
+    implementation(project(":feature:send-api"))
+    implementation(project(":feature:send-impl"))
+    implementation(project(":feature:settings-api"))
+    implementation(project(":feature:settings-impl"))
+    implementation(project(":feature:tonconnect-api"))
+    implementation(project(":feature:tonconnect-impl"))
+    implementation(project(":feature:transactions-api"))
+    implementation(project(":feature:transactions-impl"))
+    implementation(project(":feature:wallet-api"))
+    implementation(project(":feature:wallet-impl"))
 
-    implementation(project(Config.Module.strings))
-    implementation(project(Config.Module.uicomponents))
-    implementation(project(Config.Module.uikit))
+    implementation(project(":strings"))
+    implementation(project(":uicomponents"))
+    implementation(project(":uikit"))
 }

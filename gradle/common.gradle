@@ -1,0 +1,5 @@
+apply from: "${rootDir}/gradle/common-java.gradle"
+
+android {
+    kotlinOptions.jvmTarget = "1.8"
+}

@@ -1,26 +1,23 @@
 plugins {
-    id("com.android.library")
-    kotlin("android")
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
 }
+
+apply(from = "${rootDir}/gradle/common.gradle")
 
 android {
     namespace = "org.ton.wallet.data.tonclient.impl"
-    compileSdk = Config.Build.compileSdk
-    defaultConfig {
-        minSdk = Config.Build.minSdk
-    }
-    kotlinOptions.jvmTarget = Config.Version.jvmTarget
 }
 
 dependencies {
-    implementation(Config.Lib.coroutines)
-    implementation(platform(Config.Lib.okHttpBom))
-    implementation(Config.Lib.okHttpCore)
-    implementation(Config.Lib.serializationJson)
-    implementation(Config.Lib.tonKotlin)
+    implementation(libs.coroutines)
+    implementation(libs.serializationJson)
+    implementation(platform(libs.okHttpBom))
+    implementation(libs.okHttpCore)
+    implementation(libs.tonKotlin)
 
-    implementation(project(Config.Module.dataCore))
-    implementation(project(Config.Module.dataTonApi))
-    implementation(project(Config.Module.dataTonClientApi))
-    implementation(project(Config.Module.libLog))
+    implementation(project(":data:core"))
+    implementation(project(":data:tonapi"))
+    implementation(project(":data:tonclient-api"))
+    implementation(project(":lib:log"))
 }

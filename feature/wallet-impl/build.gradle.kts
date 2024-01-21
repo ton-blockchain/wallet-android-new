@@ -1,43 +1,40 @@
 plugins {
-    id("com.android.library")
-    kotlin("android")
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
 }
+
+apply(from = "${rootDir}/gradle/common.gradle")
 
 android {
     namespace = "org.ton.wallet.feature.wallet.impl"
-    compileSdk = Config.Build.compileSdk
-    defaultConfig {
-        minSdk = Config.Build.minSdk
-    }
-    kotlinOptions.jvmTarget = Config.Version.jvmTarget
 }
 
 dependencies {
-    implementation(Config.Lib.conductor)
-    implementation(Config.Lib.constraintLayout)
-    implementation(Config.Lib.easyPermissions)
-    implementation(Config.Lib.recyclerView)
+    implementation(libs.conductor)
+    implementation(libs.constraintLayout)
+    implementation(libs.easyPermissions)
+    implementation(libs.recyclerview)
 
-    implementation(project(Config.Module.dataCore))
-    implementation(project(Config.Module.dataNotificationsApi))
-    implementation(project(Config.Module.dataSettingsApi))
-    implementation(project(Config.Module.dataTransactionsApi))
-    implementation(project(Config.Module.dataWalletApi))
-    implementation(project(Config.Module.domainTransactionsApi))
-    implementation(project(Config.Module.domainWalletApi))
-    implementation(project(Config.Module.featureScanQrApi))
-    implementation(project(Config.Module.featureWalletApi))
+    implementation(project(":data:core"))
+    implementation(project(":data:notifications-api"))
+    implementation(project(":data:settings-api"))
+    implementation(project(":data:transactions-api"))
+    implementation(project(":data:wallet-api"))
+    implementation(project(":domain:transactions-api"))
+    implementation(project(":domain:wallet-api"))
+    implementation(project(":feature:scanqr-api"))
+    implementation(project(":feature:wallet-api"))
 
-    implementation(project(Config.Module.libCore))
-    implementation(project(Config.Module.libCoreUi))
-    implementation(project(Config.Module.libDi))
-    implementation(project(Config.Module.libLists))
-    implementation(project(Config.Module.libLog))
-    implementation(project(Config.Module.libQrBuilder))
-    implementation(project(Config.Module.libRLottie))
-    implementation(project(Config.Module.libScreen))
+    implementation(project(":lib:core"))
+    implementation(project(":lib:core-ui"))
+    implementation(project(":lib:di"))
+    implementation(project(":lib:lists"))
+    implementation(project(":lib:log"))
+    implementation(project(":lib:qr-builder"))
+    implementation(project(":lib:rlottie"))
+    implementation(project(":lib:screen"))
 
-    implementation(project(Config.Module.strings))
-    implementation(project(Config.Module.uicomponents))
-    implementation(project(Config.Module.uikit))
+    implementation(project(":strings"))
+    implementation(project(":uicomponents"))
+    implementation(project(":uikit"))
 }

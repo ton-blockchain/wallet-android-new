@@ -1,22 +1,19 @@
 plugins {
-    id("com.android.library")
-    kotlin("android")
-    id("kotlinx-serialization")
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.kotlinSerialization)
 }
+
+apply(from = "${rootDir}/gradle/common.gradle")
 
 android {
     namespace = "org.ton.wallet.data.transactions.api"
-    compileSdk = Config.Build.compileSdk
-    defaultConfig {
-        minSdk = Config.Build.minSdk
-    }
-    kotlinOptions.jvmTarget = Config.Version.jvmTarget
 }
 
 dependencies {
-    implementation(Config.Lib.coroutines)
-    implementation(Config.Lib.tonKotlin)
-    implementation(project(Config.Module.dataCore))
-    implementation(project(Config.Module.dataWalletApi))
-    implementation(project(Config.Module.libCore))
+    implementation(libs.coroutines)
+    implementation(libs.tonKotlin)
+    implementation(project(":data:core"))
+    implementation(project(":data:wallet-api"))
+    implementation(project(":lib:core"))
 }

@@ -1,19 +1,16 @@
 plugins {
-    id("com.android.library")
-    kotlin("android")
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
 }
+
+apply(from = "${rootDir}/gradle/common.gradle")
 
 android {
     namespace = "org.ton.wallet.domain.transactions.api"
-    compileSdk = Config.Build.compileSdk
-    defaultConfig {
-        minSdk = Config.Build.minSdk
-    }
-    kotlinOptions.jvmTarget = Config.Version.jvmTarget
 }
 
 dependencies {
-    implementation(Config.Lib.tonKotlin)
-    implementation(project(Config.Module.dataCore))
-    implementation(project(Config.Module.dataTransactionsApi))
+    implementation(libs.tonKotlin)
+    implementation(project(":data:core"))
+    implementation(project(":data:transactions-api"))
 }

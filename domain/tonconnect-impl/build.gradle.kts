@@ -1,27 +1,24 @@
 plugins {
-    id("com.android.library")
-    kotlin("android")
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
 }
+
+apply(from = "${rootDir}/gradle/common.gradle")
 
 android {
     namespace = "org.ton.wallet.domain.tonconnect.impl"
-    compileSdk = Config.Build.compileSdk
-    defaultConfig {
-        minSdk = Config.Build.minSdk
-    }
-    kotlinOptions.jvmTarget = Config.Version.jvmTarget
 }
 
 dependencies {
-    implementation(Config.Lib.coroutines)
-    implementation(Config.Lib.serializationJson)
-    implementation(Config.Lib.tonKotlin)
-    implementation(project(Config.Module.dataCore))
-    implementation(project(Config.Module.dataWalletApi))
-    implementation(project(Config.Module.domainBlockchainApi))
-    implementation(project(Config.Module.domainTonConnectApi))
-    implementation(project(Config.Module.domainWalletApi))
-    implementation(project(Config.Module.libCore))
-    implementation(project(Config.Module.libSecurity))
-    implementation(project(Config.Module.libTonConnect))
+    implementation(libs.coroutines)
+    implementation(libs.serializationJson)
+    implementation(libs.tonKotlin)
+    implementation(project(":data:core"))
+    implementation(project(":data:wallet-api"))
+    implementation(project(":domain:blockchain-api"))
+    implementation(project(":domain:tonconnect-api"))
+    implementation(project(":domain:wallet-api"))
+    implementation(project(":lib:core"))
+    implementation(project(":lib:security"))
+    implementation(project(":lib:tonconnect"))
 }

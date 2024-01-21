@@ -1,44 +1,41 @@
 plugins {
-    id("com.android.library")
-    kotlin("android")
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
     id("kotlin-parcelize")
 }
 
+apply(from = "${rootDir}/gradle/common.gradle")
+
 android {
     namespace = "org.ton.wallet.feature.onboarding.impl"
-    compileSdk = Config.Build.compileSdk
-    defaultConfig {
-        minSdk = Config.Build.minSdk
-    }
     buildFeatures {
         buildConfig = true
     }
-    kotlinOptions.jvmTarget = Config.Version.jvmTarget
 }
 
 dependencies {
-    implementation(Config.Lib.conductor)
-    implementation(Config.Lib.recyclerView)
+    implementation(libs.conductor)
+    implementation(libs.recyclerview)
 
-    implementation(project(Config.Module.dataCore))
-    implementation(project(Config.Module.dataAuthApi))
-    implementation(project(Config.Module.dataSettingsApi))
-    implementation(project(Config.Module.dataTonClientApi))
-    implementation(project(Config.Module.dataWalletApi))
-    implementation(project(Config.Module.domainBlockchainApi))
-    implementation(project(Config.Module.domainWalletApi))
-    implementation(project(Config.Module.featureOnboardingApi))
-    implementation(project(Config.Module.featurePasscodeApi))
+    implementation(project(":data:core"))
+    implementation(project(":data:auth-api"))
+    implementation(project(":data:settings-api"))
+    implementation(project(":data:tonclient-api"))
+    implementation(project(":data:wallet-api"))
+    implementation(project(":domain:blockchain-api"))
+    implementation(project(":domain:wallet-api"))
+    implementation(project(":feature:onboarding-api"))
+    implementation(project(":feature:passcode-api"))
 
-    implementation(project(Config.Module.libCore))
-    implementation(project(Config.Module.libCoreUi))
-    implementation(project(Config.Module.libLists))
-    implementation(project(Config.Module.libLog))
-    implementation(project(Config.Module.libScreen))
-    implementation(project(Config.Module.libSecurity))
-    implementation(project(Config.Module.libRLottie))
+    implementation(project(":lib:core"))
+    implementation(project(":lib:core-ui"))
+    implementation(project(":lib:lists"))
+    implementation(project(":lib:log"))
+    implementation(project(":lib:screen"))
+    implementation(project(":lib:security"))
+    implementation(project(":lib:rlottie"))
 
-    implementation(project(Config.Module.strings))
-    implementation(project(Config.Module.uicomponents))
-    implementation(project(Config.Module.uikit))
+    implementation(project(":strings"))
+    implementation(project(":uicomponents"))
+    implementation(project(":uikit"))
 }

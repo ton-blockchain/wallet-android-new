@@ -1,29 +1,26 @@
 plugins {
-    id("com.android.library")
-    kotlin("android")
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.kotlinSerialization)
     id("kotlin-parcelize")
-    id("kotlinx-serialization")
 }
+
+apply(from = "${rootDir}/gradle/common.gradle")
 
 android {
     namespace = "org.ton.wallet.data.core"
-    compileSdk = Config.Build.compileSdk
-    defaultConfig {
-        minSdk = Config.Build.minSdk
-    }
     buildFeatures {
         buildConfig = true
     }
-    kotlinOptions.jvmTarget = Config.Version.jvmTarget
 }
 
 dependencies {
-    implementation(Config.Lib.annotation)
-    implementation(Config.Lib.coroutines)
-    implementation(platform(Config.Lib.okHttpBom))
-    implementation(Config.Lib.okHttpCore)
-    implementation(Config.Lib.serializationJson)
-    implementation(Config.Lib.tonKotlin)
+    implementation(libs.annotation)
+    implementation(libs.coroutines)
+    implementation(platform(libs.okHttpBom))
+    implementation(libs.okHttpCore)
+    implementation(libs.serializationJson)
+    implementation(libs.tonKotlin)
 
-    implementation(project(Config.Module.libCore))
+    implementation(project(":lib:core"))
 }

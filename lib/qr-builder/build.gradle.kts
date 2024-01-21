@@ -1,11 +1,9 @@
 plugins {
-    id("com.android.library")
+    alias(libs.plugins.androidLibrary)
 }
+
+apply(from = "${rootDir}/gradle/common-java.gradle")
 
 android {
     namespace = "org.ton.wallet.lib.qr"
-    compileSdk = Config.Build.compileSdk
-    defaultConfig {
-        minSdk = Config.Build.minSdk
-    }
 }

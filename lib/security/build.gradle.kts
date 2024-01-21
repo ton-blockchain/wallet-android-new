@@ -1,16 +1,12 @@
 plugins {
-    id("com.android.library")
-    kotlin("android")
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
 }
+
+apply(from = "${rootDir}/gradle/common.gradle")
 
 android {
     namespace = "org.ton.wallet.lib.security"
-    compileSdk = Config.Build.compileSdk
-    ndkVersion = Config.Build.ndkVersion
-    defaultConfig {
-        minSdk = Config.Build.minSdk
-    }
-    kotlinOptions.jvmTarget = Config.Version.jvmTarget
 
     externalNativeBuild {
         cmake {
@@ -20,5 +16,5 @@ android {
 }
 
 dependencies {
-    implementation(Config.Lib.biometric)
+    implementation(libs.biometric)
 }

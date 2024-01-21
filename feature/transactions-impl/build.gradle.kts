@@ -1,32 +1,29 @@
 plugins {
-    id("com.android.library")
-    kotlin("android")
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
     id("kotlin-parcelize")
 }
 
+apply(from = "${rootDir}/gradle/common.gradle")
+
 android {
     namespace = "org.ton.wallet.feature.transactions.impl"
-    compileSdk = Config.Build.compileSdk
-    defaultConfig {
-        minSdk = Config.Build.minSdk
-    }
-    kotlinOptions.jvmTarget = Config.Version.jvmTarget
 }
 
 dependencies {
-    implementation(Config.Lib.conductor)
-    implementation(Config.Lib.recyclerView)
-    implementation(project(Config.Module.dataCore))
-    implementation(project(Config.Module.dataTransactionsApi))
-    implementation(project(Config.Module.domainTransactionsApi))
-    implementation(project(Config.Module.featureTransactionsApi))
-    implementation(project(Config.Module.libCore))
-    implementation(project(Config.Module.libCoreUi))
-    implementation(project(Config.Module.libLog))
-    implementation(project(Config.Module.libLists))
-    implementation(project(Config.Module.libRLottie))
-    implementation(project(Config.Module.libScreen))
-    implementation(project(Config.Module.strings))
-    implementation(project(Config.Module.uicomponents))
-    implementation(project(Config.Module.uikit))
+    implementation(libs.conductor)
+    implementation(libs.recyclerview)
+    implementation(project(":data:core"))
+    implementation(project(":data:transactions-api"))
+    implementation(project(":domain:transactions-api"))
+    implementation(project(":feature:transactions-api"))
+    implementation(project(":lib:core"))
+    implementation(project(":lib:core-ui"))
+    implementation(project(":lib:log"))
+    implementation(project(":lib:lists"))
+    implementation(project(":lib:rlottie"))
+    implementation(project(":lib:screen"))
+    implementation(project(":strings"))
+    implementation(project(":uicomponents"))
+    implementation(project(":uikit"))
 }

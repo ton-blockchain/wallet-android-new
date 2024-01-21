@@ -1,29 +1,25 @@
 plugins {
-    id("com.android.library")
-    kotlin("android")
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
 }
 
+apply(from = "${rootDir}/gradle/common.gradle")
 android {
     namespace = "org.ton.wallet.domain.transactions.impl"
-    compileSdk = Config.Build.compileSdk
-    defaultConfig {
-        minSdk = Config.Build.minSdk
-    }
-    kotlinOptions.jvmTarget = Config.Version.jvmTarget
 }
 
 dependencies {
-    implementation(Config.Lib.coroutines)
-    implementation(project(Config.Module.dataCore))
-    implementation(project(Config.Module.dataSettingsApi))
-    implementation(project(Config.Module.dataTonClientApi))
-    implementation(project(Config.Module.dataTransactionsApi))
-    implementation(project(Config.Module.dataWalletApi))
-    implementation(project(Config.Module.domainBlockchainApi))
-    implementation(project(Config.Module.domainTransactionsApi))
-    implementation(project(Config.Module.domainWalletApi))
-    implementation(project(Config.Module.libCore))
-    implementation(project(Config.Module.libCoreUi))
-    implementation(project(Config.Module.strings))
-    implementation(project(Config.Module.uikit))
+    implementation(libs.coroutines)
+    implementation(project(":data:core"))
+    implementation(project(":data:settings-api"))
+    implementation(project(":data:tonclient-api"))
+    implementation(project(":data:transactions-api"))
+    implementation(project(":data:wallet-api"))
+    implementation(project(":domain:blockchain-api"))
+    implementation(project(":domain:transactions-api"))
+    implementation(project(":domain:wallet-api"))
+    implementation(project(":lib:core"))
+    implementation(project(":lib:core-ui"))
+    implementation(project(":strings"))
+    implementation(project(":uikit"))
 }

@@ -1,20 +1,17 @@
 plugins {
-    id("com.android.library")
-    kotlin("android")
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
 }
+
+apply(from = "${rootDir}/gradle/common.gradle")
 
 android {
     namespace = "org.ton.wallet.domain.settings.impl"
-    compileSdk = Config.Build.compileSdk
-    defaultConfig {
-        minSdk = Config.Build.minSdk
-    }
-    kotlinOptions.jvmTarget = Config.Version.jvmTarget
 }
 
 dependencies {
-    implementation(project(Config.Module.dataCore))
-    implementation(project(Config.Module.domainSettingsApi))
-    implementation(project(Config.Module.libSqlite))
-    implementation(project(Config.Module.libTonConnect))
+    implementation(project(":data:core"))
+    implementation(project(":domain:settings-api"))
+    implementation(project(":lib:sqlite"))
+    implementation(project(":lib:tonconnect"))
 }

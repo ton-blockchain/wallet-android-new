@@ -1,18 +1,14 @@
 plugins {
-    id("com.android.library")
-    kotlin("android")
-    id("kotlinx-serialization")
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.kotlinSerialization)
     id("kotlin-parcelize")
 }
 
+apply(from = "${rootDir}/gradle/common.gradle")
+
 android {
     namespace = "org.ton.wallet.lib.tonconnect"
-    compileSdk = Config.Build.compileSdk
-    ndkVersion = Config.Build.ndkVersion
-    defaultConfig {
-        minSdk = Config.Build.minSdk
-    }
-    kotlinOptions.jvmTarget = Config.Version.jvmTarget
 
     externalNativeBuild {
         cmake {
@@ -22,15 +18,15 @@ android {
 }
 
 dependencies {
-    implementation(Config.Lib.annotation)
-    implementation(Config.Lib.coroutines)
-    implementation(platform(Config.Lib.okHttpBom))
-    implementation(Config.Lib.okHttpCore)
-    implementation(Config.Lib.okHttpLogging)
-    implementation(Config.Lib.okHttpSse)
-    implementation(Config.Lib.serializationJson)
+    implementation(libs.annotation)
+    implementation(libs.coroutines)
+    implementation(platform(libs.okHttpBom))
+    implementation(libs.okHttpCore)
+    implementation(libs.okHttpLogging)
+    implementation(libs.okHttpSse)
+    implementation(libs.serializationJson)
 
-    implementation(project(Config.Module.dataCore))
-    implementation(project(Config.Module.libCore))
-    implementation(project(Config.Module.libLog))
+    implementation(project(":data:core"))
+    implementation(project(":lib:core"))
+    implementation(project(":lib:log"))
 }

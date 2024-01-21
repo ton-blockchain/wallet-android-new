@@ -1,0 +1,40 @@
+[versions]
+agp = "8.2.1"
+camera2 = "1.3.1"
+kotlin = "1.9.22"
+serialization = "1.6.2"
+
+[libraries]
+activity = { group = "androidx.activity", name = "activity", version = "1.8.2" }
+annotation = { group = "androidx.annotation", name = "annotation", version = "1.7.1" }
+appcompat = { group = "androidx.appcompat", name = "appcompat", version = "1.6.1" }
+barCodeScanner = { group = "com.google.mlkit", name = "barcode-scanning", version = "17.2.0" }
+biometric = { group = "androidx.biometric", name = "biometric", version = "1.1.0" }
+browser = { group = "androidx.browser", name = "browser", version = "1.7.0" }
+camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "camera2" }
+cameraCore = { group = "androidx.camera", name = "camera-core", version.ref = "camera2" }
+cameraLifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "camera2" }
+cameraView = { group = "androidx.camera", name = "camera-view", version.ref = "camera2" }
+coil = { group = "io.coil-kt", name = "coil", version = "2.5.0" }
+conductor = { group = "com.bluelinelabs", name = "conductor", version = "4.0.0-preview-4" }
+constraintLayout = { group = "androidx.constraintlayout", name = "constraintlayout", version = "2.1.4" }
+core = { group = "androidx.core", name = "core-ktx", version = "1.12.0" }
+coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "1.7.3" }
+desugar = { group = "com.android.tools", name = "desugar_jdk_libs", version = "2.0.4" }
+easyPermissions = { group = "pub.devrel", name = "easypermissions", version = "3.0.0" }
+okHttpBom = { group = "com.squareup.okhttp3", name = "okhttp-bom", version = "4.12.0" }
+okHttpCore = { group = "com.squareup.okhttp3", name = "okhttp"}
+okHttpLogging = { group = "com.squareup.okhttp3", name = "logging-interceptor" }
+okHttpSse = { group = "com.squareup.okhttp3", name = "okhttp-sse" }
+recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version = "1.3.2" }
+security = { group = "androidx.security", name = "security-crypto", version = "1.0.0" }
+serializationCore = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "serialization" }
+serializationJson = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
+tonKotlin = { group = "org.ton", name = "ton-kotlin", version = "0.2.15" }
+
+[plugins]
+androidApplication = { id = "com.android.application", version.ref = "agp" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlinParcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }

@@ -1,18 +1,15 @@
 plugins {
-    id("com.android.library")
-    kotlin("android")
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
 }
+
+apply(from = "${rootDir}/gradle/common.gradle")
 
 android {
     namespace = "org.ton.wallet.lib.sqlite"
-    compileSdk = Config.Build.compileSdk
-    defaultConfig {
-        minSdk = Config.Build.minSdk
-    }
-    kotlinOptions.jvmTarget = Config.Version.jvmTarget
 }
 
 dependencies {
-    implementation(Config.Lib.appCompat)
-    api(project(Config.Module.libSqliteLib, configuration = "default"))
+    implementation(libs.appcompat)
+    api(project(":lib:sqlite-lib", configuration = "default"))
 }

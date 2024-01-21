@@ -1,42 +1,39 @@
 plugins {
-    id("com.android.library")
-    kotlin("android")
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
     id("kotlin-parcelize")
 }
 
+apply(from = "${rootDir}/gradle/common.gradle")
+
 android {
     namespace = "org.ton.wallet.feature.send.impl"
-    compileSdk = Config.Build.compileSdk
-    defaultConfig {
-        minSdk = Config.Build.minSdk
-    }
-    kotlinOptions.jvmTarget = Config.Version.jvmTarget
 }
 
 dependencies {
-    implementation(Config.Lib.conductor)
-    implementation(Config.Lib.constraintLayout)
-    implementation(Config.Lib.recyclerView)
-    implementation(Config.Lib.tonKotlin)
-    implementation(project(Config.Module.dataCore))
-    implementation(project(Config.Module.dataTonClientApi))
-    implementation(project(Config.Module.dataTransactionsApi))
-    implementation(project(Config.Module.dataWalletApi))
-    implementation(project(Config.Module.domainBlockchainApi))
-    implementation(project(Config.Module.domainTonConnectApi))
-    implementation(project(Config.Module.domainTransactionsApi))
-    implementation(project(Config.Module.domainWalletApi))
-    implementation(project(Config.Module.featurePasscodeApi))
-    implementation(project(Config.Module.featureScanQrApi))
-    implementation(project(Config.Module.featureSendApi))
-    implementation(project(Config.Module.libCore))
-    implementation(project(Config.Module.libCoreUi))
-    implementation(project(Config.Module.libLists))
-    implementation(project(Config.Module.libLog))
-    implementation(project(Config.Module.libRLottie))
-    implementation(project(Config.Module.libScreen))
-    implementation(project(Config.Module.libTonConnect))
-    implementation(project(Config.Module.strings))
-    implementation(project(Config.Module.uicomponents))
-    implementation(project(Config.Module.uikit))
+    implementation(libs.conductor)
+    implementation(libs.constraintLayout)
+    implementation(libs.recyclerview)
+    implementation(libs.tonKotlin)
+    implementation(project(":data:core"))
+    implementation(project(":data:tonclient-api"))
+    implementation(project(":data:transactions-api"))
+    implementation(project(":data:wallet-api"))
+    implementation(project(":domain:blockchain-api"))
+    implementation(project(":domain:tonconnect-api"))
+    implementation(project(":domain:transactions-api"))
+    implementation(project(":domain:wallet-api"))
+    implementation(project(":feature:passcode-api"))
+    implementation(project(":feature:scanqr-api"))
+    implementation(project(":feature:send-api"))
+    implementation(project(":lib:core"))
+    implementation(project(":lib:core-ui"))
+    implementation(project(":lib:lists"))
+    implementation(project(":lib:log"))
+    implementation(project(":lib:rlottie"))
+    implementation(project(":lib:screen"))
+    implementation(project(":lib:tonconnect"))
+    implementation(project(":strings"))
+    implementation(project(":uicomponents"))
+    implementation(project(":uikit"))
 }

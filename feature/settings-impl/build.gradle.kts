@@ -1,40 +1,37 @@
 plugins {
-    id("com.android.library")
-    kotlin("android")
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
 }
+
+apply(from = "${rootDir}/gradle/common.gradle")
 
 android {
     namespace = "org.ton.wallet.feature.settings.impl"
-    compileSdk = Config.Build.compileSdk
-    defaultConfig {
-        minSdk = Config.Build.minSdk
-    }
     buildFeatures {
         buildConfig = true
     }
-    kotlinOptions.jvmTarget = Config.Version.jvmTarget
 }
 
 dependencies {
-    implementation(Config.Lib.conductor)
-    implementation(Config.Lib.easyPermissions)
-    implementation(Config.Lib.recyclerView)
+    implementation(libs.conductor)
+    implementation(libs.easyPermissions)
+    implementation(libs.recyclerview)
 
-    implementation(project(Config.Module.dataCore))
-    implementation(project(Config.Module.dataAuthApi))
-    implementation(project(Config.Module.dataNotificationsApi))
-    implementation(project(Config.Module.dataSettingsApi))
-    implementation(project(Config.Module.dataWalletApi))
-    implementation(project(Config.Module.domainSettingsApi))
-    implementation(project(Config.Module.featurePasscodeApi))
-    implementation(project(Config.Module.featureSettingsApi))
+    implementation(project(":data:core"))
+    implementation(project(":data:auth-api"))
+    implementation(project(":data:notifications-api"))
+    implementation(project(":data:settings-api"))
+    implementation(project(":data:wallet-api"))
+    implementation(project(":domain:settings-api"))
+    implementation(project(":feature:passcode-api"))
+    implementation(project(":feature:settings-api"))
 
-    implementation(project(Config.Module.libCore))
-    implementation(project(Config.Module.libCoreUi))
-    implementation(project(Config.Module.libLists))
-    implementation(project(Config.Module.libScreen))
-    implementation(project(Config.Module.libSecurity))
-    implementation(project(Config.Module.strings))
-    implementation(project(Config.Module.uicomponents))
-    implementation(project(Config.Module.uikit))
+    implementation(project(":lib:core"))
+    implementation(project(":lib:core-ui"))
+    implementation(project(":lib:lists"))
+    implementation(project(":lib:screen"))
+    implementation(project(":lib:security"))
+    implementation(project(":strings"))
+    implementation(project(":uicomponents"))
+    implementation(project(":uikit"))
 }

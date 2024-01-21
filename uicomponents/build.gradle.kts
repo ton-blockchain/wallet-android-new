@@ -1,29 +1,26 @@
 plugins {
-    id("com.android.library")
-    kotlin("android")
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
 }
+
+apply(from = "${rootDir}/gradle/common.gradle")
 
 android {
     namespace = "org.ton.wallet.uicomponents"
-    compileSdk = Config.Build.compileSdk
-    defaultConfig {
-        minSdk = Config.Build.minSdk
-    }
-    kotlinOptions.jvmTarget = Config.Version.jvmTarget
 }
 
 dependencies {
-    implementation(Config.Lib.activity)
-    implementation(Config.Lib.appCompat)
-    implementation(Config.Lib.core)
-    implementation(Config.Lib.recyclerView)
+    implementation(libs.activity)
+    implementation(libs.appcompat)
+    implementation(libs.core)
+    implementation(libs.recyclerview)
 
-    implementation(project(Config.Module.libCore))
-    implementation(project(Config.Module.libCoreUi))
-    implementation(project(Config.Module.libLists))
-    implementation(project(Config.Module.libLog))
-    implementation(project(Config.Module.libRLottie))
+    implementation(project(":lib:core"))
+    implementation(project(":lib:core-ui"))
+    implementation(project(":lib:lists"))
+    implementation(project(":lib:log"))
+    implementation(project(":lib:rlottie"))
 
-    implementation(project(Config.Module.strings))
-    implementation(project(Config.Module.uikit))
+    implementation(project(":strings"))
+    implementation(project(":uikit"))
 }

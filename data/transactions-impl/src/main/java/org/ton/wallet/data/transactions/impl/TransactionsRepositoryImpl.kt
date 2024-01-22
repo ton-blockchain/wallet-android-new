@@ -3,8 +3,7 @@ package org.ton.wallet.data.transactions.impl
 import android.util.Base64
 import drinkless.org.ton.TonApi
 import drinkless.org.ton.TonApi.QueryInfo
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.*
 import org.ton.block.*
 import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
@@ -25,7 +24,9 @@ class TransactionsRepositoryImpl(
     private val transactionsDao: TransactionsDao
 ) : TransactionsRepository {
 
-    override val transactionsAddedFlow: Flow<TransactionDto?> = MutableSharedFlow()
+    override val hasPendingTransactionsFlow = MutableSharedFlow<Boolean>()
+    override val transactionsAddedFlow = MutableSharedFlow<TransactionDto?>()
+    override val transactionsLocalIdChangedFlow = MutableSharedFlow<Long>()
 
     override suspend fun getTransaction(internalId: Long): TransactionDto? {
         return transactionsDao.get(internalId)
@@ -49,7 +50,7 @@ class TransactionsRepositoryImpl(
         }
 
         // collect pending transactions
-        val nonExecutedTransactions = transactionsDao.getAllNonExecuted(account.id)
+        val nonExecutedTransactions = transactionsDao.getAllNonExecuted(account.id).toMutableList()
 
         // load transactions from api
         val accountAddress = TonApi.AccountAddress(account.address)
@@ -80,10 +81,13 @@ class TransactionsRepositoryImpl(
 
             // check if this transaction was non-executed locally
             var foundNonExecuted = false
-            for (nonExecutedTransaction in nonExecutedTransactions) {
+            for (i in nonExecutedTransactions.size - 1 downTo 0) {
+                val nonExecutedTransaction = nonExecutedTransactions[i]
                 if (nonExecutedTransaction.hash == dto.hash || nonExecutedTransaction.hash == Base64.encodeToString(rawTransaction.inMsg.bodyHash, Base64.NO_WRAP)) {
                     transactionsDao.update(nonExecutedTransaction.internalId, dto)
+                    transactionsLocalIdChangedFlow.emit(nonExecutedTransaction.internalId)
                     foundNonExecuted = true
+                    nonExecutedTransactions.removeAt(i)
                 }
             }
 
@@ -92,6 +96,8 @@ class TransactionsRepositoryImpl(
                 newDtoList.add(dto)
             }
         }
+
+        hasPendingTransactionsFlow.emit(nonExecutedTransactions.isNotEmpty())
 
         // put new transactions into db
         try {
@@ -154,7 +160,8 @@ class TransactionsRepositoryImpl(
         val internalId = transactionsDao.add(sendParams.account.id, transaction)
         if (internalId != null) {
             transaction.internalId = internalId
-            (transactionsAddedFlow as MutableSharedFlow).emit(transaction)
+            transactionsAddedFlow.emit(transaction)
+            hasPendingTransactionsFlow.emit(true)
         }
 
         val amount = transaction.outMessages?.sumOf { it.amount ?: 0L } ?: 0L

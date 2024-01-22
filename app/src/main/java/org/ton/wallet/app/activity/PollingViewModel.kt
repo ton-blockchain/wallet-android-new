@@ -2,13 +2,13 @@ package org.ton.wallet.app.activity
 
 import android.content.SharedPreferences
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import org.ton.wallet.app.Injector
 import org.ton.wallet.app.action.TonConnectEventHandler
 import org.ton.wallet.data.core.DefaultPrefsKeys
 import org.ton.wallet.data.prices.api.PricesRepository
 import org.ton.wallet.data.settings.api.SettingsRepository
+import org.ton.wallet.data.transactions.api.TransactionsRepository
 import org.ton.wallet.domain.wallet.api.RefreshCurrentAccountStateUseCase
 import org.ton.wallet.lib.log.L
 import org.ton.wallet.lib.tonconnect.TonConnectClient
@@ -22,6 +22,7 @@ class PollingViewModel : BaseViewModel() {
     private val pricesRepository: PricesRepository by inject()
     private val preferences: SharedPreferences by inject(Injector.DefaultSharedPreferences)
     private val settingsRepository: SettingsRepository by inject()
+    private val transactionsRepository: TransactionsRepository by inject()
 
     private val jobsMap = mutableMapOf<String, Job>()
 
@@ -29,13 +30,20 @@ class PollingViewModel : BaseViewModel() {
         initPolling("fiatPrices", 60_000) {
             pricesRepository.fetchPrices()
         }
-        initPolling("accountState", 30_000) {
-            try {
-                refreshCurrentAccountStateUseCase.invoke()
-            } catch (e: Exception) {
-                L.e(e)
+
+        transactionsRepository.hasPendingTransactionsFlow
+            .distinctUntilChanged()
+            .onEach { hasPending ->
+                val intervalMs = if (hasPending) 5_000L else 30_000L
+                initPolling("accountState", intervalMs) {
+                    try {
+                        refreshCurrentAccountStateUseCase.invoke()
+                    } catch (e: Exception) {
+                        L.e(e)
+                    }
+                }
             }
-        }
+            .launchIn(viewModelScope + Dispatchers.IO)
 
         settingsRepository.accountTypeFlow
             .onEach {
@@ -67,7 +75,9 @@ class PollingViewModel : BaseViewModel() {
                     L.d("polling $name")
                     action.invoke()
                 }.onFailure { throwable ->
-                    L.e(throwable)
+                    if (throwable !is CancellationException) {
+                        L.e(throwable)
+                    }
                     delay(failureDelay)
                     failureDelay *= 2
                 }.onSuccess {

@@ -4,9 +4,8 @@ import android.app.Activity
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import org.ton.wallet.core.Res
 import org.ton.wallet.coreui.Formatter
 import org.ton.wallet.data.transactions.api.TransactionsRepository
@@ -62,6 +61,12 @@ class TransactionDetailsViewModel(args: TransactionDetailsScreenArguments) : Bas
                 screenApi.navigateBack()
             }
         }
+
+        transactionsRepository.transactionsLocalIdChangedFlow
+            .distinctUntilChanged()
+            .filter { it == args.internalId }
+            .onEach { transactionFlow.value = transactionsRepository.getTransaction(args.internalId) }
+            .launchIn(viewModelScope + Dispatchers.IO)
     }
 
     fun onButtonClicked(activity: Activity) {
@@ -120,16 +125,12 @@ class TransactionDetailsViewModel(args: TransactionDetailsScreenArguments) : Bas
         }
 
         // status
-        val status: CharSequence? = when (transaction.status) {
+        val status: CharSequence = when (transaction.status) {
             TransactionStatus.Executed -> {
                 val timestampSec = transaction.timestampSec
-                if (timestampSec == null) {
-                    null
-                } else {
-                    val dateString = Formatter.getFullDateString(timestampSec * 1000)
-                    val timeString = Formatter.getTimeString(timestampSec * 1000)
-                    Res.str(RString.date_at_time, dateString, timeString)
-                }
+                val dateString = Formatter.getFullDateString(timestampSec * 1000)
+                val timeString = Formatter.getTimeString(timestampSec * 1000)
+                Res.str(RString.date_at_time, dateString, timeString)
             }
             TransactionStatus.Pending -> {
                 val stringBuilder = SpannableStringBuilder(Res.str(RString.pending))

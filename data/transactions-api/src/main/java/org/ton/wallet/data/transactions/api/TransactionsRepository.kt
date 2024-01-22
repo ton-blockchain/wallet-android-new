@@ -8,7 +8,9 @@ import org.ton.wallet.data.wallet.api.model.AccountDto
 
 interface TransactionsRepository : BaseRepository {
 
+    val hasPendingTransactionsFlow: Flow<Boolean>
     val transactionsAddedFlow: Flow<TransactionDto?>
+    val transactionsLocalIdChangedFlow: Flow<Long>
 
     suspend fun getTransaction(internalId: Long): TransactionDto?
 

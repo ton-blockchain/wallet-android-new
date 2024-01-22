@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.biometric)
     implementation(libs.browser)
     implementation(libs.conductor)
+    implementation(libs.coroutines)
     implementation(libs.easyPermissions)
     implementation(libs.serializationJson)
     implementation(platform(libs.okHttpBom))

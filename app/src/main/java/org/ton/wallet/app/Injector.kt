@@ -248,11 +248,6 @@ object Injector {
                     walletRepository = getInstance()
                 )
             }
-            factory<GetTransactionDetailsUseCase> {
-                GetTransactionDetailsUseCaseImpl(
-                    transactionsRepository = getInstance()
-                )
-            }
             factory<GetTransactionsUseCase> {
                 GetTransactionsUseCaseImpl(
                     accountsRepository = getInstance(),

@@ -131,17 +131,6 @@ class ImportController(args: Bundle?) : BaseInputListController<ImportViewModel>
         slidingHeaderController?.onScrollChange(v, scrollX, scrollY, oldScrollX, oldScrollY)
     }
 
-    override fun onWordSelected(word: String) {
-        super.onWordSelected(word)
-        currentFocusedEditText?.let { et ->
-            et.setTextWithSelection(word)
-            val editTextPosition = inputLayouts.indexOfFirst { it.editText == et }
-            if (editTextPosition == inputLayouts.size - 1) {
-                et.clearFocus()
-            }
-        }
-    }
-
     override fun onDoneClicked() {
         if (checkInputs()) {
             viewModel.onDoneClicked()

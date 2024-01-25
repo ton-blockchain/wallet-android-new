@@ -63,8 +63,10 @@ class MainScreenViewModel : BaseViewModel() {
 
         getCurrentAccountDataUseCase.getAccountStateFlow()
             .distinctUntilChanged()
-            .onEach {
+            .onStart {
                 _transactionsFlow.value = null
+            }
+            .onEach {
                 loadCachedTransactions()
                 refreshTransactions()
             }

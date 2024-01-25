@@ -12,6 +12,7 @@ import org.ton.wallet.data.core.util.LoadType
 import org.ton.wallet.data.settings.api.SettingsRepository
 import org.ton.wallet.data.transactions.api.TransactionsRepository
 import org.ton.wallet.data.transactions.api.model.TransactionDto
+import org.ton.wallet.data.transactions.api.model.TransactionStatus
 import org.ton.wallet.data.wallet.api.AccountsRepository
 import org.ton.wallet.data.wallet.api.model.AccountDto
 import org.ton.wallet.domain.blockhain.api.AddressType
@@ -127,15 +128,15 @@ class GetTransactionsUseCaseImpl(
             feeString = Res.str(RString.fee_storage, feeDecimal.toPlainString())
         }
 
-        val timestampSec = dto.timestampSec
         var timeString: String? = null
-        if (timestampSec != null && timestampSec != 0L) {
-            timeString = Formatter.getTimeString(timestampSec * 1000)
+        if (dto.timestampSec != 0L) {
+            timeString = Formatter.getTimeString(dto.timestampSec * 1000)
         }
 
         return TransactionDataUiListItem(
             internalId = dto.internalId,
             type = dto.type,
+            isPending = dto.status == TransactionStatus.Pending,
             value = valueCharSequence,
             peerAddressShort = peerAddressBuilder,
             timeString = timeString,

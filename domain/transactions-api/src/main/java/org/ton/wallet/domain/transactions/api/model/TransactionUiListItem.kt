@@ -9,6 +9,7 @@ class TransactionHeaderUiListItem(val title: String) : TransactionBaseUiListItem
 class TransactionDataUiListItem(
     val internalId: Long,
     val type: TransactionDto.Type,
+    val isPending: Boolean,
     val value: CharSequence?,
     val peerAddressShort: CharSequence?,
     val timeString: String?,

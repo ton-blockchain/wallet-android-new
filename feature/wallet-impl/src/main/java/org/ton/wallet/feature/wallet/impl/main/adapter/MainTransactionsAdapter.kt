@@ -19,6 +19,7 @@ import org.ton.wallet.feature.wallet.impl.main.MainScreenAdapterHolder
 import org.ton.wallet.lib.lists.RecyclerAdapter
 import org.ton.wallet.lib.lists.RecyclerHolder
 import org.ton.wallet.strings.RString
+import org.ton.wallet.uicomponents.drawable.IndeterminateProgressDrawable
 import org.ton.wallet.uikit.*
 
 internal class MainTransactionsAdapter(
@@ -101,6 +102,7 @@ internal class MainTransactionsAdapter(
         private val peerAddressText = TextView(parent.context)
         private val feeText = TextView(parent.context)
         private val messageText = TextView(parent.context)
+        private val pendingDrawable = IndeterminateProgressDrawable(Res.dp(13))
 
         init {
             val constraintLayout = itemView as ConstraintLayout
@@ -130,6 +132,7 @@ internal class MainTransactionsAdapter(
             constraintLayout.addView(peerTypeText, ConstraintLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT))
 
             timeText.id = ViewCompat.generateViewId()
+            timeText.compoundDrawablePadding = Res.dp(5)
             timeText.includeFontPadding = false
             timeText.setTextColor(Res.color(R.color.text_secondary))
             timeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
@@ -190,6 +193,9 @@ internal class MainTransactionsAdapter(
             constraintSet.connect(messageText.id, ConstraintSet.END, timeText.id, ConstraintSet.START, Res.dp(8))
 
             constraintSet.applyTo(constraintLayout)
+
+            pendingDrawable.setColor(Res.color(R.color.text_secondary))
+            pendingDrawable.setStrokeWidth(Res.dp(1.5f))
         }
 
         override fun bind(item: TransactionDataUiListItem) {
@@ -206,12 +212,15 @@ internal class MainTransactionsAdapter(
 
             peerAddressText.text = item.peerAddressShort
             peerAddressText.isVisible = item.peerAddressShort != null
-            timeText.text = item.timeString
-            timeText.isVisible = item.timeString != null
             feeText.text = item.feeString
             feeText.isVisible = item.feeString != null
             messageText.text = item.messageText
             messageText.isVisible = !item.messageText.isNullOrEmpty()
+
+            timeText.text = item.timeString
+            timeText.isVisible = item.timeString != null
+            val timeStartDrawable = if (item.isPending) pendingDrawable else null
+            timeText.setCompoundDrawablesRelativeWithIntrinsicBounds(timeStartDrawable, null, null, null)
         }
 
         override fun onClick(v: View?) {
